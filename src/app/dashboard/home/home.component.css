@@ -1,0 +1,53 @@
+.menu-spacer {
+  margin-left: 10px;
+}
+
+.header-image {
+  background-image: url('/imagens/logo.webp');
+  background-size: cover;
+  margin-left: 20px;
+}
+
+.dashboard-container {
+  height: 100vh;
+}
+
+.sidenav {
+  background-color: #08080f;
+  width: 250px;
+  transition: width 0.3s ease;
+}
+
+.sidenav.mat-drawer-collapsed {
+  width: 70px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  background-color: #3233A6;
+  ;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.content {
+  padding: 20px;
+}
+
+.mdc-list-item {
+  display: flex; /* Garante layout flexível */
+  align-items: center; /* Alinha verticalmente ícones e textos */
+}
+
+.mdc-list-item mat-icon {
+  margin-right: 8px; /* Espaço entre o ícone e o texto */
+  font-size: 24px; /* Tamanho padrão do ícone */
+  line-height: 1; /* Ajusta altura da linha para centralização */
+}
+
+.mdc-list-item span {
+  vertical-align: top; /* Garante alinhamento do texto com o ícone */
+}

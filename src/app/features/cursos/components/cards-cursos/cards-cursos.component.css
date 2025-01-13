@@ -1,0 +1,70 @@
+.grid-list {
+  display: flex;
+  justify-content: flex-start; /* Alinhamento à esquerda */
+  align-items: flex-start; /* Alinhamento superior */
+}
+
+.grid-list {
+  justify-content: start; /* Alinha os itens à esquerda */
+  align-items: start; /* Alinha os itens no topo */
+  margin: 10px;
+}
+
+.courses-header {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+  align-content: stretch;
+}
+
+.edit-button {
+  margin-right: 5px;
+}
+
+.add-button {
+  margin-right: 50px;
+}
+
+
+.card {
+  max-width: 400px;
+  margin: 10px;
+}
+
+.card:hover {
+  box-shadow: 0 8px 16px rgba(200, 198, 198, 0.2);
+  transform: translateY(-1px); /* Eleva o card levemente */
+}
+
+.card-header {
+  background-color: #3233A6;
+  border-top-left-radius: 10px; /* Ajuste para coincidir com o mat-card */
+  border-top-right-radius: 10px;
+  overflow: hidden;
+}
+
+.header-image {
+  background-image: url('/imagens/curso-header.png');
+  background-size: cover;
+}
+
+.card-image {
+  background-size: cover;
+}
+
+button {
+  margin-right: 5px;
+  background-color: #505093;
+}
+
+mat-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: right;
+}
+
+.mat-tooltip {
+  z-index: 1000;
+}

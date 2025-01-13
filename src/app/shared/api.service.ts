@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +13,7 @@ export class ApiService {
   private tokenSubject: BehaviorSubject<string | null>;
   public token: Observable<string | null>;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
     const token = this.isLocalStorageAvailable() ? localStorage.getItem('token') : null;
     this.tokenSubject = new BehaviorSubject<string | null>(token);
     this.token = this.tokenSubject.asObservable();
@@ -37,6 +39,7 @@ export class ApiService {
   logout(): void {
     localStorage.removeItem('token');
     this.tokenSubject.next(null);
+    this.router.navigate(['/login']);
   }
 
 
@@ -49,5 +52,20 @@ export class ApiService {
   }
 
 
+  // Decodifica e valida o token
+  isTokenValid(): boolean {
+    const token = this.getToken();
+    if (!token) {
+      return false; // Sem token, não é válido
+    }
+
+    try {
+      const decoded: any = jwtDecode(token);
+      const currentTime = Math.floor(Date.now() / 1000); // Tempo atual em segundos
+      return decoded.exp > currentTime; // Verifica se o token ainda não expirou
+    } catch (error) {
+      return false; // Se a decodificação falhar, o token é inválido
+    }
+  }
 
 }

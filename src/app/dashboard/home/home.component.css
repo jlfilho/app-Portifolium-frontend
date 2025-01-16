@@ -6,6 +6,12 @@
   background-image: url('/imagens/logo.webp');
   background-size: cover;
   margin-left: 20px;
+  margin-bottom: 0px;
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  object-fit: cover;
 }
 
 .dashboard-container {

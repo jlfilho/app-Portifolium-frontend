@@ -21,12 +21,13 @@
 
 .edit-button {
   margin-right: 5px;
+  background-color: #505093;
 }
 
 .add-button {
   margin-right: 50px;
+  background-color: #505093;
 }
-
 
 .card {
   max-width: 400px;

@@ -37,11 +37,12 @@
             alt="Logo do curso {{curso.nome}}" width="398" height="318" priority
           />
           <mat-card-actions>
-            <button mat-icon-button
+            <button [routerLink]="['/atividades', curso.id]" mat-icon-button
             matTooltip="Gerenciar as atividades do curso."
             matTooltipPosition="above"
             matTooltipHideDelay="1000">
               <mat-icon>hub</mat-icon>
+
             </button>
             <button mat-icon-button
             matTooltip="Permissão de usuários para gerenciar o curso."

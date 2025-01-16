@@ -1,0 +1,81 @@
+.card-activity{
+  width: 250px;
+  height: auto;
+  gap: 0px;
+  border-radius: 15px 15px 15px 15px;
+  box-shadow: 3px 3px 6px 0px rgba(101, 101, 101, 0.95);
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  align-content: center;
+  gap: 0px;
+  background: #D0D0D9;
+}
+
+.card-activity:hover{
+  width: 250px;
+  height: auto;
+  border-radius: 15px 15px 15px 15px;
+  box-shadow: 3px 3px 22px 0px rgba(101, 101, 101, 0.95);
+}
+
+.card-activity-header{
+  width: 250px;
+  height: 187.5px;
+  gap: 0px;
+  border-radius: 15px 15px 0px 0px;
+  opacity: 0px;
+}
+
+.card-activity-content{
+  width: 250px;
+  height: 206.77px;
+  top: 205px;
+  padding: 12px 0px 12px 0px;
+  gap: 0px;
+  border-radius: 0px 0px 15px 15px;
+  opacity: 0px;
+  background: #D0D0D9;
+  color: #000000;
+}
+
+.card-activity-actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  gap: 0px;
+  margin-top: 10px;
+}
+
+.card-activity-title{
+  color:#1A1A1A;
+  margin-left: 10px;
+}
+
+.card-activity-description{
+  margin-left: 10px;
+}
+
+.card-activity-actions button{
+  background-color:  #3233A6;
+  color: #FFFFFF;
+}
+
+.horizontal-line{
+  width: 100%; /* A largura da linha ocupa toda a área */
+  height: 2px; /* Altura da linha, ajuste conforme necessário */
+  background: linear-gradient(
+    90deg,
+    rgba(179, 179, 179, 0.4) 0%,
+    rgba(77, 77, 77, 0.4) 52.5%,
+    rgba(174, 174, 174, 0.4) 100%
+  );
+  border: none;
+}
+
+

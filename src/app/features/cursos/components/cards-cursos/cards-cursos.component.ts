@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule, NgOptimizedImage  } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
-import {MatCardModule} from '@angular/material/card';
+import { MatCardModule } from '@angular/material/card';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatButtonModule} from '@angular/material/button';
@@ -13,7 +14,7 @@ import { CursosService } from '../../services/cursos.service';
 
 @Component({
   selector: 'acadmanage-cards-cursos',
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatGridListModule, NgOptimizedImage, MatDividerModule, MatIconModule, MatTooltipModule],
+  imports: [CommonModule, RouterModule, MatCardModule, MatButtonModule, MatGridListModule, NgOptimizedImage, MatDividerModule, MatIconModule, MatTooltipModule],
   templateUrl: './cards-cursos.component.html',
   styleUrl: './cards-cursos.component.css'
 })

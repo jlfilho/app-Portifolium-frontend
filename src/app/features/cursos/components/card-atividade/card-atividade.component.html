@@ -1,0 +1,19 @@
+<div class="card-activity">
+  <div>
+    <img class="card-activity-header" ngSrc="{{urlBase}}{{atividade.fotoCapa}}" alt="Imagem de cada da atividade {{ atividade.nome}}" width="205" height="205" priority />
+  </div>
+  <div class="card-activity-content">
+    <div class="card-activity-title">
+      <h3>{{ atividade.nome }}</h3>
+    </div>
+    <div class="card-activity-description">
+      <p><span style="color:#4D4D4D;">Coordenador(a): </span> <span style="color: #333333;">{{ atividade.coordenador }}</span></p>
+      <p><span style="color:#4D4D4D;">Categoria: </span> <span style="color: #333333;">{{ atividade.categoria.nome }}</span></p>
+      <p><span style="color:#4D4D4D;">Data Realização: </span> <span style="color: #333333;">{{ atividade.dataRealizacao | date:'dd/MM/yyyy' }}</span></p>
+    </div>
+    <div class="horizontal-line"></div>
+    <div class="card-activity-actions">
+        <button  mat-flat-button>Saiba mais</button>
+    </div>
+  </div>
+</div>

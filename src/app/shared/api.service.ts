@@ -37,8 +37,10 @@ export class ApiService {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    this.tokenSubject.next(null);
+    if (this.isLocalStorageAvailable()) {
+      localStorage.removeItem('token');
+      this.tokenSubject.next(null);
+    }
     this.router.navigate(['/login']);
   }
 

@@ -1,0 +1,61 @@
+<div class="courses-container">
+  <div class="header">
+    <h2>Bem-vindo ao portfólio de atividades do {{ curso.nome }}!</h2>
+    <span class="space"></span>
+
+    <button mat-icon-button class="add-button"
+              matTooltip="Adicionar nova atividade."
+              matTooltipPosition="above"
+              matTooltipHideDelay="1000">
+                <mat-icon>add</mat-icon>
+    </button>
+  </div>
+  <mat-divider></mat-divider>
+  <!-- Mostra mensagem de erro caso ocorra -->
+  <div *ngIf="errorMessage" class="error">
+    {{ errorMessage }}
+  </div>
+
+  <div class="categories">
+    <h3>Categorias</h3>
+    <p class="toolbar-categories">
+      <span class="spacer"></span>
+      <mat-button-toggle-group class="custom-toggle-group" name="options" aria-label="Group of buttons">
+        <mat-button-toggle value="todas">Todas</mat-button-toggle>
+      @for(categoria of categorias; track $index) {
+        <mat-button-toggle value="{{categoria.id}}">{{categoria.nome}}</mat-button-toggle>
+      }
+      </mat-button-toggle-group>
+      <span class="spacer"></span>
+      <button mat-icon-button aria-label="Example icon button with a vertical three dot icon">
+        <mat-icon>tune</mat-icon>
+      </button>
+    </p>
+  </div>
+  <div class="horizontal-line"></div>
+
+  <div class="search-container">
+    <mat-form-field class="search" appearance="outline">
+      <mat-icon matPrefix>search</mat-icon> <!-- Ícone antes do campo -->
+      <input  matInput placeholder="Buscar por título"> <!-- Adicione 'matInput' aqui -->
+    </mat-form-field>
+    <button class="custom-button" mat-raised-button>Pesquisar</button>
+  </div>
+
+  @for(categoria of categorias; track $index) {
+    <div class="cards-container">
+      <div class="cards-header">
+        <h4>{{categoria.nome}}</h4>
+        <span class="space"></span>
+        <button mat-button class="mat-button">Exibir todos</button>
+      </div>
+      <div class="horizontal-line"></div>
+      <div class="cards">
+        @for (atividade of categoria.atividades; track $index) {
+          <acadmanage-card-atividade [atividade]="atividade"></acadmanage-card-atividade>
+        }
+      </div>
+    </div>
+  }
+
+</div>

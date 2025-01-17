@@ -1,0 +1,99 @@
+.title{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.content{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  align-content: flex-start;
+  gap: 0px;
+  width: 90%;
+  background-color: #c9c6c6;
+  color: #1e1e1e;
+  border-radius: 20px;
+  padding: 40px 40px 40px 90px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.content p{
+  padding: 0px;
+  margin: 8px;
+}
+
+
+.horizontal-line{
+  width: 100%; /* A largura da linha ocupa toda a área */
+  height: 2px; /* Altura da linha, ajuste conforme necessário */
+  background: linear-gradient(
+    90deg,
+    rgba(179, 179, 179, 0.4) 0%,
+    rgba(77, 77, 77, 0.4) 52.5%,
+    rgba(174, 174, 174, 0.4) 100%
+  );
+  border: none;
+}
+
+.evidencias {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.title-evidencias{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+  align-content: stretch;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.add-button {
+  margin-right: 50px;
+  background-color: #505093;
+}
+
+.foto-legenda{
+  display: block;
+  flex-direction: column;
+}
+
+.foto-legenda .image-container {
+  width: 305px;
+  height: 305px;
+  position: relative; /* Importante para o comportamento do `fill` */
+  overflow: hidden; /* Esconde partes que extrapolam o contêiner */
+}
+
+.foto{
+  object-fit: cover; /* Ajusta a imagem sem distorcer */
+  border-radius: 5%;
+  box-shadow: 2px 2px 2px #6e6d6d;
+}
+
+.foto:hover{
+  box-shadow: 3px 3px 3px rgba(234, 233, 233, 0.8);
+  transform: translateY(-1px); /* Eleva o card levemente */
+}
+
+.foto-legenda p{
+  margin-left: 20px;
+}

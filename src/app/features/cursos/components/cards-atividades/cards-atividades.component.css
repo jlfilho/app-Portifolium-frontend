@@ -112,6 +112,18 @@
   background-color: #505093 !important; /* Define a cor de fundo */
 }
 
+.mat-button{
+  color: #3233A6 !important;
+}
+
+.mat-button:hover{
+  background-color: #cbcbce !important;
+}
+
+.mat-button:active{
+  background-color: #d8d8dc !important;
+}
+
 .search{
   display: block;
   width: 50%;
@@ -152,4 +164,5 @@
 .custom-toggle-group .mat-button-toggle.mat-focus-indicator {
   box-shadow: 0 0 3px #3233A6; /* Destaque no foco */
 }
+
 

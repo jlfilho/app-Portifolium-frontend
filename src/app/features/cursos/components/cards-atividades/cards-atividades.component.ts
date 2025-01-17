@@ -1,23 +1,22 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { Location } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatGridListModule } from '@angular/material/grid-list';
-import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatFormFieldModule } from '@angular/material/form-field';
-
 
 import { Categoria } from '../../../../shared/models/categoria.model';
 import { Curso } from '../../../../shared/models/curso.model';
 import { CursosService } from '../../services/cursos.service';
 import { CardAtividadeComponent } from '../card-atividade/card-atividade.component';
 import { MatInputModule } from '@angular/material/input';
-
 
 @Component({
   selector: 'acadmanage-cards-atividades',
@@ -33,7 +32,7 @@ export class CardsAtividadesComponent implements OnInit {
   errorMessage: string = ''; // Mensagem de erro (caso ocorra)
 
 
-  constructor(private cursosService: CursosService, private route: ActivatedRoute) {
+  constructor(private cursosService: CursosService, private route: ActivatedRoute, private location: Location) {
     // Extrai o parâmetro 'id' da URL
     this.route.params.subscribe(params => {
       this.cursoId = +params['id']; // Converte para número se necessário
@@ -44,6 +43,10 @@ export class CardsAtividadesComponent implements OnInit {
 
     ngOnInit(): void {
       this.listCategorias();
+    }
+
+    voltar(): void {
+      this.location.back(); // Retorna para a tela anterior
     }
 
     listCategorias(): void {

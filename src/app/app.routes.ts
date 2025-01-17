@@ -10,6 +10,7 @@ import { FormUsuarioComponent } from './features/usuarios/components/form-usuari
 import { ListaUsuariosComponent } from './features/usuarios/components/lista-usuarios/lista-usuarios.component';
 import { authGuard } from './shared/auth.guard';
 import { NotFoundComponent } from './shared/not-found/not-found.component';
+import { DetalheAtividadeComponent } from './features/cursos/components/detalhe-atividade/detalhe-atividade.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -18,6 +19,7 @@ export const routes: Routes = [
       { path: 'dashboard', component: GraficosComponent },
       { path: 'cursos', component: CardsCursosComponent },
       { path: 'atividades/:id', component: CardsAtividadesComponent },
+      { path: 'atividades/detalhe/:id', component: DetalheAtividadeComponent, pathMatch: 'full' },
       { path: 'categorias', component: ListaCategoriasComponent },
       { path: 'formcategoria', component: FormCategoriaComponent },
       { path: 'usuarios', component: ListaUsuariosComponent },

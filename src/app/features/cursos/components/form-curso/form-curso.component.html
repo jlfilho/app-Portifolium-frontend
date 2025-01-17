@@ -1,0 +1,25 @@
+@if(data.curso.id==0){
+  <h1 mat-dialog-title>Novo Curso:</h1>
+} @else {
+  <h1 mat-dialog-title>Editar Curso:</h1>
+}
+<div mat-dialog-content>
+  <form [formGroup]="cursoForm">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Nome do Curso:</mat-label>
+      <input matInput formControlName="nome" />
+      <mat-error *ngIf="cursoForm.get('nome')?.hasError('required')">
+        O nome é obrigatório.
+      </mat-error>
+      <mat-error *ngIf="cursoForm.get('nome')?.hasError('minlength')">
+        O nome deve ter pelo menos 8 caracteres.
+      </mat-error>
+    </mat-form-field>
+  </form>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="save()" [disabled]="!cursoForm.valid">
+    Salvar
+  </button>
+</div>

@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Categoria } from '../../../shared/models/categoria.model';
 import { Curso } from '../../../shared/models/curso.model';
+import { Atividade } from '../../../shared/models/atividade.model';
+import { Evidencia } from '../../../shared/models/evidencia.model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +15,7 @@ export class CursosService {
   constructor(private http: HttpClient) {}
 
   // Método para buscar a lista de cursos do usuário autenticado
-  getUserCourses(): Observable<any> {
+  getUserCourses(): Observable<Curso[]> {
     const token = localStorage.getItem('token'); // Obtém o token JWT armazenado
 
     // Configura os headers com o token de autenticação
@@ -22,7 +24,7 @@ export class CursosService {
     });
 
     // Faz a requisição GET ao endpoint
-    return this.http.get<any>(`${this.baseUrl}/cursos/usuarios`, { headers });
+    return this.http.get<Curso[]>(`${this.baseUrl}/cursos/usuarios`, { headers });
   }
 
   getAllCourses(): Observable<any> {
@@ -36,7 +38,6 @@ export class CursosService {
   getAllCategories(): Observable<any> {
     return this.http.get(`${this.baseUrl}/categorias`);
   }
-
 
   getCategoriasPorCurso(
     cursoId: number,
@@ -69,7 +70,43 @@ export class CursosService {
     return this.http.get<Curso>(`${this.baseUrl}/cursos/${courseId}`);
   }
 
+  getAtividadeById(atividadeId: number): Observable<Atividade> {
+    return this.http.get<Atividade>(`${this.baseUrl}/atividades/${atividadeId}`);
+  }
+
   getAtividadesByCursoId(cursoId: number): Observable<any> {
     return this.http.get(`${this.baseUrl}/atividades/curso/${cursoId}`);
   }
+
+  getEvidenciasByAtividadeId(atividadeId: number): Observable<Evidencia[]> {
+    return this.http.get<Evidencia[]>(`${this.baseUrl}/evidencias/atividade/${atividadeId}`);
+  }
+
+  saveCurso(curso: Curso): Observable<Curso> {
+    const token = localStorage.getItem('token'); // Obtém o token JWT armazenado
+    // Configura os headers com o token de autenticação
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+    return this.http.post<Curso>(`${this.baseUrl}/cursos`, curso, { headers });
+  }
+
+  deleteCurso(cursoId: number): Observable<any> {
+    const token = localStorage.getItem('token'); // Obtém o token JWT armazenado
+    // Configura os headers com o token de autenticação
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+    return this.http.delete<any>(`${this.baseUrl}/cursos/${cursoId}`, { headers });
+  }
+
+  updateCurso(curso: Curso): Observable<Curso> {
+    const token = localStorage.getItem('token'); // Obtém o token JWT armazenado
+    // Configura os headers com o token de autenticação
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+    return this.http.put<Curso>(`${this.baseUrl}/cursos/${curso.id}`, curso, { headers });
+  }
+
 }

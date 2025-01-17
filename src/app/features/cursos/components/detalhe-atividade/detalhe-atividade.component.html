@@ -1,0 +1,58 @@
+<button mat-icon-button
+              matTooltip="Voltar para tela anterior."
+              matTooltipPosition="above"
+              (click)="voltar()"
+              matTooltipHideDelay="1000">
+                <mat-icon>arrow_back</mat-icon>
+</button>
+
+<div class="title">
+  <h1>{{atividade.nome}}</h1>
+</div>
+<div class="horizontal-line"></div>
+
+<div class="content">
+  <p><b>Nome:</b> {{atividade.nome}}</p>
+  <p><b>Categoria:</b> {{atividade.categoria?.nome}}</p>
+  <p><b>Público alvo:</b> {{atividade.publicoAlvo}}</p>
+  <p><b>Coordenador(a):</b> {{atividade.coordenador}}</p>
+  <p><b>Objetivo:</b> {{atividade.objetivo}}</p>
+  <p><b>Data de Início:</b> {{atividade.dataRealizacao | date:'dd/MM/yyyy'}}</p>
+  <p><b>Fonte financiadora:</b></p>
+  <ul>
+    @for(fonte of atividade.fontesFinanciadora; track $index) {
+      <li>{{fonte.nome}}</li>
+    }
+  </ul>
+  <p><b>Integrandes:</b> </p>
+  <ul>
+    @for(integrante of atividade.integrantes; track $index) {
+      <li>{{integrante.nome}} - {{integrante.cpf}} - {{integrante.papel}}</li>
+    }
+  </ul>
+</div>
+
+<div class="horizontal-line"></div>
+
+
+<div class="title-evidencias">
+    <h3>Evidências da atividade</h3>
+    <span class="space"></span>
+    <button mat-icon-button class="add-button"
+                matTooltip="Adicionar nova evidência."
+                matTooltipPosition="above"
+                matTooltipHideDelay="1000">
+                  <mat-icon>add</mat-icon>
+    </button>
+</div>
+
+<div class="evidencias">
+  @for(evidencia of evidencias; track $index) {
+      <div class="foto-legenda">
+        <div class="imagem-container">
+          <img class="foto" ngSrc="{{urlBase}}{{evidencia.foto}}" alt="Imagem de {{ evidencia.legenda}}" width="305" height="305"  priority />
+        </div>
+        <p>{{evidencia.legenda}}</p>
+      </div>
+  }
+</div>

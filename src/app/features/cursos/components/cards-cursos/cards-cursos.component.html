@@ -6,8 +6,10 @@
     <button mat-icon-button class="add-button"
               matTooltip="Adicionar novo curso."
               matTooltipPosition="above"
-              matTooltipHideDelay="1000">
-                <mat-icon>add</mat-icon>
+              matTooltipHideDelay="1000"
+              (click)="cadastarCursoDialog()"
+              >
+              <mat-icon>add</mat-icon>
     </button>
 </div>
   <mat-divider></mat-divider>
@@ -27,7 +29,8 @@
             <button mat-icon-button class="edit-button"
             matTooltip="Editar nome do curso."
             matTooltipPosition="above"
-            matTooltipHideDelay="1000">
+            matTooltipHideDelay="1000"
+            (click)="utualizarCursoDialog(curso)">
               <mat-icon>edit</mat-icon>
             </button>
           </mat-card-header>
@@ -59,7 +62,8 @@
             <button mat-icon-button
             matTooltip="Excluir curso."
             matTooltipPosition="above"
-            matTooltipHideDelay="1000">
+            matTooltipHideDelay="1000"
+            (click)="deleteCurso(curso)">
               <mat-icon>delete</mat-icon>
             </button>
           </mat-card-actions>

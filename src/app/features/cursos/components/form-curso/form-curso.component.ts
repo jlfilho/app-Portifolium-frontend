@@ -33,11 +33,12 @@ export class FormCursoComponent {
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<FormCursoComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { curso: { id: number; nome: string } }
+    @Inject(MAT_DIALOG_DATA) public data: { curso: { id: number; nome: string; ativo: boolean } }
   ) {
     this.cursoForm = this.fb.group({
       id: [data.curso.id],
       nome: [data.curso.nome, [Validators.required, Validators.minLength(8)]],
+      ativo: [data.curso.ativo],
     });
   }
 

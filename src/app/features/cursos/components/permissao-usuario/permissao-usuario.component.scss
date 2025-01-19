@@ -1,0 +1,74 @@
+.mat-elevation-z8{
+  margin-top: 30px;
+}
+
+table {
+  width: 100%;
+}
+
+.mat-mdc-form-field {
+  font-size: 14px;
+  width: 100%;
+}
+
+td, th {
+  width: 25%;
+}
+
+.button-row {
+  display: table-cell;
+  max-width: 300px;
+}
+
+.button-row .mat-mdc-button-base {
+  margin: 8px 8px 8px 0;
+}
+
+.flex-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  width: 70px;
+}
+
+button {
+  background-color: #3233A6;
+}
+
+
+.action-buttons {
+  padding-bottom: 20px;
+}
+
+.headers-align .mat-expansion-panel-header{
+  margin-top: 50px!important;
+}
+
+.headers-align .mat-expansion-panel-header-description {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.headers-align .mat-mdc-form-field + .mat-mdc-form-field {
+  margin-left: 8px;
+}
+
+.mat-expansion-panel-body {
+  justify-content: center;
+  align-items: center!important;
+  align-content: center;
+}
+
+.full-width {
+  width: 50%;
+  margin-right: 10px;
+}
+
+.add-button {
+  margin-bottom: 15px!important;
+}

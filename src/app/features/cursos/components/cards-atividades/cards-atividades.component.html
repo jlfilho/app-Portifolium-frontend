@@ -1,20 +1,25 @@
 <div class="courses-container">
+  <div class="toolbar">
   <button mat-icon-button
+              class="voltar-button"
               matTooltip="Voltar para tela anterior."
               matTooltipPosition="above"
               (click)="voltar()"
               matTooltipHideDelay="1000">
                 <mat-icon>arrow_back</mat-icon>
   </button>
-  <div class="header">
-    <h2>Bem-vindo ao portfólio de atividades do {{ curso.nome }}!</h2>
-    <span class="space"></span>
-    <button mat-icon-button class="add-button"
+  <span></span>
+  <button mat-icon-button class="add-button"
               matTooltip="Adicionar nova atividade."
               matTooltipPosition="above"
               matTooltipHideDelay="1000">
                 <mat-icon>add</mat-icon>
-    </button>
+  </button>
+  </div>
+  <div class="header">
+    <h2>Portfólio de Atividades de {{ curso.nome }}</h2>
+    <span class="space"></span>
+
   </div>
   <mat-divider></mat-divider>
   <!-- Mostra mensagem de erro caso ocorra -->

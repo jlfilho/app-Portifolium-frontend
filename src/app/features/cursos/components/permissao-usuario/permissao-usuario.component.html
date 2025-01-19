@@ -1,0 +1,90 @@
+<button mat-icon-button
+              matTooltip="Voltar para tela anterior"
+              matTooltipPosition="above"
+              (click)="voltar()"
+              matTooltipHideDelay="1000">
+                <mat-icon>arrow_back</mat-icon>
+</button>
+
+<div>
+  <h2>Permissões no curso</h2>
+  <mat-divider></mat-divider>
+  <!-- Mostra mensagem de erro caso ocorra -->
+  <div *ngIf="errorMessage" class="error">
+    {{ errorMessage }}
+  </div>
+
+  <mat-accordion class="headers-align" multi>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title> Adicionar permissão a usuário </mat-panel-title>
+        <mat-panel-description>
+          <span></span>
+          <mat-icon>group_add</mat-icon>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+        <mat-form-field class="full-width">
+          <mat-label>Nome do Usuário</mat-label>
+          <input type="text" matInput [formControl]="usuarioControl" [matAutocomplete]="auto">
+          <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn"
+          (optionSelected)="onUsuarioSelected($event.option.value)"
+          >
+            @for (usuario of filteredUsuarios | async; track usuario) {
+              <mat-option [value]="usuario">{{usuario.nome}}</mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <button class="add-button" mat-stroked-button
+        [disabled]="!usuarioSelecionado"
+        (click)="adicionarUsuario(usuarioSelecionado!.id)">
+          <mat-icon mat-raised-button>add</mat-icon>
+          Adicionar
+        </button>
+    </mat-expansion-panel>
+  </mat-accordion>
+
+
+  <div class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource" matSort>
+
+      <!-- Nome Column -->
+      <ng-container matColumnDef="usuario">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 10%;"> Usuario </th>
+        <td mat-cell *matCellDef="let row" style="width: 10%;"> {{row.usuarioNome}} </td>
+      </ng-container>
+
+      <!-- Nome Column -->
+      <ng-container matColumnDef="permissao">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 10%;"> Permissão </th>
+        <td mat-cell *matCellDef="let row" style="width: 10%;"> {{row.permissao | removeRole }} </td>
+      </ng-container>
+
+      <!-- Ação Column -->
+      <ng-container matColumnDef="acao">
+        <th mat-header-cell *matHeaderCellDef style="padding-left:30px;"> Ação </th>
+        <td mat-cell *matCellDef="let row">
+          <div class="button-row">
+            <div class="flex-container">
+              <div class="button-container">
+                <button mat-icon-button matTooltip="Remover permissão deste usuário."
+                matTooltipPosition="above"
+                matTooltipHideDelay="1000"
+                (click)="removerUsuario(row.usuarioId)">
+                  <mat-icon>remove</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Selecione páginas de categorias."></mat-paginator>
+  </div>
+
+</div>

@@ -1,13 +1,15 @@
-<button mat-icon-button
-              matTooltip="Voltar para tela anterior."
-              matTooltipPosition="above"
-              (click)="voltar()"
-              matTooltipHideDelay="1000">
-                <mat-icon>arrow_back</mat-icon>
+<button
+  class="voltar-button"
+  mat-icon-button
+  matTooltip="Voltar para tela anterior."
+  matTooltipPosition="above"
+  (click)="voltar()"
+  matTooltipHideDelay="1000">
+    <mat-icon>arrow_back</mat-icon>
 </button>
 
 <div class="title">
-  <h1>{{atividade.nome}}</h1>
+  <h2>{{atividade.nome}}</h2>
 </div>
 <div class="horizontal-line"></div>
 
@@ -39,7 +41,7 @@
     <h3>Evidências da atividade</h3>
     <span class="space"></span>
     <button mat-icon-button class="add-button"
-                matTooltip="Adicionar nova evidência."
+                matTooltip="Adicionar nova evidência"
                 matTooltipPosition="above"
                 matTooltipHideDelay="1000">
                   <mat-icon>add</mat-icon>

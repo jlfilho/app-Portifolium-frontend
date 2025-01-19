@@ -59,9 +59,23 @@
   align-content: stretch;
 }
 
+.toolbar{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+  align-content: center;
+  width: 100%;
+}
+
 .add-button {
   margin-right: 50px;
-  background-color: #505093;
+  background-color: #3233A6;
+}
+
+.voltar-button {
+  background-color: #3233A6;
 }
 
 .categories {
@@ -109,7 +123,7 @@
 
 .custom-button {
   color: white !important; /* Define a cor da fonte */
-  background-color: #505093 !important; /* Define a cor de fundo */
+  background-color: #3233A6 !important; /* Define a cor de fundo */
 }
 
 .mat-button{

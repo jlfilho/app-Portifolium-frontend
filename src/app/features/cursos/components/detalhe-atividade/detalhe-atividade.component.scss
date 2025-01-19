@@ -1,7 +1,7 @@
 .title{
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: start;
   align-items: center;
   align-content: center;
   gap: 10px;
@@ -68,7 +68,11 @@
 
 .add-button {
   margin-right: 50px;
-  background-color: #505093;
+  background-color: #3233A6;
+}
+
+.voltar-button {
+  background-color: #3233A6;
 }
 
 .foto-legenda{

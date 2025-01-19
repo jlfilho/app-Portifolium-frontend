@@ -9,6 +9,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatChipsModule } from '@angular/material/chips';
 
 
 import { CursosService } from '../../services/cursos.service';
@@ -19,7 +20,8 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
 
 @Component({
   selector: 'acadmanage-cards-cursos',
-  imports: [CommonModule, RouterModule, MatCardModule, MatButtonModule, MatGridListModule, NgOptimizedImage, MatDividerModule, MatIconModule, MatTooltipModule, MatDialogModule],
+  imports: [CommonModule, RouterModule, MatCardModule, MatButtonModule, MatGridListModule, NgOptimizedImage, MatDividerModule, MatIconModule, MatTooltipModule, MatDialogModule, MatChipsModule
+  ],
   templateUrl: './cards-cursos.component.html',
   styleUrl: './cards-cursos.component.css'
 })
@@ -122,6 +124,27 @@ export class CardsCursosComponent {
       }
     });
   }
+
+  alterarStatusCurso(curso: Curso): void {
+    const dialogRef = this.confirmacao(`Tem certeza que deseja alterar o status do curso ${curso.nome}?`);
+    if (!dialogRef) return;
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        curso.ativo = !curso.ativo;
+        this.cursosService.updateCurso(curso).subscribe({
+          next: (data) => {
+            this.loadCourses();
+            console.log('Curso atualizado:', data);
+          },
+          error: (error) => {
+            this.errorMessage = 'Erro ao atualizar o curso. Tente novamente.';
+            console.error(error);
+          },
+        });
+      }
+    });
+  }
+
 
   // Método para carregar os cursos do usuário
   loadCourses(): void {

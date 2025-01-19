@@ -11,6 +11,7 @@ import { ListaUsuariosComponent } from './features/usuarios/components/lista-usu
 import { authGuard } from './shared/auth.guard';
 import { NotFoundComponent } from './shared/not-found/not-found.component';
 import { DetalheAtividadeComponent } from './features/cursos/components/detalhe-atividade/detalhe-atividade.component';
+import { PermissaoUsuarioComponent } from './features/cursos/components/permissao-usuario/permissao-usuario.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -19,6 +20,7 @@ export const routes: Routes = [
       { path: 'dashboard', component: GraficosComponent },
       { path: 'cursos', component: CardsCursosComponent },
       { path: 'atividades/:id', component: CardsAtividadesComponent },
+      { path: 'permissao-usuario/:id', component: PermissaoUsuarioComponent, pathMatch: 'full' },
       { path: 'atividades/detalhe/:id', component: DetalheAtividadeComponent, pathMatch: 'full' },
       { path: 'categorias', component: ListaCategoriasComponent },
       { path: 'formcategoria', component: FormCategoriaComponent },

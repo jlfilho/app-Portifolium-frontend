@@ -5,6 +5,7 @@ import { Categoria } from '../../../shared/models/categoria.model';
 import { Curso } from '../../../shared/models/curso.model';
 import { Atividade } from '../../../shared/models/atividade.model';
 import { Evidencia } from '../../../shared/models/evidencia.model';
+import { Permissao } from '../../../shared/models/permissao.model';
 
 @Injectable({
   providedIn: 'root'
@@ -82,6 +83,16 @@ export class CursosService {
     return this.http.get<Evidencia[]>(`${this.baseUrl}/evidencias/atividade/${atividadeId}`);
   }
 
+  getAllPermissoesByCurso(cursoId: number): Observable<Permissao[]> {
+    const token = localStorage.getItem('token'); // Obtém o token JWT armazenado
+    // Configura os headers com o token de autenticação
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+    return this.http.get<Permissao[]>(`${this.baseUrl}/cursos/permissoes/${cursoId}`, { headers });
+  }
+
+
   saveCurso(curso: Curso): Observable<Curso> {
     const token = localStorage.getItem('token'); // Obtém o token JWT armazenado
     // Configura os headers com o token de autenticação
@@ -98,6 +109,24 @@ export class CursosService {
       Authorization: `Bearer ${token}`,
     });
     return this.http.delete<any>(`${this.baseUrl}/cursos/${cursoId}`, { headers });
+  }
+
+  removeCursoUsuario(cursoId: number, usuarioId: number): Observable<Permissao[]> {
+    const token = localStorage.getItem('token'); // Obtém o token JWT armazenado
+    // Configura os headers com o token de autenticação
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+    return this.http.delete<Permissao[]>(`${this.baseUrl}/cursos/${cursoId}/usuarios/${usuarioId}`, { headers });
+  }
+
+  adicionarCursoUsuario(cursoId: number, usuarioId: number): Observable<Permissao[]> {
+    const token = localStorage.getItem('token'); // Obtém o token JWT armazenado
+    // Configura os headers com o token de autenticação
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+    return this.http.put<Permissao[]>(`${this.baseUrl}/cursos/${cursoId}/usuarios/${usuarioId}`, { headers });
   }
 
   updateCurso(curso: Curso): Observable<Curso> {

@@ -15,15 +15,21 @@ export interface Curso {
 }
 
 export enum UserRole {
-  ADMINISTRADOR = 'ADMINISTRADOR',
-  PROFESSOR = 'PROFESSOR',
-  ALUNO = 'ALUNO'
+  ADMINISTRADOR = 'ROLE_ADMINISTRADOR',
+  GERENTE = 'ROLE_GERENTE',
+  SECRETARIO = 'ROLE_SECRETARIO'
 }
 
 // Request para mudança de senha
 export interface ChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
+}
+
+// Response da mudança de senha
+export interface ChangePasswordResponse {
+  message: string;
+  usuarioId: string;
 }
 
 // Response do checkAuthorities

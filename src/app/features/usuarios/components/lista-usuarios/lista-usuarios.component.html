@@ -7,12 +7,12 @@
     </h2>
     <span class="space"></span>
     <button
-      mat-raised-button
-      color="primary"
+      mat-icon-button
       class="add-button"
+      matTooltip="Adicionar novo usuário"
+      matTooltipPosition="below"
       (click)="addUser()">
-      <mat-icon>person_add</mat-icon>
-      Adicionar Usuário
+      <mat-icon>add</mat-icon>
     </button>
   </div>
 
@@ -47,7 +47,7 @@
         </button>
       </mat-form-field>
 
-      <!-- Tabela -->
+      <!-- Tabela (Desktop/Notebook) -->
       <div class="table-container">
         <table mat-table [dataSource]="dataSource" matSort class="usuarios-table">
 
@@ -159,10 +159,106 @@
         </table>
       </div>
 
-      <!-- Paginador -->
+      <!-- Cards (Tablet/Mobile) -->
+      <div class="cards-container">
+        <div
+          *ngFor="let usuario of dataSource.data"
+          class="user-card">
+          <!-- Header do Card -->
+          <div class="user-card-header">
+            <mat-icon class="user-card-avatar">account_circle</mat-icon>
+            <div class="user-card-title">
+              <h3 class="user-card-name">{{ usuario.nome }}</h3>
+              <p class="user-card-email">{{ usuario.email }}</p>
+            </div>
+            <span class="id-badge">{{ usuario.id }}</span>
+          </div>
+
+          <!-- Body do Card -->
+          <div class="user-card-body">
+            <!-- CPF -->
+            <div class="user-card-info">
+              <mat-icon>badge</mat-icon>
+              <span class="label">CPF:</span>
+              <span class="value">{{ usuario.cpf }}</span>
+            </div>
+
+            <!-- Role -->
+            <div class="user-card-info">
+              <mat-icon>{{ getRoleIcon(usuario.role) }}</mat-icon>
+              <span class="label">Função:</span>
+              <span class="value">
+                <mat-chip [color]="getRoleColor(usuario.role)" class="role-chip">
+                  {{ usuario.role }}
+                </mat-chip>
+              </span>
+            </div>
+
+            <!-- Cursos -->
+            <div class="user-card-info">
+              <mat-icon>school</mat-icon>
+              <span class="label">Cursos:</span>
+              <span class="value">
+                <button
+                  mat-stroked-button
+                  color="primary"
+                  (click)="viewCursos(usuario)"
+                  class="view-cursos-button">
+                  <mat-icon
+                    [matBadge]="usuario.cursos.length || 0"
+                    matBadgeColor="accent"
+                    [matBadgeHidden]="!usuario.cursos || usuario.cursos.length === 0">
+                    visibility
+                  </mat-icon>
+                  Ver Cursos
+                </button>
+              </span>
+            </div>
+          </div>
+
+          <!-- Footer do Card (Ações) -->
+          <div class="user-card-footer">
+            <div class="user-card-actions">
+              <button
+                mat-mini-fab
+                color="primary"
+                matTooltip="Editar"
+                (click)="editUser(usuario)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                mat-mini-fab
+                color="accent"
+                matTooltip="Alterar senha"
+                (click)="changePassword(usuario)">
+                <mat-icon>lock_reset</mat-icon>
+              </button>
+              <button
+                mat-mini-fab
+                color="warn"
+                matTooltip="Excluir"
+                (click)="deleteUser(usuario)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mensagem quando não há dados -->
+        <div *ngIf="dataSource.data.length === 0" class="no-data">
+          <mat-icon>person_off</mat-icon>
+          <p>Nenhum usuário encontrado</p>
+          <small *ngIf="input.value">Tente ajustar sua busca</small>
+        </div>
+      </div>
+
+      <!-- Paginador (Server-side) -->
       <mat-paginator
-        [pageSizeOptions]="[5, 10, 25, 50]"
-        [pageSize]="10"
+        [length]="totalElements"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="[5, 10, 25, 50, 100]"
+        (page)="onPageChange($event)"
         showFirstLastButtons
         class="usuarios-paginator">
       </mat-paginator>

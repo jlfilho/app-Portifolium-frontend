@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment.development';
-import { Usuario, ChangePasswordRequest, AuthoritiesResponse } from '../models/usuario.model';
+import { Usuario, ChangePasswordRequest, ChangePasswordResponse, AuthoritiesResponse } from '../models/usuario.model';
+import { Page, PageRequest } from '../../../shared/models/page.model';
 
 @Injectable({
   providedIn: 'root'
@@ -14,11 +15,28 @@ export class UsuariosService {
 
   /**
    * GET /api/usuarios
-   * Buscar todos os usuários (apenas ADMINISTRADOR)
+   * Buscar todos os usuários (apenas ADMINISTRADOR) - SEM paginação
    * @PreAuthorize("hasRole('ADMINISTRADOR')")
+   * @deprecated Use getAllUsersPaginado() para melhor performance
    */
   getAllUsers(): Observable<Usuario[]> {
     return this.http.get<Usuario[]>(`${this.baseUrl}/usuarios`);
+  }
+
+  /**
+   * GET /api/usuarios (com paginação)
+   * Buscar usuários paginados (apenas ADMINISTRADOR)
+   * @param pageRequest - Parâmetros de paginação
+   * @PreAuthorize("hasRole('ADMINISTRADOR')")
+   */
+  getAllUsersPaginado(pageRequest: PageRequest): Observable<Page<Usuario>> {
+    let params = new HttpParams()
+      .set('page', pageRequest.page.toString())
+      .set('size', pageRequest.size.toString())
+      .set('sortBy', pageRequest.sortBy)
+      .set('direction', pageRequest.direction);
+
+    return this.http.get<Page<Usuario>>(`${this.baseUrl}/usuarios`, { params });
   }
 
   /**
@@ -58,9 +76,13 @@ export class UsuariosService {
    * PUT /api/usuarios/{usuarioId}/change-password
    * Alterar senha do usuário
    * Request: { currentPassword, newPassword }
+   * Response: { message: string, usuarioId: string }
    */
-  changePassword(usuarioId: number, passwordData: ChangePasswordRequest): Observable<string> {
-    return this.http.put<string>(`${this.baseUrl}/usuarios/${usuarioId}/change-password`, passwordData);
+  changePassword(usuarioId: number, passwordData: ChangePasswordRequest): Observable<ChangePasswordResponse> {
+    return this.http.put<ChangePasswordResponse>(
+      `${this.baseUrl}/usuarios/${usuarioId}/change-password`,
+      passwordData
+    );
   }
 
   /**

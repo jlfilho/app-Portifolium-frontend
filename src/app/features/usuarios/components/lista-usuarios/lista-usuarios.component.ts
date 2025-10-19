@@ -25,6 +25,7 @@ import { Usuario } from '../../models/usuario.model';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { CursosUsuarioDialogComponent } from '../cursos-usuario-dialog/cursos-usuario-dialog.component';
 import { ChangePasswordDialogComponent } from '../../../../shared/components/change-password-dialog/change-password-dialog.component';
+import { PageRequest } from '../../../../shared/models/page.model';
 
 @Component({
   selector: 'acadmanage-lista-usuarios',
@@ -54,6 +55,13 @@ export class ListaUsuariosComponent implements OnInit {
   dataSource!: MatTableDataSource<Usuario>;
   isLoading = true;
 
+  // Paginação do servidor
+  totalElements = 0;
+  pageSize = 10;
+  pageIndex = 0;
+  sortBy = 'id';
+  sortDirection: 'ASC' | 'DESC' = 'ASC';
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -70,17 +78,41 @@ export class ListaUsuariosComponent implements OnInit {
     this.loadUsers();
   }
 
+  ngAfterViewInit(): void {
+    // Conectar eventos do MatSort para paginação do servidor
+    if (this.sort) {
+      this.sort.sortChange.subscribe(() => {
+        this.pageIndex = 0; // Resetar para primeira página ao ordenar
+        this.sortBy = this.sort.active || 'id';
+        this.sortDirection = this.sort.direction === 'desc' ? 'DESC' : 'ASC';
+        this.loadUsers();
+      });
+    }
+  }
+
   loadUsers(): void {
     this.isLoading = true;
-    this.usuariosService.getAllUsers().subscribe({
-      next: (usuarios) => {
-        this.dataSource.data = usuarios;
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
+
+    const pageRequest: PageRequest = {
+      page: this.pageIndex,
+      size: this.pageSize,
+      sortBy: this.sortBy,
+      direction: this.sortDirection
+    };
+
+    console.log('📄 Carregando usuários paginados:', pageRequest);
+
+    this.usuariosService.getAllUsersPaginado(pageRequest).subscribe({
+      next: (page) => {
+        console.log('✅ Página recebida:', page);
+        console.log(`📊 ${page.numberOfElements} de ${page.totalElements} usuários`);
+
+        this.dataSource.data = page.content;
+        this.totalElements = page.totalElements;
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Erro ao carregar usuários:', error);
+        console.error('❌ Erro ao carregar usuários:', error);
         this.showMessage('Erro ao carregar usuários. Verifique suas permissões.', 'error');
         this.isLoading = false;
       }
@@ -91,9 +123,15 @@ export class ListaUsuariosComponent implements OnInit {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
 
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
+    // Nota: Filtro ainda é do lado do cliente
+    // Para filtro do servidor, seria necessário adicionar parâmetro "search" na API
+  }
+
+  onPageChange(event: any): void {
+    console.log('📄 Mudança de página:', event);
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.loadUsers();
   }
 
   addUser(): void {
@@ -101,7 +139,10 @@ export class ListaUsuariosComponent implements OnInit {
   }
 
   editUser(usuario: Usuario): void {
-    this.router.navigate(['/usuarios/editar', usuario.id]);
+    // Passa os dados do usuário via state para evitar nova requisição
+    this.router.navigate(['/usuarios/editar', usuario.id], {
+      state: { usuario: usuario }
+    });
   }
 
   viewCursos(usuario: Usuario): void {
@@ -166,29 +207,27 @@ export class ListaUsuariosComponent implements OnInit {
   }
 
   getRoleColor(role: string): string {
-    switch (role.toUpperCase()) {
-      case 'ADMINISTRADOR':
-        return 'warn';
-      case 'PROFESSOR':
-        return 'primary';
-      case 'ALUNO':
-        return 'accent';
-      default:
-        return '';
+    const roleUpper = role.toUpperCase();
+    if (roleUpper.includes('ADMINISTRADOR')) {
+      return 'warn';
+    } else if (roleUpper.includes('GERENTE')) {
+      return 'primary';
+    } else if (roleUpper.includes('SECRETARIO')) {
+      return 'accent';
     }
+    return '';
   }
 
   getRoleIcon(role: string): string {
-    switch (role.toUpperCase()) {
-      case 'ADMINISTRADOR':
-        return 'admin_panel_settings';
-      case 'PROFESSOR':
-        return 'school';
-      case 'ALUNO':
-        return 'person';
-      default:
-        return 'person';
+    const roleUpper = role.toUpperCase();
+    if (roleUpper.includes('ADMINISTRADOR')) {
+      return 'admin_panel_settings';
+    } else if (roleUpper.includes('GERENTE')) {
+      return 'manage_accounts';
+    } else if (roleUpper.includes('SECRETARIO')) {
+      return 'assignment_ind';
     }
+    return 'person';
   }
 
   private showMessage(message: string, type: 'success' | 'error'): void {

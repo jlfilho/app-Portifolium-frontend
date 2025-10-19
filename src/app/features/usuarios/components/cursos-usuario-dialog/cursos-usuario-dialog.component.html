@@ -34,7 +34,7 @@
       <div class="stat-card">
         <mat-icon>school</mat-icon>
         <div class="stat-info">
-          <span class="stat-number">{{ data.usuario.cursos.length }}</span>
+          <span class="stat-number">{{ getTotalCursos() }}</span>
           <span class="stat-label">Total</span>
         </div>
       </div>
@@ -49,8 +49,8 @@
         Lista de Cursos
       </h3>
 
-      <mat-list *ngIf="data.usuario.cursos.length > 0; else noCursos">
-        <mat-list-item *ngFor="let curso of data.usuario.cursos" class="curso-item">
+      <mat-list *ngIf="hasCursos(); else noCursos">
+        <mat-list-item *ngFor="let curso of data.usuario.cursos; trackBy: trackByCursoId" class="curso-item">
           <mat-icon matListItemIcon [class.icon-active]="curso.ativo" [class.icon-inactive]="!curso.ativo">
             {{ curso.ativo ? 'check_circle' : 'cancel' }}
           </mat-icon>
@@ -58,12 +58,13 @@
           <div matListItemLine class="curso-info">
             ID: {{ curso.id }}
           </div>
-          <mat-chip
-            matListItemMeta
-            [color]="curso.ativo ? 'primary' : ''"
-            class="status-chip">
-            {{ curso.ativo ? 'Ativo' : 'Inativo' }}
-          </mat-chip>
+          <mat-chip-set matListItemMeta>
+            <mat-chip 
+              [highlighted]="curso.ativo"
+              class="status-chip">
+              {{ curso.ativo ? 'Ativo' : 'Inativo' }}
+            </mat-chip>
+          </mat-chip-set>
         </mat-list-item>
       </mat-list>
 

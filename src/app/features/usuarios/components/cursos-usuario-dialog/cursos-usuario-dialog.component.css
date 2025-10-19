@@ -2,6 +2,16 @@
   min-width: 500px;
   max-width: 700px;
   padding: 0;
+  background-color: white !important;
+}
+
+/* Forçar fundo branco em todo o dialog */
+::ng-deep .cursos-dialog-panel .mat-mdc-dialog-container {
+  background-color: white !important;
+}
+
+::ng-deep .cursos-dialog-panel .mat-mdc-dialog-surface {
+  background-color: white !important;
 }
 
 /* Header */
@@ -55,6 +65,12 @@
   padding: 24px;
   max-height: 500px;
   overflow-y: auto;
+  background-color: white !important;
+}
+
+/* Garantir fundo branco em todos os elementos */
+.cursos-list {
+  background-color: white !important;
 }
 
 /* Stats */
@@ -97,13 +113,13 @@
 .stat-number {
   font-size: 28px;
   font-weight: 700;
-  color: #111827;
+  color: #111827 !important;
   line-height: 1;
 }
 
 .stat-label {
   font-size: 12px;
-  color: #9CA3AF;
+  color: #6B7280 !important;
   text-transform: uppercase;
   font-weight: 600;
   margin-top: 4px;
@@ -120,7 +136,7 @@
   gap: 8px;
   font-size: 16px;
   font-weight: 600;
-  color: #111827;
+  color: #111827 !important;
   margin: 0 0 16px 0;
 }
 
@@ -138,14 +154,20 @@
   height: auto !important;
   min-height: 72px;
   transition: background-color 0.2s ease;
+  background-color: white !important;
 }
 
 ::ng-deep .curso-item:hover {
-  background-color: #f8f9fa;
+  background-color: #f8f9fa !important;
 }
 
 ::ng-deep .curso-item:last-child {
   border-bottom: none;
+}
+
+/* Fundo da lista branco */
+::ng-deep mat-list {
+  background-color: white !important;
 }
 
 ::ng-deep .curso-item mat-icon[matListItemIcon] {
@@ -164,20 +186,48 @@
 
 .curso-nome {
   font-weight: 500;
-  color: #111827;
+  color: #111827 !important;
   font-size: 16px;
 }
 
 .curso-info {
   font-size: 12px;
-  color: #9CA3AF;
+  color: #6B7280 !important;
   margin-top: 4px;
+}
+
+/* Garantir contraste no texto da lista */
+::ng-deep .curso-item .mdc-list-item__primary-text {
+  color: #111827 !important;
+}
+
+::ng-deep .curso-item .mdc-list-item__secondary-text {
+  color: #6B7280 !important;
+}
+
+::ng-deep .curso-item [matListItemTitle] {
+  color: #111827 !important;
+}
+
+::ng-deep .curso-item [matListItemLine] {
+  color: #6B7280 !important;
 }
 
 .status-chip {
   font-size: 12px;
   height: 24px;
   padding: 0 12px;
+}
+
+/* Chip Ativo */
+::ng-deep .status-chip[highlighted="true"] {
+  background-color: #5B5BEA !important;
+  color: white !important;
+}
+
+::ng-deep .status-chip:not([highlighted="true"]) {
+  background-color: #9CA3AF !important;
+  color: white !important;
 }
 
 /* No Cursos */
@@ -208,7 +258,7 @@
 /* Actions */
 mat-dialog-actions {
   padding: 16px 24px;
-  background: #f8f9fa;
+  background: #f8f9fa !important;
   margin: 0;
 }
 
@@ -216,6 +266,15 @@ mat-dialog-actions button {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+/* Garantir que o dialog tenha fundo branco */
+::ng-deep mat-dialog-content {
+  background-color: white !important;
+}
+
+::ng-deep .mat-mdc-dialog-content {
+  background-color: white !important;
 }
 
 /* Scrollbar */
@@ -267,5 +326,26 @@ mat-dialog-actions button {
 ::ng-deep .mat-mdc-chip.mat-primary {
   --mdc-chip-elevated-container-color: #5B5BEA !important;
   --mdc-chip-label-text-color: white !important;
+}
+
+::ng-deep .mat-mdc-chip {
+  --mdc-chip-label-text-color: white !important;
+}
+
+::ng-deep mat-chip-set mat-chip {
+  color: white !important;
+}
+
+::ng-deep mat-chip-set mat-chip span {
+  color: white !important;
+}
+
+/* Fix para highlighted chips */
+::ng-deep mat-chip[highlighted] {
+  background-color: #5B5BEA !important;
+}
+
+::ng-deep mat-chip:not([highlighted]) {
+  background-color: #9CA3AF !important;
 }
 

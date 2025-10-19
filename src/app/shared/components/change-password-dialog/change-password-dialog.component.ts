@@ -64,24 +64,65 @@ export class ChangePasswordDialogComponent {
 
       const { currentPassword, newPassword } = this.passwordForm.value;
 
-      this.usuariosService.changePassword(this.data.usuarioId, {
-        currentPassword,
-        newPassword
-      }).subscribe({
+      const passwordData = {
+        currentPassword: currentPassword.trim(),
+        newPassword: newPassword.trim()
+      };
+
+      console.log('=== ALTERAÇÃO DE SENHA ===');
+      console.log('Usuário ID:', this.data.usuarioId);
+      console.log('Usuário Nome:', this.data.usuarioNome);
+      console.log('Endpoint:', `PUT /api/usuarios/${this.data.usuarioId}/change-password`);
+      console.log('Payload:', { currentPassword: '***', newPassword: '***' });
+
+      this.usuariosService.changePassword(this.data.usuarioId, passwordData).subscribe({
         next: (response) => {
-          this.showMessage('Senha alterada com sucesso!', 'success');
+          console.log('=== SENHA ALTERADA COM SUCESSO ===');
+          console.log('Response:', response);
+          console.log('Mensagem:', response.message);
+          console.log('Usuário ID:', response.usuarioId);
+
+          // Exibe mensagem retornada pelo backend
+          this.showMessage(response.message || 'Senha alterada com sucesso!', 'success');
           this.isSaving = false;
           this.dialogRef.close(true);
         },
         error: (error) => {
-          console.error('Erro ao alterar senha:', error);
-          this.showMessage('Erro ao alterar senha. Verifique a senha atual.', 'error');
+          console.error('=== ERRO AO ALTERAR SENHA ===');
+          console.error('Status:', error.status);
+          console.error('Error:', error);
+          console.error('Error Message:', error.error);
+
+          let errorMessage = 'Erro ao alterar senha. ';
+
+          if (error.error?.message) {
+            errorMessage += error.error.message;
+          } else if (error.error && typeof error.error === 'string') {
+            errorMessage += error.error;
+          } else if (error.status === 400) {
+            errorMessage += 'Senha atual incorreta ou nova senha inválida.';
+          } else if (error.status === 401) {
+            errorMessage += 'Senha atual incorreta.';
+          } else if (error.status === 403) {
+            errorMessage += 'Sem permissão para alterar esta senha.';
+          } else if (error.status === 404) {
+            errorMessage += 'Usuário não encontrado.';
+          } else {
+            errorMessage += 'Verifique a senha atual e tente novamente.';
+          }
+
+          this.showMessage(errorMessage, 'error');
           this.isSaving = false;
         }
       });
     } else {
       this.markFormGroupTouched(this.passwordForm);
-      this.showMessage('Por favor, preencha todos os campos corretamente.', 'warning');
+
+      if (this.passwordForm.hasError('passwordMismatch')) {
+        this.showMessage('As senhas não coincidem.', 'warning');
+      } else {
+        this.showMessage('Por favor, preencha todos os campos corretamente.', 'warning');
+      }
     }
   }
 

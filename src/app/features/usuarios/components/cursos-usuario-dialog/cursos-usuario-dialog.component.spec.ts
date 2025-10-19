@@ -23,7 +23,7 @@ describe('CursosUsuarioDialogComponent', () => {
               nome: 'João Silva',
               email: 'joao@test.com',
               cpf: '123.456.789-00',
-              role: 'PROFESSOR',
+              role: 'ROLE_GERENTE',
               cursos: [
                 { id: 1, nome: 'Angular', ativo: true },
                 { id: 2, nome: 'TypeScript', ativo: false }

@@ -48,9 +48,9 @@ export class FormUsuarioComponent implements OnInit {
   usuarioOriginal?: Usuario; // Armazena dados originais do usuário
 
   roles = [
-    { value: 'ADMINISTRADOR', label: 'Administrador', icon: 'admin_panel_settings' },
-    { value: 'PROFESSOR', label: 'Professor', icon: 'school' },
-    { value: 'ALUNO', label: 'Aluno', icon: 'person' }
+    { value: 'ROLE_ADMINISTRADOR', label: 'Administrador', icon: 'admin_panel_settings' },
+    { value: 'ROLE_GERENTE', label: 'Gerente', icon: 'manage_accounts' },
+    { value: 'ROLE_SECRETARIO', label: 'Secretário(a)', icon: 'assignment_ind' }
   ];
 
   constructor(
@@ -68,7 +68,19 @@ export class FormUsuarioComponent implements OnInit {
       if (params['id']) {
         this.isEditMode = true;
         this.usuarioId = +params['id'];
-        this.loadUsuario(this.usuarioId);
+
+        // Tentar usar dados passados via navigation state primeiro
+        const navigation = this.router.getCurrentNavigation();
+        const usuarioFromState = navigation?.extras?.state?.['usuario'] ||
+                                 window.history.state?.['usuario'];
+
+        if (usuarioFromState) {
+          console.log('📦 Usando dados do state (não faz nova requisição)');
+          this.loadUsuarioFromData(usuarioFromState);
+        } else {
+          console.log('🌐 Carregando dados do servidor (GET /api/usuarios/' + this.usuarioId + ')');
+          this.loadUsuario(this.usuarioId);
+        }
       }
     });
   }
@@ -79,34 +91,63 @@ export class FormUsuarioComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       cpf: ['', [Validators.required, Validators.pattern(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)]],
       senha: ['', this.isEditMode ? [] : [Validators.required, Validators.minLength(6)]],
-      role: ['ALUNO', Validators.required]
+      role: ['ROLE_SECRETARIO', Validators.required]
     });
   }
 
+  // Carregar dados de usuário passados via state (evita requisição)
+  loadUsuarioFromData(usuario: Usuario): void {
+    this.usuarioOriginal = usuario;
+
+    this.usuarioForm.patchValue({
+      nome: usuario.nome,
+      email: usuario.email,
+      cpf: usuario.cpf,
+      role: usuario.role
+    });
+
+    // Em modo de edição, senha não é obrigatória
+    this.usuarioForm.get('senha')?.clearValidators();
+    this.usuarioForm.get('senha')?.setValidators([Validators.minLength(6)]);
+    this.usuarioForm.get('senha')?.updateValueAndValidity();
+
+    console.log('✅ Dados carregados do state:', usuario);
+  }
+
+  // Carregar dados do servidor (fallback se não tiver no state)
   loadUsuario(id: number): void {
     this.isLoading = true;
     this.usuariosService.getUserById(id).subscribe({
       next: (usuario) => {
-        this.usuarioOriginal = usuario; // Armazena dados originais
-
-        this.usuarioForm.patchValue({
-          nome: usuario.nome,
-          email: usuario.email,
-          cpf: usuario.cpf,
-          role: usuario.role
-        });
-
-        // Em modo de edição, senha não é obrigatória
-        this.usuarioForm.get('senha')?.clearValidators();
-        this.usuarioForm.get('senha')?.setValidators([Validators.minLength(6)]);
-        this.usuarioForm.get('senha')?.updateValueAndValidity();
+        console.log('✅ Dados carregados do servidor:', usuario);
+        this.loadUsuarioFromData(usuario);
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Erro ao carregar usuário:', error);
-        this.showMessage('Erro ao carregar usuário', 'error');
+        console.error('❌ Erro ao carregar usuário:', error);
+        console.error('Status:', error.status);
+        console.error('Mensagem:', error.error);
+
+        let errorMessage = 'Erro ao carregar usuário. ';
+
+        if (error.status === 500) {
+          errorMessage += 'O endpoint GET /api/usuarios/{id} pode não estar implementado no backend. ';
+          errorMessage += 'Use a listagem para editar usuários.';
+        } else if (error.status === 404) {
+          errorMessage += 'Usuário não encontrado.';
+        } else if (error.status === 403) {
+          errorMessage += 'Sem permissão para visualizar este usuário.';
+        } else {
+          errorMessage += 'Tente novamente pela listagem.';
+        }
+
+        this.showMessage(errorMessage, 'error');
         this.isLoading = false;
-        this.router.navigate(['/usuarios']);
+
+        // Redireciona de volta para listagem
+        setTimeout(() => {
+          this.router.navigate(['/usuarios']);
+        }, 2000);
       }
     });
   }
@@ -120,34 +161,35 @@ export class FormUsuarioComponent implements OnInit {
       let usuarioData: any;
 
       if (this.isEditMode && this.usuarioOriginal) {
-        // MODO EDIÇÃO: Manter estrutura completa do usuário
+        // MODO EDIÇÃO: Estrutura conforme API
         usuarioData = {
-          id: this.usuarioOriginal.id,
-          nome: formValues.nome,
-          cpf: formValues.cpf,
-          email: formValues.email,
+          nome: formValues.nome.trim(),
+          cpf: formValues.cpf.trim(),
+          email: formValues.email.trim(),
           role: formValues.role,
-          cursos: this.usuarioOriginal.cursos || [] // Manter cursos existentes
+          cursos: (this.usuarioOriginal.cursos || []).map(curso => ({ id: curso.id }))
         };
 
         // Adicionar senha apenas se foi preenchida
         if (formValues.senha && formValues.senha.trim() !== '') {
-          usuarioData.senha = formValues.senha;
+          usuarioData.senha = formValues.senha.trim();
         }
       } else {
-        // MODO CRIAÇÃO: Criar novo usuário com cursos vazio
+        // MODO CRIAÇÃO: Estrutura conforme API (SEM campo id no usuário)
         usuarioData = {
-          id: 0,
-          nome: formValues.nome,
-          cpf: formValues.cpf,
-          email: formValues.email,
-          senha: formValues.senha,
+          nome: formValues.nome.trim(),
+          cpf: formValues.cpf.trim(),
+          email: formValues.email.trim(),
+          senha: formValues.senha.trim(),
           role: formValues.role,
-          cursos: [] // Array vazio para novo usuário
+          cursos: [] // Array vazio - cursos gerenciados depois
         };
       }
 
-      console.log('Enviando payload:', usuarioData);
+      console.log('=== PAYLOAD ENVIADO ===');
+      console.log('Modo:', this.isEditMode ? 'EDIÇÃO' : 'CRIAÇÃO');
+      console.log('Endpoint:', this.isEditMode ? `PUT /api/usuarios/${this.usuarioId}` : 'POST /api/usuarios');
+      console.log('Payload:', JSON.stringify(usuarioData, null, 2));
 
       const operation = this.isEditMode && this.usuarioId
         ? this.usuariosService.updateUser(this.usuarioId, usuarioData)
@@ -155,7 +197,10 @@ export class FormUsuarioComponent implements OnInit {
 
       operation.subscribe({
         next: (response) => {
-          console.log('Resposta do servidor:', response);
+          console.log('=== RESPOSTA DO SERVIDOR ===');
+          console.log('Status: Sucesso');
+          console.log('Response:', response);
+
           this.showMessage(
             this.isEditMode ? 'Usuário atualizado com sucesso!' : 'Usuário cadastrado com sucesso!',
             'success'
@@ -164,15 +209,26 @@ export class FormUsuarioComponent implements OnInit {
           this.router.navigate(['/usuarios']);
         },
         error: (error) => {
-          console.error('Erro ao salvar usuário:', error);
+          console.error('=== ERRO AO SALVAR USUÁRIO ===');
+          console.error('Status:', error.status);
+          console.error('Error:', error);
+          console.error('Error Message:', error.error);
 
           let errorMessage = 'Erro ao salvar usuário. ';
+
+          // Priorizar mensagem do backend
           if (error.error?.message) {
             errorMessage += error.error.message;
+          } else if (error.error && typeof error.error === 'string') {
+            errorMessage += error.error;
           } else if (error.status === 400) {
-            errorMessage += 'Verifique os dados informados.';
+            errorMessage += 'Dados inválidos. Verifique os campos.';
           } else if (error.status === 409) {
             errorMessage += 'CPF ou email já cadastrado.';
+          } else if (error.status === 403) {
+            errorMessage += 'Sem permissão para esta operação.';
+          } else if (error.status === 500) {
+            errorMessage += 'Erro no servidor. Tente novamente mais tarde.';
           } else {
             errorMessage += 'Tente novamente.';
           }
@@ -193,7 +249,7 @@ export class FormUsuarioComponent implements OnInit {
 
   onReset(): void {
     this.usuarioForm.reset({
-      role: 'ALUNO'
+      role: 'ROLE_SECRETARIO'
     });
   }
 
@@ -240,29 +296,27 @@ export class FormUsuarioComponent implements OnInit {
   }
 
   getRoleColor(role: string): string {
-    switch (role.toUpperCase()) {
-      case 'ADMINISTRADOR':
-        return 'warn';
-      case 'PROFESSOR':
-        return 'primary';
-      case 'ALUNO':
-        return 'accent';
-      default:
-        return '';
+    const roleUpper = role.toUpperCase();
+    if (roleUpper.includes('ADMINISTRADOR')) {
+      return 'warn';
+    } else if (roleUpper.includes('GERENTE')) {
+      return 'primary';
+    } else if (roleUpper.includes('SECRETARIO')) {
+      return 'accent';
     }
+    return '';
   }
 
   getRoleIcon(role: string): string {
-    switch (role.toUpperCase()) {
-      case 'ADMINISTRADOR':
-        return 'admin_panel_settings';
-      case 'PROFESSOR':
-        return 'school';
-      case 'ALUNO':
-        return 'person';
-      default:
-        return 'person';
+    const roleUpper = role.toUpperCase();
+    if (roleUpper.includes('ADMINISTRADOR')) {
+      return 'admin_panel_settings';
+    } else if (roleUpper.includes('GERENTE')) {
+      return 'manage_accounts';
+    } else if (roleUpper.includes('SECRETARIO')) {
+      return 'assignment_ind';
     }
+    return 'person';
   }
 
   // Getters

@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, interval } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 import { environment } from '../../environments/environment.development';
 import { AuthoritiesResponse } from '../features/usuarios/models/usuario.model';
+import { isTokenExpired, getTokenExpirationTime } from './utils/jwt.helper';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +17,7 @@ export class ApiService {
   private authoritiesSubject: BehaviorSubject<string[]>;
   public authorities: Observable<string[]>;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
     const token = this.isLocalStorageAvailable() ? localStorage.getItem('token') : null;
     const authorities = this.isLocalStorageAvailable() ?
       JSON.parse(localStorage.getItem('authorities') || '[]') : [];
@@ -25,6 +27,18 @@ export class ApiService {
 
     this.authoritiesSubject = new BehaviorSubject<string[]>(authorities);
     this.authorities = this.authoritiesSubject.asObservable();
+
+    // Verificar se token inicial está expirado
+    if (token && isTokenExpired(token)) {
+      console.warn('⚠️ Token expirado detectado ao inicializar');
+      this.logout();
+      this.router.navigate(['/login'], {
+        queryParams: { reason: 'session-expired' }
+      });
+    } else if (token) {
+      // Iniciar verificação periódica de expiração
+      this.startTokenExpirationCheck();
+    }
   }
 
   private isLocalStorageAvailable(): boolean {
@@ -38,10 +52,17 @@ export class ApiService {
         if (response?.token) {
           localStorage.setItem('token', response.token);
           this.tokenSubject.next(response.token);
-          console.log('Login efetuado com sucesso!, token: ', response.token);
+          console.log('✅ Login efetuado com sucesso!');
+
+          // Verificar expiração do token
+          const expiresIn = getTokenExpirationTime(response.token);
+          console.log(`⏱️ Token expira em: ${Math.floor(expiresIn / 60)} minutos`);
 
           // Carregar authorities após login
           this.loadAuthorities();
+
+          // Iniciar verificação periódica de expiração
+          this.startTokenExpirationCheck();
         }
       })
     );
@@ -101,5 +122,47 @@ export class ApiService {
    */
   getAuthorities(): string[] {
     return this.authoritiesSubject.value;
+  }
+
+  /**
+   * Verificar periodicamente se o token expirou
+   * Executa a cada 60 segundos
+   */
+  private startTokenExpirationCheck(): void {
+    // Verifica a cada 60 segundos (1 minuto)
+    interval(60000).subscribe(() => {
+      const token = this.getToken();
+
+      if (token && isTokenExpired(token)) {
+        console.warn('⚠️ Token expirado detectado na verificação periódica');
+        console.log('🚪 Efetuando logout automático...');
+
+        this.logout();
+        this.router.navigate(['/login'], {
+          queryParams: {
+            reason: 'session-expired',
+            message: 'Sua sessão expirou. Por favor, faça login novamente.'
+          }
+        });
+      }
+    });
+  }
+
+  /**
+   * Verificar se o token atual está expirado
+   */
+  isTokenExpired(): boolean {
+    const token = this.getToken();
+    if (!token) return true;
+    return isTokenExpired(token);
+  }
+
+  /**
+   * Obter tempo restante até expiração (em segundos)
+   */
+  getTokenTimeLeft(): number {
+    const token = this.getToken();
+    if (!token) return 0;
+    return getTokenExpirationTime(token);
   }
 }

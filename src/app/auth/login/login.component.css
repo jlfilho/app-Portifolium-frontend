@@ -1,46 +1,521 @@
-.login-container {
-  max-width: 400px;
-  margin: 50px auto;
+/* ========================================
+   🎨 PALETA "EDUCAÇÃO MODERNA"
+   ======================================== */
+:host {
+  --primary-color: #5B5BEA;      /* Azul violeta suave */
+  --secondary-color: #38BDF8;    /* Azul ciano leve */
+  --background-dark: #111827;    /* Cinza azulado escuro */
+  --card-bg: #1F2937;            /* Cinza carvão */
+  --text-primary: #F9FAFB;       /* Branco gelo */
+  --text-secondary: #9CA3AF;     /* Cinza claro */
+  --accent-color: #7C3AED;       /* Roxo vibrante */
+  --error-color: #EF4444;        /* Vermelho */
+  --warning-color: #F59E0B;      /* Âmbar */
+  --success-color: #10B981;      /* Verde */
+}
+
+/* ========================================
+   🌍 PÁGINA COMPLETA
+   ======================================== */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--background-dark) 0%, #1a1f35 50%, #0f172a 100%);
+  position: relative;
+  overflow: hidden;
   padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-h2 {
+/* Background decorativo com círculos animados */
+.background-decoration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.1;
+  animation: float 20s infinite ease-in-out;
+}
+
+.circle-1 {
+  width: 400px;
+  height: 400px;
+  background: var(--primary-color);
+  top: -200px;
+  right: -100px;
+  animation-delay: 0s;
+}
+
+.circle-2 {
+  width: 300px;
+  height: 300px;
+  background: var(--secondary-color);
+  bottom: -150px;
+  left: -100px;
+  animation-delay: 5s;
+}
+
+.circle-3 {
+  width: 250px;
+  height: 250px;
+  background: var(--accent-color);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: 10s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-30px) rotate(180deg);
+  }
+}
+
+/* ========================================
+   📦 CONTAINER PRINCIPAL
+   ======================================== */
+.login-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 450px;
+  animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   🎯 HEADER (Logo e Título)
+   ======================================== */
+.login-header {
   text-align: center;
+  margin-bottom: 32px;
 }
 
-form div {
-  margin-bottom: 15px;
+.logo-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  border-radius: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 32px rgba(91, 91, 234, 0.3);
+  animation: pulse 2s infinite ease-in-out;
 }
 
-label {
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 8px 32px rgba(91, 91, 234, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 12px 40px rgba(91, 91, 234, 0.5);
+  }
+}
+
+.logo-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: var(--text-primary) !important;
+}
+
+.app-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 12px 0 4px 0;
+  background: linear-gradient(135deg, var(--text-primary), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.app-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+  font-weight: 400;
+}
+
+/* ========================================
+   ⚠️ ALERTA DE SESSÃO EXPIRADA
+   ======================================== */
+.session-expired-alert {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  background: rgba(245, 158, 11, 0.15);
+  border-left: 4px solid var(--warning-color);
+  border-radius: 12px;
+  animation: slideDown 0.4s ease-out;
+  backdrop-filter: blur(10px);
+}
+
+.session-expired-alert mat-icon {
+  color: var(--warning-color);
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.session-expired-alert strong {
   display: block;
-  margin-bottom: 5px;
+  color: var(--warning-color);
+  font-size: 15px;
+  margin-bottom: 4px;
+  font-weight: 600;
 }
 
-input {
+.session-expired-alert p {
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   🃏 CARD DE LOGIN
+   ======================================== */
+.login-card {
+  background: var(--card-bg) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  padding: 8px !important;
+}
+
+.login-card mat-card-header {
+  margin-bottom: 24px;
+  padding: 16px 16px 0 16px;
+}
+
+.login-card mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 24px !important;
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+  margin: 0 !important;
+}
+
+.title-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  color: var(--primary-color) !important;
+}
+
+.login-card mat-card-content {
+  padding: 16px;
+}
+
+/* ========================================
+   📝 FORMULÁRIO
+   ======================================== */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.full-width {
   width: 100%;
-  padding: 8px;
-  box-sizing: border-box;
 }
 
-button {
+/* Form Fields */
+::ng-deep .login-card .mat-mdc-form-field {
   width: 100%;
-  padding: 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
 }
 
-button:disabled {
-  background-color: #ccc;
+::ng-deep .login-card .mat-mdc-text-field-wrapper {
+  background-color: rgba(31, 41, 55, 0.6) !important;
+  border-radius: 8px;
 }
 
-.error {
-  color: red;
+::ng-deep .login-card .mat-mdc-form-field-focus-overlay {
+  background-color: transparent !important;
+}
+
+::ng-deep .login-card .mdc-text-field--outlined .mdc-notched-outline__leading,
+::ng-deep .login-card .mdc-text-field--outlined .mdc-notched-outline__notch,
+::ng-deep .login-card .mdc-text-field--outlined .mdc-notched-outline__trailing {
+  border-color: rgba(156, 163, 175, 0.3) !important;
+}
+
+::ng-deep .login-card .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+::ng-deep .login-card .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+::ng-deep .login-card .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: var(--primary-color) !important;
+  border-width: 2px !important;
+}
+
+::ng-deep .login-card .mat-mdc-form-field:hover .mdc-notched-outline__leading,
+::ng-deep .login-card .mat-mdc-form-field:hover .mdc-notched-outline__notch,
+::ng-deep .login-card .mat-mdc-form-field:hover .mdc-notched-outline__trailing {
+  border-color: rgba(91, 91, 234, 0.5) !important;
+}
+
+::ng-deep .login-card .mat-mdc-form-field-infix {
+  color: var(--text-primary) !important;
+}
+
+::ng-deep .login-card .mat-mdc-input-element {
+  color: var(--text-primary) !important;
+  caret-color: var(--primary-color) !important;
+}
+
+::ng-deep .login-card .mat-mdc-input-element::placeholder {
+  color: var(--text-secondary) !important;
+  opacity: 0.7;
+}
+
+::ng-deep .login-card .mat-mdc-form-field-label,
+::ng-deep .login-card .mdc-floating-label {
+  color: var(--text-secondary) !important;
+}
+
+::ng-deep .login-card .mat-mdc-form-field.mat-focused .mat-mdc-form-field-label,
+::ng-deep .login-card .mat-mdc-form-field.mat-focused .mdc-floating-label {
+  color: var(--primary-color) !important;
+}
+
+/* Ícones do formulário */
+::ng-deep .login-card .mat-mdc-form-field .mat-icon {
+  color: var(--text-secondary) !important;
+}
+
+::ng-deep .login-card .mat-mdc-form-field.mat-focused .mat-icon[matprefix] {
+  color: var(--primary-color) !important;
+}
+
+/* Botão de visibilidade da senha */
+::ng-deep .login-card .mat-mdc-icon-button {
+  color: var(--text-secondary) !important;
+}
+
+::ng-deep .login-card .mat-mdc-icon-button:hover {
+  color: var(--primary-color) !important;
+}
+
+/* Mensagens de erro do formulário */
+::ng-deep .login-card .mat-mdc-form-field-error {
+  color: var(--error-color) !important;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* ========================================
+   ❌ MENSAGEM DE ERRO
+   ======================================== */
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(239, 68, 68, 0.15);
+  border-left: 3px solid var(--error-color);
+  border-radius: 8px;
+  color: var(--error-color);
+  font-size: 14px;
+  animation: shake 0.4s ease-in-out;
+}
+
+.error-message mat-icon {
+  color: var(--error-color);
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+/* ========================================
+   🔘 BOTÃO DE LOGIN
+   ======================================== */
+.login-button {
+  width: 100%;
+  height: 48px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  border-radius: 12px !important;
+  text-transform: none !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.3s ease !important;
+  margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+::ng-deep .login-button.mat-mdc-raised-button {
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color)) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 4px 20px rgba(91, 91, 234, 0.4) !important;
+}
+
+::ng-deep .login-button.mat-mdc-raised-button:hover:not([disabled]) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(91, 91, 234, 0.6) !important;
+}
+
+::ng-deep .login-button.mat-mdc-raised-button:active:not([disabled]) {
+  transform: translateY(0);
+}
+
+::ng-deep .login-button.mat-mdc-raised-button[disabled] {
+  background: rgba(156, 163, 175, 0.2) !important;
+  color: var(--text-secondary) !important;
+  box-shadow: none !important;
+  cursor: not-allowed;
+}
+
+.login-button span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.login-button mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.button-spinner {
+  display: inline-block;
+}
+
+::ng-deep .button-spinner circle {
+  stroke: var(--text-primary) !important;
+}
+
+/* ========================================
+   📄 FOOTER
+   ======================================== */
+.login-footer {
   text-align: center;
+  margin-top: 24px;
+}
+
+.copyright {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.footer-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: var(--text-secondary) !important;
+}
+
+/* ========================================
+   📱 RESPONSIVIDADE
+   ======================================== */
+@media (max-width: 600px) {
+  .login-page {
+    padding: 16px;
+  }
+
+  .login-container {
+    max-width: 100%;
+  }
+
+  .logo-container {
+    width: 64px;
+    height: 64px;
+  }
+
+  .logo-icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .app-title {
+    font-size: 26px;
+  }
+
+  .app-subtitle {
+    font-size: 13px;
+  }
+
+  .login-card mat-card-title {
+    font-size: 20px !important;
+  }
+
+  .title-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+
+  .circle-1,
+  .circle-2,
+  .circle-3 {
+    display: none;
+  }
+}
+
+@media (max-width: 400px) {
+  .app-title {
+    font-size: 22px;
+  }
+
+  .login-button {
+    height: 44px !important;
+    font-size: 15px !important;
+  }
 }

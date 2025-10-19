@@ -27,18 +27,39 @@ export class CursosUsuarioDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<CursosUsuarioDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { usuario: Usuario }
-  ) {}
+  ) {
+    // Garantir que cursos existe
+    if (!this.data.usuario.cursos) {
+      this.data.usuario.cursos = [];
+    }
+    console.log('📚 Diálogo de Cursos - Usuário:', this.data.usuario);
+    console.log('📚 Total de cursos:', this.data.usuario.cursos.length);
+  }
 
   close(): void {
     this.dialogRef.close();
   }
 
   getCursosAtivos(): number {
-    return this.data.usuario.cursos?.filter(c => c.ativo).length || 0;
+    if (!this.data.usuario.cursos) return 0;
+    return this.data.usuario.cursos.filter(c => c.ativo).length;
   }
 
   getCursosInativos(): number {
-    return this.data.usuario.cursos?.filter(c => !c.ativo).length || 0;
+    if (!this.data.usuario.cursos) return 0;
+    return this.data.usuario.cursos.filter(c => !c.ativo).length;
+  }
+
+  getTotalCursos(): number {
+    return this.data.usuario.cursos?.length || 0;
+  }
+
+  hasCursos(): boolean {
+    return this.data.usuario.cursos && this.data.usuario.cursos.length > 0;
+  }
+
+  trackByCursoId(index: number, curso: any): number {
+    return curso.id;
   }
 }
 

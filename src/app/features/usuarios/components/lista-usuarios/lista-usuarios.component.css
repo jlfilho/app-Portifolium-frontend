@@ -1,4 +1,21 @@
-/* Container Principal */
+/* ========================================
+   🎨 VARIÁVEIS E PALETA
+   ======================================== */
+:host {
+  --primary-color: #5B5BEA;
+  --secondary-color: #38BDF8;
+  --accent-color: #7C3AED;
+  --error-color: #EF4444;
+  --text-dark: #333;
+  --text-medium: #666;
+  --text-light: #999;
+  --bg-hover: #f8f9fa;
+  --border-color: #e0e0e0;
+}
+
+/* ========================================
+   📦 CONTAINER PRINCIPAL
+   ======================================== */
 .usuarios-container {
   padding: 24px;
   max-width: 1600px;
@@ -6,56 +23,77 @@
   min-height: calc(100vh - 100px);
 }
 
-/* Header */
+/* ========================================
+   🎯 HEADER
+   ======================================== */
 .usuarios-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 24px;
   padding: 16px 0;
+  gap: 16px;
 }
 
 .usuarios-header h2 {
   font-size: 28px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-dark);
   margin: 0;
   display: flex;
   align-items: center;
   gap: 12px;
+  white-space: nowrap;
 }
 
 .usuarios-header h2 mat-icon {
   font-size: 32px;
   width: 32px;
   height: 32px;
-  color: #5B5BEA;
+  color: var(--primary-color);
 }
 
 .space {
   flex: 1;
 }
 
-/* Botão Adicionar */
+/* Botão Adicionar - Mesmo estilo do componente de cursos */
 .add-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 24px;
-  font-weight: 500;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%) !important;
+  color: white !important;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(91, 91, 234, 0.4);
   transition: all 0.3s ease;
+  flex-shrink: 0; /* Evitar compressão em telas pequenas */
 }
 
 .add-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6);
+}
+
+.add-button:active {
+  transform: scale(1.05) translateY(-1px);
+}
+
+.add-button:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
 }
 
 .add-button mat-icon {
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  color: white !important;
+}
+
+/* Garantir que o botão não tenha efeito ripple do Material Design em cores erradas */
+::ng-deep .add-button .mat-mdc-button-persistent-ripple,
+::ng-deep .add-button .mat-mdc-button-ripple {
+  display: none;
 }
 
 /* Divider */
@@ -63,11 +101,14 @@ mat-divider {
   margin-bottom: 24px;
 }
 
-/* Card */
+/* ========================================
+   🃏 CARD DA TABELA
+   ======================================== */
 .table-card {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
   padding: 24px;
+  animation: fadeIn 0.3s ease-out;
 }
 
 /* Loading */
@@ -76,17 +117,19 @@ mat-divider {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 64px;
+  padding: 64px 16px;
   gap: 16px;
 }
 
 .loading-container p {
-  color: #666;
+  color: var(--text-medium);
   font-size: 16px;
   margin: 0;
 }
 
-/* Campo de Busca */
+/* ========================================
+   🔍 CAMPO DE BUSCA
+   ======================================== */
 .filter-field {
   width: 100%;
   max-width: 500px;
@@ -94,48 +137,46 @@ mat-divider {
 }
 
 ::ng-deep .filter-field .mat-mdc-form-field-icon-prefix {
-  color: #5B5BEA;
+  color: var(--primary-color);
 }
 
-/* Tabela Container */
+/* ========================================
+   📊 TABELA (Desktop/Notebook)
+   ======================================== */
 .table-container {
   overflow-x: auto;
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border-color);
+  display: block; /* Mostrar por padrão */
 }
 
-/* Tabela */
 .usuarios-table {
   width: 100%;
   background: white;
 }
 
-/* Header da Tabela - Nova Paleta */
+/* Header da Tabela */
 ::ng-deep .usuarios-table .mat-mdc-header-cell {
-  background: linear-gradient(135deg, #5B5BEA 0%, #7C3AED 100%) !important;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%) !important;
   font-weight: 600;
   font-size: 14px;
-  padding: 16px;
+  padding: 16px 12px;
   border: none;
-}
-
-::ng-deep .usuarios-table .mat-mdc-header-cell .mat-sort-header-content {
   color: white !important;
 }
 
-::ng-deep .usuarios-table .mat-mdc-header-cell .mat-sort-header-arrow {
+::ng-deep .usuarios-table .mat-mdc-header-cell .mat-sort-header-content,
+::ng-deep .usuarios-table .mat-mdc-header-cell .mat-sort-header-arrow,
+::ng-deep .usuarios-table thead tr th,
+::ng-deep .usuarios-table thead tr th * {
   color: white !important;
-}
-
-::ng-deep .usuarios-table thead tr th {
-  color: white !important;
-  background: linear-gradient(135deg, #5B5BEA 0%, #7C3AED 100%) !important;
 }
 
 /* Células da Tabela */
 ::ng-deep .usuarios-table .mat-mdc-cell {
-  padding: 16px;
+  padding: 16px 12px;
   border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
 }
 
 /* Linhas da Tabela */
@@ -144,15 +185,15 @@ mat-divider {
 }
 
 .table-row:hover {
-  background-color: #f8f9fa;
+  background-color: var(--bg-hover);
 }
 
-/* ID Badge - Nova Paleta */
+/* ID Badge */
 .id-badge {
   display: inline-block;
   padding: 4px 12px;
   background: rgba(91, 91, 234, 0.1);
-  color: #5B5BEA;
+  color: var(--primary-color);
   border-radius: 12px;
   font-weight: 600;
   font-size: 12px;
@@ -166,7 +207,7 @@ mat-divider {
 }
 
 .user-avatar {
-  color: #5B5BEA;
+  color: var(--primary-color);
   font-size: 32px;
   width: 32px;
   height: 32px;
@@ -174,19 +215,19 @@ mat-divider {
 
 .user-name {
   font-weight: 500;
-  color: #333;
+  color: var(--text-dark);
 }
 
 /* Email */
 .email-text {
-  color: #666;
+  color: var(--text-medium);
   font-size: 14px;
 }
 
 /* CPF */
 .cpf-text {
   font-family: 'Courier New', monospace;
-  color: #666;
+  color: var(--text-medium);
   font-size: 14px;
 }
 
@@ -208,8 +249,8 @@ mat-divider {
   color: white !important;
 }
 
-/* Forçar cor branca nos chips independente do tema */
-::ng-deep .role-chip span {
+::ng-deep .role-chip span,
+::ng-deep .role-chip .mat-mdc-chip-action-label {
   color: white !important;
 }
 
@@ -244,7 +285,7 @@ mat-divider {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 48px;
+  padding: 48px 16px;
   gap: 12px;
 }
 
@@ -257,18 +298,18 @@ mat-divider {
 
 .no-data p {
   font-size: 18px;
-  color: #666;
+  color: var(--text-medium);
   margin: 0;
 }
 
 .no-data small {
-  color: #999;
+  color: var(--text-light);
   font-size: 14px;
 }
 
 /* Paginador */
 .usuarios-paginator {
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--border-color);
   margin-top: 16px;
   background: transparent;
 }
@@ -277,43 +318,157 @@ mat-divider {
   padding: 8px 0;
 }
 
-/* Responsividade */
-@media (max-width: 1200px) {
-  .table-container {
-    overflow-x: scroll;
-  }
-
-  .usuarios-table {
-    min-width: 900px;
-  }
+/* ========================================
+   📱 VIEW DE CARDS (Mobile/Tablet)
+   ======================================== */
+.cards-container {
+  display: none; /* Oculto por padrão */
+  gap: 16px;
 }
 
-@media (max-width: 768px) {
-  .usuarios-container {
-    padding: 16px;
-  }
-
-  .usuarios-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
-
-  .add-button {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .filter-field {
-    max-width: 100%;
-  }
-
-  .table-card {
-    padding: 16px;
-  }
+.user-card {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  animation: slideIn 0.3s ease-out;
 }
 
-/* Animações */
+.user-card:hover {
+  box-shadow: 0 4px 12px rgba(91, 91, 234, 0.2);
+  transform: translateY(-2px);
+}
+
+.user-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.user-card-avatar {
+  color: var(--primary-color);
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+}
+
+.user-card-title {
+  flex: 1;
+}
+
+.user-card-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin: 0 0 4px 0;
+}
+
+.user-card-email {
+  font-size: 13px;
+  color: var(--text-medium);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.user-card-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.user-card-info mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: var(--text-medium);
+}
+
+.user-card-info .label {
+  font-weight: 500;
+  color: var(--text-medium);
+  min-width: 60px;
+}
+
+.user-card-info .value {
+  color: var(--text-dark);
+  flex: 1;
+}
+
+.user-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.user-card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.user-card-actions button {
+  width: 40px;
+  height: 40px;
+}
+
+.view-cursos-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  padding: 4px 12px;
+  height: 32px;
+  line-height: 32px;
+}
+
+.view-cursos-button mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+/* ========================================
+   🎨 MATERIAL OVERRIDES
+   ======================================== */
+::ng-deep .mat-mdc-chip.mat-warn {
+  --mdc-chip-label-text-color: white !important;
+  --mdc-chip-elevated-container-color: #EF4444 !important;
+}
+
+::ng-deep .mat-mdc-chip.mat-primary {
+  --mdc-chip-label-text-color: white !important;
+  --mdc-chip-elevated-container-color: #5B5BEA !important;
+}
+
+::ng-deep .mat-mdc-chip.mat-accent {
+  --mdc-chip-label-text-color: white !important;
+  --mdc-chip-elevated-container-color: #38BDF8 !important;
+}
+
+::ng-deep .mat-mdc-chip .mat-icon {
+  color: white !important;
+}
+
+/* ========================================
+   🎬 ANIMAÇÕES
+   ======================================== */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -325,11 +480,20 @@ mat-divider {
   }
 }
 
-.table-card {
-  animation: fadeIn 0.3s ease-out;
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-/* Scroll da Tabela */
+/* ========================================
+   🎨 SCROLLBAR PERSONALIZADA
+   ======================================== */
 .table-container::-webkit-scrollbar {
   height: 8px;
 }
@@ -340,81 +504,480 @@ mat-divider {
 }
 
 .table-container::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #5B5BEA 0%, #7C3AED 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
   border-radius: 4px;
 }
 
 .table-container::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #7C3AED 0%, #5B5BEA 100%);
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
 }
 
-/* Material Overrides - Chips de Role - Nova Paleta */
-::ng-deep .mat-mdc-chip.mat-warn {
-  --mdc-chip-label-text-color: white !important;
-  --mdc-chip-elevated-container-color: #EF4444 !important;
+/* ========================================
+   📱 RESPONSIVIDADE
+   ======================================== */
+
+/* 🖥️ DESKTOP GRANDE (>1400px) */
+@media (min-width: 1401px) {
+  .usuarios-container {
+    padding: 32px;
+  }
+
+  .table-card {
+    padding: 32px;
+  }
 }
 
-::ng-deep .mat-mdc-chip.mat-warn .mat-icon {
-  color: white !important;
+/* 💻 NOTEBOOK/DESKTOP MÉDIO (1025px - 1400px) */
+@media (max-width: 1400px) {
+  .usuarios-container {
+    max-width: 1200px;
+  }
+
+  ::ng-deep .usuarios-table .mat-mdc-header-cell,
+  ::ng-deep .usuarios-table .mat-mdc-cell {
+    padding: 12px 8px;
+    font-size: 13px;
+  }
+
+  .user-name {
+    font-size: 14px;
+  }
 }
 
-::ng-deep .mat-mdc-chip.mat-primary {
-  --mdc-chip-label-text-color: white !important;
-  --mdc-chip-elevated-container-color: #5B5BEA !important;
+/* 📱 TABLET HORIZONTAL (769px - 1024px) */
+@media (max-width: 1024px) {
+  .usuarios-container {
+    padding: 20px;
+  }
+
+  .usuarios-header h2 {
+    font-size: 24px;
+  }
+
+  .usuarios-header h2 mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Manter tabela mas com scroll horizontal */
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .usuarios-table {
+    min-width: 800px;
+  }
+
+  .add-button {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+  }
+
+  .add-button mat-icon {
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+  }
+
+  .table-card {
+    padding: 20px;
+  }
+
+  /* Esconder coluna CPF em tablets */
+  ::ng-deep .usuarios-table .mat-column-cpf {
+    display: none;
+  }
 }
 
-::ng-deep .mat-mdc-chip.mat-primary .mat-icon {
-  color: white !important;
+/* 📱 TABLET VERTICAL (601px - 768px) */
+@media (max-width: 768px) {
+  .usuarios-container {
+    padding: 16px;
+  }
+
+  .usuarios-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .usuarios-header h2 {
+    font-size: 22px;
+    flex: 1;
+  }
+
+  .add-button {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+  }
+
+  .add-button mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+
+  .filter-field {
+    max-width: 100%;
+  }
+
+  .table-card {
+    padding: 16px;
+  }
+
+  /* TROCAR PARA VIEW DE CARDS */
+  .table-container {
+    display: none !important;
+  }
+
+  .cards-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .usuarios-paginator {
+    border-top: none;
+    margin-top: 8px;
+  }
+
+  /* Ajustar paginador para mobile */
+  ::ng-deep .usuarios-paginator .mat-mdc-paginator-container {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  ::ng-deep .usuarios-paginator .mat-mdc-paginator-range-label {
+    margin: 0 8px;
+  }
 }
 
-::ng-deep .mat-mdc-chip.mat-accent {
-  --mdc-chip-label-text-color: white !important;
-  --mdc-chip-elevated-container-color: #38BDF8 !important;
+/* 📱 SMARTPHONE GRANDE (481px - 600px) */
+@media (max-width: 600px) {
+  .usuarios-container {
+    padding: 12px;
+  }
+
+  .usuarios-header h2 {
+    font-size: 20px;
+  }
+
+  .usuarios-header h2 mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+
+  .table-card {
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  .user-card {
+    padding: 14px;
+  }
+
+  .user-card-name {
+    font-size: 15px;
+  }
+
+  .user-card-email {
+    font-size: 12px;
+  }
+
+  .user-card-info {
+    font-size: 13px;
+  }
+
+  /* Paginador mais compacto */
+  ::ng-deep .usuarios-paginator .mat-mdc-paginator-page-size {
+    margin-right: 0;
+  }
+
+  ::ng-deep .usuarios-paginator .mat-mdc-paginator-range-actions {
+    gap: 4px;
+  }
+
+  ::ng-deep .usuarios-paginator .mat-mdc-icon-button {
+    width: 36px;
+    height: 36px;
+    padding: 6px;
+  }
 }
 
-::ng-deep .mat-mdc-chip.mat-accent .mat-icon {
-  color: white !important;
+/* 📱 SMARTPHONE PEQUENO (≤480px) */
+@media (max-width: 480px) {
+  .usuarios-container {
+    padding: 8px;
+  }
+
+  .usuarios-header {
+    padding: 8px 0;
+    margin-bottom: 16px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .usuarios-header h2 {
+    font-size: 18px;
+    flex: 1;
+  }
+
+  .add-button {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+  }
+
+  .add-button mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+
+  .table-card {
+    padding: 10px;
+  }
+
+  .filter-field {
+    margin-bottom: 16px;
+  }
+
+  ::ng-deep .filter-field .mat-mdc-form-field-infix {
+    font-size: 14px;
+  }
+
+  .user-card {
+    padding: 12px;
+  }
+
+  .user-card-header {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+  }
+
+  .user-card-avatar {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .user-card-name {
+    font-size: 14px;
+  }
+
+  .user-card-email {
+    font-size: 11px;
+  }
+
+  .user-card-info {
+    font-size: 12px;
+  }
+
+  .user-card-info mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .user-card-info .label {
+    min-width: 50px;
+    font-size: 11px;
+  }
+
+  .user-card-footer {
+    padding-top: 10px;
+  }
+
+  .role-chip {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  .role-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  ::ng-deep .usuarios-paginator .mat-mdc-paginator-container {
+    padding: 4px 0;
+  }
+
+  ::ng-deep .usuarios-paginator .mat-mdc-paginator-page-size-label,
+  ::ng-deep .usuarios-paginator .mat-mdc-paginator-range-label {
+    font-size: 11px;
+  }
+
+  .loading-container {
+    padding: 32px 8px;
+  }
+
+  .no-data {
+    padding: 32px 8px;
+  }
+
+  .no-data mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .no-data p {
+    font-size: 16px;
+  }
+
+  .no-data small {
+    font-size: 12px;
+  }
 }
 
-/* Garantir que o texto dos chips seja sempre branco */
-::ng-deep .role-chip {
-  color: white !important;
+/* 📱 SMARTPHONE MUITO PEQUENO (≤360px) */
+@media (max-width: 360px) {
+  .usuarios-container {
+    padding: 6px;
+  }
+
+  .usuarios-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .usuarios-header h2 {
+    font-size: 16px;
+    gap: 8px;
+    flex: 1;
+  }
+
+  .add-button {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+  }
+
+  .add-button mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .user-card {
+    padding: 10px;
+  }
+
+  .user-card-actions button {
+    width: 36px;
+    height: 36px;
+  }
+
+  ::ng-deep .user-card-actions .mat-mdc-mini-fab {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  ::ng-deep .user-card-actions .mat-mdc-mini-fab mat-icon {
+    font-size: 18px;
+  }
+
+  .view-cursos-button {
+    font-size: 12px;
+    padding: 4px 10px;
+    height: 30px;
+  }
+
+  .view-cursos-button mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  ::ng-deep .usuarios-paginator .mat-mdc-icon-button {
+    width: 32px;
+    height: 32px;
+    padding: 4px;
+  }
+
+  ::ng-deep .usuarios-paginator .mat-mdc-icon-button mat-icon {
+    font-size: 18px;
+  }
 }
 
-::ng-deep .role-chip .mat-mdc-chip-action-label {
-  color: white !important;
+/* ========================================
+   📱 ORIENTAÇÃO PAISAGEM (Landscape)
+   ======================================== */
+@media (max-width: 768px) and (orientation: landscape) {
+  .usuarios-container {
+    padding: 12px;
+  }
+
+  .usuarios-header {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .add-button {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+  }
+
+  .user-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .user-card-header {
+    grid-column: 1 / -1;
+  }
+
+  .user-card-footer {
+    grid-column: 1 / -1;
+  }
 }
 
-/* Estilos adicionais para garantir visibilidade */
-::ng-deep .mat-mdc-standard-chip {
-  color: white !important;
+/* ========================================
+   🌙 MODO ESCURO (Opcional)
+   ======================================== */
+@media (prefers-color-scheme: dark) {
+  /* Descomentar se quiser suporte automático a dark mode
+  .table-card {
+    background: #1F2937;
+  }
+
+  .user-card {
+    background: #1F2937;
+    border-color: #374151;
+  }
+  */
 }
 
-::ng-deep .mat-mdc-standard-chip .mat-mdc-chip-action-label {
-  color: white !important;
+/* ========================================
+   ♿ ACESSIBILIDADE
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
-/* Header da tabela - máxima especificidade */
-::ng-deep table.usuarios-table thead tr th {
-  background: linear-gradient(135deg, #5B5BEA 0%, #7C3AED 100%) !important;
-  color: white !important;
-}
+/* Alto contraste */
+@media (prefers-contrast: high) {
+  .user-card {
+    border-width: 2px;
+  }
 
-::ng-deep table.usuarios-table thead tr th * {
-  color: white !important;
+  .id-badge {
+    border: 1px solid var(--primary-color);
+  }
 }
-
-/* Chips - máxima especificidade */
-::ng-deep td mat-chip {
-  color: white !important;
-}
-
-::ng-deep td mat-chip * {
-  color: white !important;
-}
-
-/* Garantir que ícones nos chips sejam brancos */
-::ng-deep mat-chip mat-icon {
-  color: white !important;
-}
-

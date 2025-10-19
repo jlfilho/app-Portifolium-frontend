@@ -30,7 +30,7 @@ describe('FormUsuarioComponent', () => {
 
   it('should initialize form with default values', () => {
     expect(component.usuarioForm).toBeDefined();
-    expect(component.usuarioForm.get('role')?.value).toBe('ALUNO');
+    expect(component.usuarioForm.get('role')?.value).toBe('ROLE_SECRETARIO');
   });
 
   it('should validate required fields', () => {
@@ -42,7 +42,7 @@ describe('FormUsuarioComponent', () => {
       email: 'joao@test.com',
       cpf: '123.456.789-00',
       senha: '123456',
-      role: 'PROFESSOR'
+      role: 'ROLE_GERENTE'
     });
 
     expect(form.valid).toBeTruthy();
@@ -69,14 +69,14 @@ describe('FormUsuarioComponent', () => {
   });
 
   it('should return correct role color', () => {
-    expect(component.getRoleColor('ADMINISTRADOR')).toBe('warn');
-    expect(component.getRoleColor('PROFESSOR')).toBe('primary');
-    expect(component.getRoleColor('ALUNO')).toBe('accent');
+    expect(component.getRoleColor('ROLE_ADMINISTRADOR')).toBe('warn');
+    expect(component.getRoleColor('ROLE_GERENTE')).toBe('primary');
+    expect(component.getRoleColor('ROLE_SECRETARIO')).toBe('accent');
   });
 
   it('should return correct role icon', () => {
-    expect(component.getRoleIcon('ADMINISTRADOR')).toBe('admin_panel_settings');
-    expect(component.getRoleIcon('PROFESSOR')).toBe('school');
-    expect(component.getRoleIcon('ALUNO')).toBe('person');
+    expect(component.getRoleIcon('ROLE_ADMINISTRADOR')).toBe('admin_panel_settings');
+    expect(component.getRoleIcon('ROLE_GERENTE')).toBe('manage_accounts');
+    expect(component.getRoleIcon('ROLE_SECRETARIO')).toBe('assignment_ind');
   });
 });

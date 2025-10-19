@@ -1,0 +1,86 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div class="header-content">
+      <mat-icon class="header-icon">school</mat-icon>
+      <div class="header-text">
+        <h2 mat-dialog-title>Cursos do Usuário</h2>
+        <p class="subtitle">{{ data.usuario.nome }}</p>
+      </div>
+    </div>
+    <button mat-icon-button class="close-button" (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <mat-dialog-content class="dialog-content">
+    <!-- Estatísticas -->
+    <div class="stats-container">
+      <div class="stat-card">
+        <mat-icon>check_circle</mat-icon>
+        <div class="stat-info">
+          <span class="stat-number">{{ getCursosAtivos() }}</span>
+          <span class="stat-label">Ativos</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <mat-icon>cancel</mat-icon>
+        <div class="stat-info">
+          <span class="stat-number">{{ getCursosInativos() }}</span>
+          <span class="stat-label">Inativos</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <mat-icon>school</mat-icon>
+        <div class="stat-info">
+          <span class="stat-number">{{ data.usuario.cursos.length }}</span>
+          <span class="stat-label">Total</span>
+        </div>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Lista de Cursos -->
+    <div class="cursos-list">
+      <h3 class="list-title">
+        <mat-icon>list</mat-icon>
+        Lista de Cursos
+      </h3>
+
+      <mat-list *ngIf="data.usuario.cursos.length > 0; else noCursos">
+        <mat-list-item *ngFor="let curso of data.usuario.cursos" class="curso-item">
+          <mat-icon matListItemIcon [class.icon-active]="curso.ativo" [class.icon-inactive]="!curso.ativo">
+            {{ curso.ativo ? 'check_circle' : 'cancel' }}
+          </mat-icon>
+          <div matListItemTitle class="curso-nome">{{ curso.nome }}</div>
+          <div matListItemLine class="curso-info">
+            ID: {{ curso.id }}
+          </div>
+          <mat-chip
+            matListItemMeta
+            [color]="curso.ativo ? 'primary' : ''"
+            class="status-chip">
+            {{ curso.ativo ? 'Ativo' : 'Inativo' }}
+          </mat-chip>
+        </mat-list-item>
+      </mat-list>
+
+      <ng-template #noCursos>
+        <div class="no-cursos">
+          <mat-icon>school_off</mat-icon>
+          <p>Este usuário ainda não possui cursos cadastrados.</p>
+        </div>
+      </ng-template>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-raised-button color="primary" (click)="close()">
+      <mat-icon>check</mat-icon>
+      Fechar
+    </button>
+  </mat-dialog-actions>
+</div>
+

@@ -23,6 +23,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { UsuariosService } from '../../services/usuarios.service';
 import { Usuario } from '../../models/usuario.model';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { CursosUsuarioDialogComponent } from '../cursos-usuario-dialog/cursos-usuario-dialog.component';
 
 @Component({
   selector: 'acadmanage-lista-usuarios',
@@ -102,6 +103,15 @@ export class ListaUsuariosComponent implements OnInit {
     this.router.navigate(['/usuarios/editar', usuario.id]);
   }
 
+  viewCursos(usuario: Usuario): void {
+    this.dialog.open(CursosUsuarioDialogComponent, {
+      width: '700px',
+      maxWidth: '90vw',
+      panelClass: 'cursos-dialog-panel',
+      data: { usuario }
+    });
+  }
+
   deleteUser(usuario: Usuario): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '500px',
@@ -163,7 +173,7 @@ export class ListaUsuariosComponent implements OnInit {
 
   private showMessage(message: string, type: 'success' | 'error'): void {
     const panelClass = type === 'success' ? 'snackbar-success' : 'snackbar-error';
-    
+
     this.snackBar.open(message, 'Fechar', {
       duration: 4000,
       horizontalPosition: 'end',

@@ -1,1 +1,185 @@
-<p>form-usuario works!</p>
+<div class="form-container">
+  <mat-card class="form-card">
+    <mat-card-header>
+      <div class="header-content">
+        <div class="header-icon">
+          <mat-icon>{{ isEditMode ? 'edit' : 'person_add' }}</mat-icon>
+        </div>
+        <div>
+          <mat-card-title>
+            {{ isEditMode ? 'Editar Usuário' : 'Cadastrar Novo Usuário' }}
+          </mat-card-title>
+          <mat-card-subtitle>
+            {{ isEditMode ? 'Atualize as informações do usuário' : 'Preencha os dados para criar um novo usuário' }}
+          </mat-card-subtitle>
+        </div>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Loading Spinner -->
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Carregando...</p>
+      </div>
+
+      <!-- Formulário -->
+      <form [formGroup]="usuarioForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
+        <div class="form-row">
+          <!-- Nome -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nome Completo</mat-label>
+            <mat-icon matPrefix>person</mat-icon>
+            <input
+              matInput
+              formControlName="nome"
+              placeholder="Ex: João da Silva"
+              maxlength="100"
+              autofocus>
+            <mat-hint align="end">{{ nome?.value?.length || 0 }}/100</mat-hint>
+            <mat-error *ngIf="nome?.hasError('required')">
+              Nome é obrigatório
+            </mat-error>
+            <mat-error *ngIf="nome?.hasError('minlength')">
+              Nome deve ter pelo menos 3 caracteres
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row two-columns">
+          <!-- Email -->
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <mat-icon matPrefix>email</mat-icon>
+            <input
+              matInput
+              type="email"
+              formControlName="email"
+              placeholder="usuario@example.com">
+            <mat-error *ngIf="email?.hasError('required')">
+              Email é obrigatório
+            </mat-error>
+            <mat-error *ngIf="email?.hasError('email')">
+              Email inválido
+            </mat-error>
+          </mat-form-field>
+
+          <!-- CPF -->
+          <mat-form-field appearance="outline">
+            <mat-label>CPF</mat-label>
+            <mat-icon matPrefix>badge</mat-icon>
+            <input
+              matInput
+              formControlName="cpf"
+              placeholder="000.000.000-00"
+              (input)="onCpfInput($event)"
+              maxlength="14">
+            <mat-hint>Formato: 000.000.000-00</mat-hint>
+            <mat-error *ngIf="cpf?.hasError('required')">
+              CPF é obrigatório
+            </mat-error>
+            <mat-error *ngIf="cpf?.hasError('pattern')">
+              CPF inválido
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row two-columns">
+          <!-- Senha -->
+          <mat-form-field appearance="outline">
+            <mat-label>{{ isEditMode ? 'Nova Senha (opcional)' : 'Senha' }}</mat-label>
+            <mat-icon matPrefix>lock</mat-icon>
+            <input
+              matInput
+              type="password"
+              formControlName="senha"
+              [placeholder]="isEditMode ? 'Deixe em branco para manter' : 'Mínimo 6 caracteres'">
+            <mat-hint *ngIf="!isEditMode">Mínimo 6 caracteres</mat-hint>
+            <mat-hint *ngIf="isEditMode">Deixe em branco para não alterar</mat-hint>
+            <mat-error *ngIf="senha?.hasError('required')">
+              Senha é obrigatória
+            </mat-error>
+            <mat-error *ngIf="senha?.hasError('minlength')">
+              Senha deve ter pelo menos 6 caracteres
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Role -->
+          <mat-form-field appearance="outline">
+            <mat-label>Função</mat-label>
+            <mat-icon matPrefix>work</mat-icon>
+            <mat-select formControlName="role" placeholder="Selecione a função">
+              <mat-option *ngFor="let role of roles" [value]="role.value">
+                <div class="role-option">
+                  <mat-icon>{{ role.icon }}</mat-icon>
+                  {{ role.label }}
+                </div>
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="role?.hasError('required')">
+              Função é obrigatória
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+          <mat-icon>info</mat-icon>
+          <div>
+            <strong *ngIf="!isEditMode">Importante:</strong>
+            <strong *ngIf="isEditMode">Atenção:</strong>
+            <span *ngIf="!isEditMode">
+              O usuário receberá um email de boas-vindas com as credenciais de acesso.
+            </span>
+            <span *ngIf="isEditMode">
+              Deixe o campo de senha em branco se não quiser alterar a senha atual.
+            </span>
+          </div>
+        </div>
+
+        <!-- Preview da Role Selecionada -->
+        <div class="role-preview" *ngIf="role && role.value">
+          <span class="preview-label">Função selecionada:</span>
+          <mat-chip-set>
+            <mat-chip [highlighted]="true" class="role-chip-preview">
+              <mat-icon>{{ getRoleIcon(role.value) }}</mat-icon>
+              {{ role.value }}
+            </mat-chip>
+          </mat-chip-set>
+        </div>
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions align="end" *ngIf="!isLoading">
+      <button
+        mat-button
+        type="button"
+        (click)="onReset()"
+        [disabled]="isSaving"
+        matTooltip="Limpar formulário">
+        <mat-icon>refresh</mat-icon>
+        Limpar
+      </button>
+
+      <button
+        mat-button
+        type="button"
+        (click)="onCancel()"
+        [disabled]="isSaving">
+        <mat-icon>close</mat-icon>
+        Cancelar
+      </button>
+
+      <button
+        mat-raised-button
+        color="primary"
+        type="button"
+        (click)="onSubmit()"
+        [disabled]="isSaving || usuarioForm.invalid"
+        matTooltip="Salvar usuário">
+        <mat-icon>{{ isSaving ? 'hourglass_empty' : 'save' }}</mat-icon>
+        {{ isSaving ? 'Salvando...' : (isEditMode ? 'Atualizar' : 'Cadastrar') }}
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

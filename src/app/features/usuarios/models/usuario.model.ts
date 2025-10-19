@@ -20,3 +20,15 @@ export enum UserRole {
   ALUNO = 'ALUNO'
 }
 
+// Request para mudança de senha
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+// Response do checkAuthorities
+export interface AuthoritiesResponse {
+  username: string;
+  authorities: string[];
+}
+

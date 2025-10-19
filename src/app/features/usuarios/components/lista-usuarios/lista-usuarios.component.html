@@ -127,6 +127,13 @@
               </button>
               <button
                 mat-icon-button
+                color="accent"
+                matTooltip="Alterar senha"
+                (click)="changePassword(usuario)">
+                <mat-icon>lock_reset</mat-icon>
+              </button>
+              <button
+                mat-icon-button
                 color="warn"
                 matTooltip="Excluir usuário"
                 (click)="deleteUser(usuario)">

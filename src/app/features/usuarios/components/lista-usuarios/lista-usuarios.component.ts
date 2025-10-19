@@ -24,6 +24,7 @@ import { UsuariosService } from '../../services/usuarios.service';
 import { Usuario } from '../../models/usuario.model';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { CursosUsuarioDialogComponent } from '../cursos-usuario-dialog/cursos-usuario-dialog.component';
+import { ChangePasswordDialogComponent } from '../../../../shared/components/change-password-dialog/change-password-dialog.component';
 
 @Component({
   selector: 'acadmanage-lista-usuarios',
@@ -109,6 +110,25 @@ export class ListaUsuariosComponent implements OnInit {
       maxWidth: '90vw',
       panelClass: 'cursos-dialog-panel',
       data: { usuario }
+    });
+  }
+
+  changePassword(usuario: Usuario): void {
+    const dialogRef = this.dialog.open(ChangePasswordDialogComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      panelClass: 'change-password-dialog-panel',
+      data: {
+        usuarioId: usuario.id,
+        usuarioNome: usuario.nome
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        // Senha alterada com sucesso
+        console.log('Senha alterada para usuário:', usuario.nome);
+      }
     });
   }
 

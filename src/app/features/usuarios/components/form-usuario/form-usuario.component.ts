@@ -45,6 +45,7 @@ export class FormUsuarioComponent implements OnInit {
   usuarioId?: number;
   isLoading = false;
   isSaving = false;
+  usuarioOriginal?: Usuario; // Armazena dados originais do usuário
 
   roles = [
     { value: 'ADMINISTRADOR', label: 'Administrador', icon: 'admin_panel_settings' },
@@ -86,12 +87,15 @@ export class FormUsuarioComponent implements OnInit {
     this.isLoading = true;
     this.usuariosService.getUserById(id).subscribe({
       next: (usuario) => {
+        this.usuarioOriginal = usuario; // Armazena dados originais
+
         this.usuarioForm.patchValue({
           nome: usuario.nome,
           email: usuario.email,
           cpf: usuario.cpf,
           role: usuario.role
         });
+
         // Em modo de edição, senha não é obrigatória
         this.usuarioForm.get('senha')?.clearValidators();
         this.usuarioForm.get('senha')?.setValidators([Validators.minLength(6)]);
@@ -102,6 +106,7 @@ export class FormUsuarioComponent implements OnInit {
         console.error('Erro ao carregar usuário:', error);
         this.showMessage('Erro ao carregar usuário', 'error');
         this.isLoading = false;
+        this.router.navigate(['/usuarios']);
       }
     });
   }
@@ -109,19 +114,48 @@ export class FormUsuarioComponent implements OnInit {
   onSubmit(): void {
     if (this.usuarioForm.valid) {
       this.isSaving = true;
-      const usuarioData: Partial<Usuario> = this.usuarioForm.value;
 
-      // Se a senha estiver vazia em modo de edição, não enviar
-      if (this.isEditMode && !usuarioData.senha) {
-        delete usuarioData.senha;
+      // Preparar payload de acordo com a API
+      const formValues = this.usuarioForm.value;
+      let usuarioData: any;
+
+      if (this.isEditMode && this.usuarioOriginal) {
+        // MODO EDIÇÃO: Manter estrutura completa do usuário
+        usuarioData = {
+          id: this.usuarioOriginal.id,
+          nome: formValues.nome,
+          cpf: formValues.cpf,
+          email: formValues.email,
+          role: formValues.role,
+          cursos: this.usuarioOriginal.cursos || [] // Manter cursos existentes
+        };
+
+        // Adicionar senha apenas se foi preenchida
+        if (formValues.senha && formValues.senha.trim() !== '') {
+          usuarioData.senha = formValues.senha;
+        }
+      } else {
+        // MODO CRIAÇÃO: Criar novo usuário com cursos vazio
+        usuarioData = {
+          id: 0,
+          nome: formValues.nome,
+          cpf: formValues.cpf,
+          email: formValues.email,
+          senha: formValues.senha,
+          role: formValues.role,
+          cursos: [] // Array vazio para novo usuário
+        };
       }
+
+      console.log('Enviando payload:', usuarioData);
 
       const operation = this.isEditMode && this.usuarioId
         ? this.usuariosService.updateUser(this.usuarioId, usuarioData)
         : this.usuariosService.createUser(usuarioData);
 
       operation.subscribe({
-        next: () => {
+        next: (response) => {
+          console.log('Resposta do servidor:', response);
           this.showMessage(
             this.isEditMode ? 'Usuário atualizado com sucesso!' : 'Usuário cadastrado com sucesso!',
             'success'
@@ -131,7 +165,19 @@ export class FormUsuarioComponent implements OnInit {
         },
         error: (error) => {
           console.error('Erro ao salvar usuário:', error);
-          this.showMessage('Erro ao salvar usuário. Tente novamente.', 'error');
+
+          let errorMessage = 'Erro ao salvar usuário. ';
+          if (error.error?.message) {
+            errorMessage += error.error.message;
+          } else if (error.status === 400) {
+            errorMessage += 'Verifique os dados informados.';
+          } else if (error.status === 409) {
+            errorMessage += 'CPF ou email já cadastrado.';
+          } else {
+            errorMessage += 'Tente novamente.';
+          }
+
+          this.showMessage(errorMessage, 'error');
           this.isSaving = false;
         }
       });

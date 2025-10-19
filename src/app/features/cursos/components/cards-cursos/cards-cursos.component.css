@@ -1,70 +1,363 @@
-.grid-list {
-  display: flex;
-  justify-content: flex-start; /* Alinhamento à esquerda */
-  align-items: flex-start; /* Alinhamento superior */
+/* Container Principal */
+.courses-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: calc(100vh - 100px);
+  overflow-y: auto;
 }
 
-.grid-list {
-  justify-content: start; /* Alinha os itens à esquerda */
-  align-items: start; /* Alinha os itens no topo */
-  margin: 10px;
-}
-
+/* Header */
 .courses-header {
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap;
   justify-content: space-between;
   align-items: center;
-  align-content: stretch;
+  margin-bottom: 24px;
+  padding: 16px 0;
 }
 
-.edit-button {
-  margin-right: 5px;
+.courses-header h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
+.courses-header h2::before {
+  content: '📚';
+  font-size: 32px;
+}
+
+.space {
+  flex: 1;
+}
+
+/* Botão Adicionar - Nova Paleta */
 .add-button {
-  margin-right: 50px;
+  background: linear-gradient(135deg, #5B5BEA 0%, #7C3AED 100%) !important;
+  color: white !important;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(91, 91, 234, 0.4);
+  transition: all 0.3s ease;
 }
 
+.add-button:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6);
+}
 
+.add-button mat-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+}
+
+/* Divider */
+mat-divider {
+  margin-bottom: 24px;
+}
+
+/* Grid List */
+.grid-list {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Grid Tile - Remover padding padrão do Material */
+::ng-deep .grid-list .mat-grid-tile {
+  overflow: visible !important;
+}
+
+::ng-deep .grid-list .mat-grid-tile .mat-grid-tile-content {
+  top: 12px !important;
+  left: 12px !important;
+  right: 12px !important;
+  bottom: 12px !important;
+  position: absolute;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+/* Card */
 .card {
-  max-width: 400px;
-  margin: 10px;
-}
-
-.card:hover {
-  box-shadow: 0 8px 16px rgba(200, 198, 198, 0.2);
-  transform: translateY(-1px); /* Eleva o card levemente */
-}
-
-.card-header {
-  background-color: #3233A6;
-  border-top-left-radius: 10px; /* Ajuste para coincidir com o mat-card */
-  border-top-right-radius: 10px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
+.card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+}
+
+/* Card Header - Nova Paleta */
+.card-header {
+  background: linear-gradient(135deg, #5B5BEA 0%, #7C3AED 100%);
+  color: white;
+  padding: 16px;
+  border-radius: 12px 12px 0 0 !important;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+::ng-deep .card-header .mat-card-header-text {
+  margin: 0 8px;
+  flex: 1;
+}
+
 .header-image {
-  background-image: url('/imagens/curso-header.png');
+  background-image: url('/imagens/logo.webp');
   background-size: cover;
+  background-position: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
+::ng-deep .card-header .mat-card-title {
+  color: white !important;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 !important;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Botão Editar no Header */
+.edit-button {
+  color: white !important;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+}
+
+.edit-button:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+  transform: scale(1.1);
+}
+
+.edit-button mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Card Image */
 .card-image {
-  background-size: cover;
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
 }
 
-button {
-  margin-right: 5px;
-  background-color: #505093;
-}
-
+/* Card Actions */
 mat-card-actions {
   display: flex;
   justify-content: flex-end;
-  align-items: right;
+  align-items: center;
+  padding: 12px 16px !important;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  gap: 4px;
+  margin: 0 !important;
 }
 
-.mat-tooltip {
-  z-index: 1000;
+mat-card-actions button {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: transparent !important;
+  color: #666 !important;
+  transition: all 0.2s ease;
+}
+
+mat-card-actions button:hover {
+  background: #e9ecef !important;
+  transform: scale(1.1);
+}
+
+/* Cores específicas dos botões de ação */
+mat-card-actions button:nth-child(1) {
+  color: #38BDF8 !important; /* Gerenciar - Azul Ciano */
+}
+
+mat-card-actions button:nth-child(2) {
+  color: #F59E0B !important; /* Permissões - Laranja */
+}
+
+mat-card-actions button:nth-child(3) {
+  color: #10B981 !important; /* Publicar - Verde */
+}
+
+mat-card-actions button:nth-child(4) {
+  color: #EF4444 !important; /* Excluir - Vermelho */
+}
+
+mat-card-actions button:hover:nth-child(1) {
+  background: rgba(33, 150, 243, 0.1) !important;
+}
+
+mat-card-actions button:hover:nth-child(2) {
+  background: rgba(255, 152, 0, 0.1) !important;
+}
+
+mat-card-actions button:hover:nth-child(3) {
+  background: rgba(76, 175, 80, 0.1) !important;
+}
+
+mat-card-actions button:hover:nth-child(4) {
+  background: rgba(244, 67, 54, 0.1) !important;
+}
+
+mat-card-actions button mat-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+}
+
+/* Mensagem de Erro */
+.error {
+  background: #ffebee;
+  color: #c62828;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  border-left: 4px solid #f44336;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.error::before {
+  content: '⚠️';
+  font-size: 24px;
+}
+
+/* Mensagem quando não há cursos */
+.courses-container p {
+  text-align: center;
+  padding: 48px 24px;
+  color: #999;
+  font-size: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.courses-container p::before {
+  content: '📚';
+  font-size: 64px;
+  opacity: 0.3;
+}
+
+/* Responsividade */
+@media (max-width: 1200px) {
+  ::ng-deep .grid-list {
+    /* 2 colunas em telas médias */
+  }
+}
+
+@media (max-width: 768px) {
+  .courses-container {
+    padding: 16px;
+  }
+
+  .courses-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .add-button {
+    align-self: flex-end;
+  }
+
+  ::ng-deep .grid-list {
+    /* 1 coluna em mobile */
+  }
+
+  .card-image {
+    height: 160px;
+  }
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Tooltip customizado */
+::ng-deep .mat-mdc-tooltip {
+  background: rgba(0, 0, 0, 0.9) !important;
+  color: white !important;
+  font-size: 12px !important;
+  padding: 8px 12px !important;
+  border-radius: 6px !important;
+}
+
+/* Fix para overflow do container pai */
+::ng-deep mat-sidenav-content {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* Melhorar scroll */
+.courses-container {
+  scrollbar-width: thin;
+  scrollbar-color: #667eea #f1f1f1;
+}
+
+.courses-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.courses-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.courses-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #5B5BEA 0%, #7C3AED 100%);
+  border-radius: 4px;
+}
+
+.courses-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #7C3AED 0%, #5B5BEA 100%);
 }

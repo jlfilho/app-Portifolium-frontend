@@ -1,59 +1,168 @@
-# AcadmanageFrontend
+# 🎓 AcadManage Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.6.
+Sistema de gerenciamento acadêmico desenvolvido com **Angular 19** seguindo as melhores práticas e arquitetura moderna.
 
-## Development server
+## 🚀 Características
 
-To start a local development server, run:
+- ✅ **100% Standalone Components** - Sem NgModules
+- ⚡ **Lazy Loading** - Carregamento sob demanda
+- 🔐 **HTTP Interceptor** - Autenticação automática
+- 🎨 **Angular Material** - UI moderna e responsiva
+- 🌐 **SSR (Server-Side Rendering)** - Melhor SEO e performance
+- 📦 **Environment Configuration** - Configuração centralizada
+- 🛡️ **TypeScript Strict Mode** - Maior segurança de tipos
+
+## 📋 Pré-requisitos
+
+- **Node.js** 18+ e npm
+- Angular CLI 19+ (opcional, mas recomendado)
+
+## 🔧 Instalação
 
 ```bash
+# Instalar dependências
+npm install
+
+# Instalar Angular CLI globalmente (opcional)
+npm install -g @angular/cli
+```
+
+## 💻 Servidor de Desenvolvimento
+
+Para iniciar o servidor local de desenvolvimento:
+
+```bash
+npm start
+# ou
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Acesse `http://localhost:4200/` no navegador. A aplicação recarrega automaticamente ao modificar os arquivos.
 
-## Code scaffolding
+## 🏗️ Estrutura do Projeto
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```
+src/app/
+├── auth/                    # Módulo de autenticação
+│   └── login/
+├── dashboard/               # Dashboard principal
+│   ├── dashboard.routes.ts # Rotas do dashboard (lazy loading)
+│   ├── home/               # Layout principal
+│   └── graficos/           # Componente de gráficos
+├── features/               # Features da aplicação
+│   ├── cursos/            # Gestão de cursos
+│   │   ├── cursos.routes.ts
+│   │   ├── components/
+│   │   └── services/
+│   └── usuarios/          # Gestão de usuários
+│       ├── usuarios.routes.ts
+│       ├── components/
+│       └── services/
+├── shared/                # Recursos compartilhados
+│   ├── interceptors/      # HTTP Interceptors
+│   ├── api.service.ts     # Serviço de API
+│   └── auth.guard.ts      # Guard de autenticação
+└── environments/          # Configurações por ambiente
+    ├── environment.ts
+    └── environment.development.ts
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## ⚙️ Configuração
 
-```bash
-ng generate --help
+### API URL
+
+Configure a URL da API nos arquivos de environment:
+
+**Desenvolvimento:** `src/environments/environment.development.ts`
+```typescript
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:8080/api'
+};
 ```
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
+**Produção:** `src/environments/environment.ts`
+```typescript
+export const environment = {
+  production: true,
+  apiUrl: 'https://api.seudominio.com/api'
+};
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## 🔐 Autenticação
 
-## Running unit tests
+O projeto usa **JWT (JSON Web Token)** para autenticação. O token é automaticamente adicionado a todas as requisições HTTP através do `authInterceptor`.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+**Não é necessário** adicionar headers manualmente nos services:
 
-```bash
-ng test
+```typescript
+// ✅ Correto - Token adicionado automaticamente
+this.http.get(`${this.baseUrl}/cursos`);
+
+// ❌ Não é mais necessário
+const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+this.http.get(`${this.baseUrl}/cursos`, { headers });
 ```
 
-## Running end-to-end tests
+## 📦 Build
 
-For end-to-end (e2e) testing, run:
-
+### Build de Desenvolvimento
 ```bash
-ng e2e
+npm run build
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### Build de Produção
+```bash
+ng build --configuration production
+```
 
-## Additional Resources
+Os arquivos de build serão armazenados em `dist/`.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## 🧪 Testes
+
+```bash
+# Executar testes unitários
+npm test
+
+# Executar testes com coverage
+ng test --code-coverage
+```
+
+## 🚀 Comandos Úteis
+
+```bash
+# Criar novo componente standalone
+ng generate component nome-componente --standalone
+
+# Criar novo serviço
+ng generate service services/nome-servico
+
+# Criar novo guard
+ng generate guard guards/nome-guard --functional
+
+# Servidor com watch mode
+npm run watch
+```
+
+## 📚 Documentação Adicional
+
+- 📖 **[REFACTORING_SUMMARY.md](./REFACTORING_SUMMARY.md)** - Detalhes da refatoração implementada
+- 🔗 [Angular CLI Documentation](https://angular.dev/tools/cli)
+- 🔗 [Angular Material Components](https://material.angular.io/components)
+
+## 🤝 Contribuindo
+
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/MinhaFeature`)
+3. Commit suas mudanças (`git commit -m 'Adiciona MinhaFeature'`)
+4. Push para a branch (`git push origin feature/MinhaFeature`)
+5. Abra um Pull Request
+
+## 📝 Licença
+
+Este projeto está sob a licença MIT.
+
+---
+
+**Versão Angular:** 19.0.x  
+**Última Atualização:** 2025

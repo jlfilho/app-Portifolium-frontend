@@ -1,0 +1,35 @@
+<div class="dialog-container">
+  <div class="dialog-header" [ngClass]="'header-' + data.type">
+    <div class="icon-container" [ngClass]="getIconClass()">
+      <mat-icon class="dialog-icon">{{ getIcon() }}</mat-icon>
+    </div>
+  </div>
+
+  <div class="dialog-content">
+    <h2 mat-dialog-title class="dialog-title">{{ data.title }}</h2>
+
+    <mat-dialog-content class="dialog-message">
+      <p>{{ data.message }}</p>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="dialog-actions">
+      <button
+        mat-button
+        (click)="onCancel()"
+        class="cancel-button">
+        <mat-icon>close</mat-icon>
+        {{ data.cancelText }}
+      </button>
+
+      <button
+        mat-raised-button
+        [color]="data.type === 'danger' ? 'warn' : 'primary'"
+        (click)="onConfirm()"
+        class="confirm-button">
+        <mat-icon>{{ data.type === 'danger' ? 'delete' : 'check' }}</mat-icon>
+        {{ data.confirmText }}
+      </button>
+    </mat-dialog-actions>
+  </div>
+</div>
+

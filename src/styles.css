@@ -1,4 +1,189 @@
-/* You can add global styles to this file, and also import other style files */
+/* ============================================
+   IMPORTS
+   ============================================ */
+@import './styles/variables.css';
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+/* ============================================
+   ESTILOS GLOBAIS - EDUCAÇÃO MODERNA
+   ============================================ */
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+}
+
+/* ============================================
+   SNACKBAR - NOVA PALETA
+   ============================================ */
+
+.snackbar-success {
+  --mdc-snackbar-container-color: #10B981 !important;
+  --mat-mdc-snack-bar-button-color: #fff !important;
+  --mdc-snackbar-supporting-text-color: #fff !important;
+}
+
+.snackbar-error {
+  --mdc-snackbar-container-color: #EF4444 !important;
+  --mat-mdc-snack-bar-button-color: #fff !important;
+  --mdc-snackbar-supporting-text-color: #fff !important;
+}
+
+.snackbar-warning {
+  --mdc-snackbar-container-color: #F59E0B !important;
+  --mat-mdc-snack-bar-button-color: #fff !important;
+  --mdc-snackbar-supporting-text-color: #fff !important;
+}
+
+/* ============================================
+   SCROLLBAR CUSTOMIZADA
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-light);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gradient-primary);
+  border-radius: var(--border-radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gradient-accent);
+}
+
+/* ============================================
+   MATERIAL OVERRIDES - NOVA PALETA
+   ============================================ */
+
+/* Primary Color */
+::ng-deep .mat-mdc-raised-button.mat-primary {
+  --mdc-protected-button-container-color: var(--primary-color) !important;
+  --mdc-protected-button-label-text-color: white !important;
+}
+
+::ng-deep .mat-mdc-raised-button.mat-primary:hover {
+  --mdc-protected-button-container-color: var(--accent-color) !important;
+  box-shadow: var(--shadow-primary);
+}
+
+/* Accent Color */
+::ng-deep .mat-mdc-button.mat-accent {
+  --mdc-text-button-label-text-color: var(--accent-color) !important;
+}
+
+/* Icons */
+::ng-deep .mat-icon {
+  color: inherit;
+}
+
+/* Form Fields */
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-form-field-focus-overlay {
+  background-color: rgba(91, 91, 234, 0.1) !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
+  color: var(--primary-color) !important;
+}
+
+/* ============================================
+   ANIMAÇÕES GLOBAIS
+   ============================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+.scale-in {
+  animation: scaleIn 0.3s ease-out;
+}
+
+/* ============================================
+   UTILIDADES GLOBAIS
+   ============================================ */
+
+.container-fluid {
+  width: 100%;
+  padding: 0 var(--spacing-lg);
+  margin: 0 auto;
+}
+
+.container {
+  max-width: 1400px;
+  padding: 0 var(--spacing-lg);
+  margin: 0 auto;
+}
+
+.card-modern {
+  background: white;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-lg);
+  transition: all var(--transition-base);
+}
+
+.card-modern:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.btn-gradient {
+  background: var(--gradient-primary) !important;
+  color: white !important;
+  border: none;
+  transition: all var(--transition-base);
+}
+
+.btn-gradient:hover {
+  background: var(--gradient-accent) !important;
+  box-shadow: var(--shadow-primary);
+  transform: translateY(-2px);
+}

@@ -1,0 +1,95 @@
+/* ============================================
+   PALETA DE CORES - EDUCAÇÃO MODERNA
+   ============================================ */
+
+:root {
+  /* Cores Primárias */
+  --primary-color: #5B5BEA;           /* Azul violeta suave */
+  --secondary-color: #38BDF8;         /* Azul ciano leve */
+  --accent-color: #7C3AED;            /* Roxo vibrante */
+
+  /* Backgrounds */
+  --bg-dark: #111827;                 /* Cinza azulado escuro */
+  --bg-card: #1F2937;                 /* Cinza carvão */
+  --bg-light: #F9FAFB;                /* Branco gelo */
+  --bg-hover: rgba(91, 91, 234, 0.1); /* Hover sutil */
+
+  /* Texto */
+  --text-primary: #F9FAFB;            /* Branco gelo */
+  --text-secondary: #9CA3AF;          /* Cinza claro */
+  --text-dark: #111827;               /* Texto em fundo claro */
+
+  /* Gradientes */
+  --gradient-primary: linear-gradient(135deg, #5B5BEA 0%, #7C3AED 100%);
+  --gradient-secondary: linear-gradient(135deg, #38BDF8 0%, #5B5BEA 100%);
+  --gradient-accent: linear-gradient(135deg, #7C3AED 0%, #5B5BEA 100%);
+
+  /* Estados */
+  --success-color: #10B981;           /* Verde */
+  --error-color: #EF4444;             /* Vermelho */
+  --warning-color: #F59E0B;           /* Laranja */
+  --info-color: #38BDF8;              /* Azul ciano */
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+  --shadow-primary: 0 4px 12px rgba(91, 91, 234, 0.4);
+  --shadow-accent: 0 4px 12px rgba(124, 58, 237, 0.4);
+
+  /* Bordas */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+  --border-radius-full: 9999px;
+
+  /* Transições */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.3s ease;
+
+  /* Espaçamentos */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+}
+
+/* ============================================
+   CLASSES UTILITÁRIAS
+   ============================================ */
+
+/* Backgrounds */
+.bg-primary { background: var(--primary-color) !important; }
+.bg-secondary { background: var(--secondary-color) !important; }
+.bg-accent { background: var(--accent-color) !important; }
+.bg-dark { background: var(--bg-dark) !important; }
+.bg-card { background: var(--bg-card) !important; }
+.bg-gradient-primary { background: var(--gradient-primary) !important; }
+.bg-gradient-secondary { background: var(--gradient-secondary) !important; }
+.bg-gradient-accent { background: var(--gradient-accent) !important; }
+
+/* Text Colors */
+.text-primary { color: var(--text-primary) !important; }
+.text-secondary { color: var(--text-secondary) !important; }
+.text-dark { color: var(--text-dark) !important; }
+.text-accent { color: var(--accent-color) !important; }
+
+/* Sombras */
+.shadow-sm { box-shadow: var(--shadow-sm) !important; }
+.shadow-md { box-shadow: var(--shadow-md) !important; }
+.shadow-lg { box-shadow: var(--shadow-lg) !important; }
+.shadow-primary { box-shadow: var(--shadow-primary) !important; }
+.shadow-accent { box-shadow: var(--shadow-accent) !important; }
+
+/* Border Radius */
+.rounded-sm { border-radius: var(--border-radius-sm) !important; }
+.rounded-md { border-radius: var(--border-radius-md) !important; }
+.rounded-lg { border-radius: var(--border-radius-lg) !important; }
+.rounded-xl { border-radius: var(--border-radius-xl) !important; }
+.rounded-full { border-radius: var(--border-radius-full) !important; }
+

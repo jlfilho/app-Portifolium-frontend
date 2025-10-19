@@ -1,0 +1,111 @@
+<div class="form-container">
+  <mat-card class="form-card">
+    <mat-card-header>
+      <div class="header-content">
+        <div class="header-icon">
+          <mat-icon>{{ isEditMode ? 'edit' : 'add_circle_outline' }}</mat-icon>
+        </div>
+        <div>
+          <mat-card-title>
+            {{ isEditMode ? 'Editar Curso' : 'Cadastrar Novo Curso' }}
+          </mat-card-title>
+          <mat-card-subtitle>
+            {{ isEditMode ? 'Atualize as informações do curso' : 'Preencha os dados para criar um novo curso' }}
+          </mat-card-subtitle>
+        </div>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Loading Spinner -->
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Carregando...</p>
+      </div>
+
+      <!-- Formulário -->
+      <form [formGroup]="cursoForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
+        <div class="form-row">
+          <!-- Nome do Curso -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nome do Curso</mat-label>
+            <mat-icon matPrefix>school</mat-icon>
+            <input
+              matInput
+              formControlName="nome"
+              placeholder="Ex: Introdução ao Angular"
+              maxlength="100"
+              autofocus>
+            <mat-hint align="end">{{ nome?.value?.length || 0 }}/100</mat-hint>
+            <mat-error *ngIf="nome?.hasError('required')">
+              Nome é obrigatório
+            </mat-error>
+            <mat-error *ngIf="nome?.hasError('minlength')">
+              Nome deve ter pelo menos 3 caracteres
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <!-- Status Ativo -->
+          <div class="toggle-container">
+            <mat-slide-toggle
+              formControlName="ativo"
+              color="primary">
+              <div class="toggle-content">
+                <mat-icon>{{ cursoForm.get('ativo')?.value ? 'visibility' : 'visibility_off' }}</mat-icon>
+                <span class="toggle-label">
+                  {{ cursoForm.get('ativo')?.value ? 'Curso Ativo' : 'Curso Inativo' }}
+                </span>
+              </div>
+            </mat-slide-toggle>
+            <mat-hint class="toggle-hint">
+              {{ cursoForm.get('ativo')?.value ? 'Visível para alunos' : 'Oculto para alunos' }}
+            </mat-hint>
+          </div>
+        </div>
+
+        <!-- Informações adicionais -->
+        <div class="info-box" *ngIf="!isEditMode">
+          <mat-icon>info</mat-icon>
+          <div>
+            <strong>Dica:</strong> Após criar o curso, você poderá adicionar atividades,
+            gerenciar permissões e publicar o conteúdo para os alunos.
+          </div>
+        </div>
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions align="end" *ngIf="!isLoading">
+      <button
+        mat-button
+        type="button"
+        (click)="onReset()"
+        [disabled]="isSaving"
+        matTooltip="Limpar formulário">
+        <mat-icon>refresh</mat-icon>
+        Limpar
+      </button>
+
+      <button
+        mat-button
+        type="button"
+        (click)="onCancel()"
+        [disabled]="isSaving">
+        <mat-icon>close</mat-icon>
+        Cancelar
+      </button>
+
+      <button
+        mat-raised-button
+        color="primary"
+        type="button"
+        (click)="onSubmit()"
+        [disabled]="isSaving || cursoForm.invalid"
+        matTooltip="Salvar curso">
+        <mat-icon>{{ isSaving ? 'hourglass_empty' : 'save' }}</mat-icon>
+        {{ isSaving ? 'Salvando...' : (isEditMode ? 'Atualizar' : 'Cadastrar') }}
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

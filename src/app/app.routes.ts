@@ -1,29 +1,38 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './auth/login/login.component';
-import { HomeComponent } from './dashboard/home/home.component';
-import { CardsCursosComponent } from './features/cursos/components/cards-cursos/cards-cursos.component';
 import { authGuard } from './shared/auth.guard';
-import { NotFoundComponent } from './shared/not-found/not-found.component';
-import { ListaCategoriasComponent } from './features/cursos/components/lista-categorias/lista-categorias.component';
-import { ListaUsuariosComponent } from './features/usuarios/components/lista-usuarios/lista-usuarios.component';
-import { FormCategoriaComponent } from './features/cursos/components/form-categoria/form-categoria.component';
-import { FormUsuarioComponent } from './features/usuarios/components/form-usuario/form-usuario.component';
-import { GraficosComponent } from './dashboard/graficos/graficos.component';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
-  { path: '', component: HomeComponent, canActivate: [authGuard],
-    children: [                    // Rotas filhas do Dashboard
-      { path: 'dashboard', component: GraficosComponent },
-      { path: 'cursos', component: CardsCursosComponent },
-      { path: 'categorias', component: ListaCategoriasComponent },
-      { path: 'formcategoria', component: FormCategoriaComponent },
-      { path: 'usuarios', component: ListaUsuariosComponent },
-      { path: 'formusuario', component: FormUsuarioComponent },
-      { path: '**', component: NotFoundComponent },
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }, // Rota padrão dentro do dashboard
-    ],
-   },
-   { path: '**', redirectTo: 'login' },
+  {
+    path: 'login',
+    loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent)
+  },
+  {
+    path: '',
+    loadComponent: () => import('./dashboard/home/home.component').then(m => m.HomeComponent),
+    canActivate: [authGuard],
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
+      {
+        path: '',
+        loadChildren: () => import('./dashboard/dashboard.routes').then(m => m.DASHBOARD_ROUTES)
+      },
+      {
+        path: '',
+        loadChildren: () => import('./features/cursos/cursos.routes').then(m => m.CURSOS_ROUTES)
+      },
+      {
+        path: '',
+        loadChildren: () => import('./features/usuarios/usuarios.routes').then(m => m.USUARIOS_ROUTES)
+      }
+    ]
+  },
+  {
+    path: '**',
+    loadComponent: () => import('./shared/not-found/not-found.component').then(m => m.NotFoundComponent)
+  }
 ];
 

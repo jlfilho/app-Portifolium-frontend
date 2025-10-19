@@ -1,0 +1,420 @@
+/* Container Principal */
+.usuarios-container {
+  padding: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+  min-height: calc(100vh - 100px);
+}
+
+/* Header */
+.usuarios-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding: 16px 0;
+}
+
+.usuarios-header h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.usuarios-header h2 mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: #5B5BEA;
+}
+
+.space {
+  flex: 1;
+}
+
+/* Botão Adicionar */
+.add-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 24px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+.add-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+}
+
+.add-button mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Divider */
+mat-divider {
+  margin-bottom: 24px;
+}
+
+/* Card */
+.table-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px;
+  gap: 16px;
+}
+
+.loading-container p {
+  color: #666;
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Campo de Busca */
+.filter-field {
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 24px;
+}
+
+::ng-deep .filter-field .mat-mdc-form-field-icon-prefix {
+  color: #5B5BEA;
+}
+
+/* Tabela Container */
+.table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+/* Tabela */
+.usuarios-table {
+  width: 100%;
+  background: white;
+}
+
+/* Header da Tabela - Nova Paleta */
+::ng-deep .usuarios-table .mat-mdc-header-cell {
+  background: linear-gradient(135deg, #5B5BEA 0%, #7C3AED 100%) !important;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 16px;
+  border: none;
+}
+
+::ng-deep .usuarios-table .mat-mdc-header-cell .mat-sort-header-content {
+  color: white !important;
+}
+
+::ng-deep .usuarios-table .mat-mdc-header-cell .mat-sort-header-arrow {
+  color: white !important;
+}
+
+::ng-deep .usuarios-table thead tr th {
+  color: white !important;
+  background: linear-gradient(135deg, #5B5BEA 0%, #7C3AED 100%) !important;
+}
+
+/* Células da Tabela */
+::ng-deep .usuarios-table .mat-mdc-cell {
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* Linhas da Tabela */
+.table-row {
+  transition: background-color 0.2s ease;
+}
+
+.table-row:hover {
+  background-color: #f8f9fa;
+}
+
+/* ID Badge - Nova Paleta */
+.id-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: rgba(91, 91, 234, 0.1);
+  color: #5B5BEA;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+/* User Info */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  color: #5B5BEA;
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+}
+
+.user-name {
+  font-weight: 500;
+  color: #333;
+}
+
+/* Email */
+.email-text {
+  color: #666;
+  font-size: 14px;
+}
+
+/* CPF */
+.cpf-text {
+  font-family: 'Courier New', monospace;
+  color: #666;
+  font-size: 14px;
+}
+
+/* Role Chip */
+.role-chip {
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  height: auto;
+  color: white !important;
+}
+
+.role-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: white !important;
+}
+
+/* Forçar cor branca nos chips independente do tema */
+::ng-deep .role-chip span {
+  color: white !important;
+}
+
+/* Cursos Badge Button */
+.cursos-badge-button {
+  position: relative;
+}
+
+/* Actions */
+.actions-header {
+  text-align: right;
+}
+
+.actions-cell {
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.actions-cell button {
+  transition: all 0.2s ease;
+}
+
+.actions-cell button:hover {
+  transform: scale(1.1);
+}
+
+/* No Data */
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  gap: 12px;
+}
+
+.no-data mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: #ccc;
+}
+
+.no-data p {
+  font-size: 18px;
+  color: #666;
+  margin: 0;
+}
+
+.no-data small {
+  color: #999;
+  font-size: 14px;
+}
+
+/* Paginador */
+.usuarios-paginator {
+  border-top: 1px solid #e0e0e0;
+  margin-top: 16px;
+  background: transparent;
+}
+
+::ng-deep .usuarios-paginator .mat-mdc-paginator-container {
+  padding: 8px 0;
+}
+
+/* Responsividade */
+@media (max-width: 1200px) {
+  .table-container {
+    overflow-x: scroll;
+  }
+
+  .usuarios-table {
+    min-width: 900px;
+  }
+}
+
+@media (max-width: 768px) {
+  .usuarios-container {
+    padding: 16px;
+  }
+
+  .usuarios-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .add-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .filter-field {
+    max-width: 100%;
+  }
+
+  .table-card {
+    padding: 16px;
+  }
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.table-card {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Scroll da Tabela */
+.table-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #5B5BEA 0%, #7C3AED 100%);
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #7C3AED 0%, #5B5BEA 100%);
+}
+
+/* Material Overrides - Chips de Role - Nova Paleta */
+::ng-deep .mat-mdc-chip.mat-warn {
+  --mdc-chip-label-text-color: white !important;
+  --mdc-chip-elevated-container-color: #EF4444 !important;
+}
+
+::ng-deep .mat-mdc-chip.mat-warn .mat-icon {
+  color: white !important;
+}
+
+::ng-deep .mat-mdc-chip.mat-primary {
+  --mdc-chip-label-text-color: white !important;
+  --mdc-chip-elevated-container-color: #5B5BEA !important;
+}
+
+::ng-deep .mat-mdc-chip.mat-primary .mat-icon {
+  color: white !important;
+}
+
+::ng-deep .mat-mdc-chip.mat-accent {
+  --mdc-chip-label-text-color: white !important;
+  --mdc-chip-elevated-container-color: #38BDF8 !important;
+}
+
+::ng-deep .mat-mdc-chip.mat-accent .mat-icon {
+  color: white !important;
+}
+
+/* Garantir que o texto dos chips seja sempre branco */
+::ng-deep .role-chip {
+  color: white !important;
+}
+
+::ng-deep .role-chip .mat-mdc-chip-action-label {
+  color: white !important;
+}
+
+/* Estilos adicionais para garantir visibilidade */
+::ng-deep .mat-mdc-standard-chip {
+  color: white !important;
+}
+
+::ng-deep .mat-mdc-standard-chip .mat-mdc-chip-action-label {
+  color: white !important;
+}
+
+/* Header da tabela - máxima especificidade */
+::ng-deep table.usuarios-table thead tr th {
+  background: linear-gradient(135deg, #5B5BEA 0%, #7C3AED 100%) !important;
+  color: white !important;
+}
+
+::ng-deep table.usuarios-table thead tr th * {
+  color: white !important;
+}
+
+/* Chips - máxima especificidade */
+::ng-deep td mat-chip {
+  color: white !important;
+}
+
+::ng-deep td mat-chip * {
+  color: white !important;
+}
+
+/* Garantir que ícones nos chips sejam brancos */
+::ng-deep mat-chip mat-icon {
+  color: white !important;
+}
+

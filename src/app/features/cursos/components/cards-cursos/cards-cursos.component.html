@@ -1,73 +1,98 @@
 <div class="courses-container">
+  <!-- Header com título e botão adicionar -->
   <div class="courses-header">
     <h2>Meus Cursos</h2>
     <span class="space"></span>
-
-    <button mat-icon-button class="add-button"
-              matTooltip="Adicionar novo curso."
-              matTooltipPosition="above"
-              matTooltipHideDelay="1000">
-                <mat-icon>add</mat-icon>
+    <button
+      mat-icon-button
+      class="add-button"
+      matTooltip="Adicionar novo curso"
+      matTooltipPosition="below"
+      (click)="addCourse()">
+      <mat-icon>add</mat-icon>
     </button>
-</div>
+  </div>
+
   <mat-divider></mat-divider>
-  <!-- Mostra mensagem de erro caso ocorra -->
+
+  <!-- Mensagem de erro -->
   <div *ngIf="errorMessage" class="error">
     {{ errorMessage }}
   </div>
 
-  @if (cursos.length > 0){
-    <mat-grid-list cols="3" rowHeight="1:1" gutterSize="10px" class="grid-list">
-     @for (curso of cursos; track curso.id) {
-      <mat-grid-tile>
-        <mat-card class="card" appearance="outlined">
-          <mat-card-header class="card-header">
-            <div mat-card-avatar class="header-image"></div>
-            <mat-card-title>{{ curso.nome }}</mat-card-title>
-            <button mat-icon-button class="edit-button"
-            matTooltip="Editar nome do curso."
-            matTooltipPosition="above"
-            matTooltipHideDelay="1000">
-              <mat-icon>edit</mat-icon>
-            </button>
-          </mat-card-header>
-          <img class="card-image"
-            mat-card-image
-            ngSrc="/imagens/curso-header.png"
-            alt="Logo do curso {{curso.nome}}" width="398" height="318" priority
-          />
-          <mat-card-actions>
-            <button mat-icon-button
-            matTooltip="Gerenciar as atividades do curso."
-            matTooltipPosition="above"
-            matTooltipHideDelay="1000">
-              <mat-icon>hub</mat-icon>
-            </button>
-            <button mat-icon-button
-            matTooltip="Permissão de usuários para gerenciar o curso."
-            matTooltipPosition="above"
-            matTooltipHideDelay="1000">
-              <mat-icon>manage_accounts</mat-icon>
-            </button>
-            <button mat-icon-button
-            matTooltip="Publicar o curso."
-            matTooltipPosition="above"
-            matTooltipHideDelay="1000">
-              <mat-icon>visibility</mat-icon>
-            </button>
-            <button mat-icon-button
-            matTooltip="Excluir curso."
-            matTooltipPosition="above"
-            matTooltipHideDelay="1000">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </mat-card-actions>
-        </mat-card>
-      </mat-grid-tile>
+  <!-- Grid de cursos -->
+  @if (cursos.length > 0) {
+    <mat-grid-list
+      cols="3"
+      rowHeight="420px"
+      gutterSize="24px"
+      class="grid-list"
+      [cols]="getColumns()">
+      @for (curso of cursos; track curso.id) {
+        <mat-grid-tile>
+          <mat-card class="card" appearance="outlined">
+            <!-- Header do Card -->
+            <mat-card-header class="card-header">
+              <div mat-card-avatar class="header-image"></div>
+              <mat-card-title>{{ curso.nome }}</mat-card-title>
+              <button
+                mat-icon-button
+                class="edit-button"
+                matTooltip="Editar curso"
+                matTooltipPosition="left"
+                (click)="editCourse(curso.id); $event.stopPropagation()">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </mat-card-header>
+
+            <!-- Imagem do Curso -->
+            <img
+              class="card-image"
+              mat-card-image
+              ngSrc="/imagens/curso-header.png"
+              alt="Imagem do curso {{ curso.nome }}"
+              width="398"
+              height="318"
+              priority
+            />
+
+            <!-- Ações do Card -->
+            <mat-card-actions>
+              <button
+                mat-icon-button
+                matTooltip="Gerenciar atividades"
+                matTooltipPosition="above">
+                <mat-icon>hub</mat-icon>
+              </button>
+
+              <button
+                mat-icon-button
+                matTooltip="Gerenciar permissões"
+                matTooltipPosition="above">
+                <mat-icon>manage_accounts</mat-icon>
+              </button>
+
+              <button
+                mat-icon-button
+                matTooltip="Publicar curso"
+                matTooltipPosition="above">
+                <mat-icon>visibility</mat-icon>
+              </button>
+
+              <button
+                mat-icon-button
+                matTooltip="Excluir curso"
+                matTooltipPosition="above"
+                (click)="deleteCourse(curso); $event.stopPropagation()">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </mat-grid-tile>
       }
     </mat-grid-list>
-
   } @else {
+    <!-- Mensagem quando não há cursos -->
     <p>Você não possui cursos cadastrados.</p>
   }
 </div>

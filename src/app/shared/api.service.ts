@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { environment } from '../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ApiService {
-  private baseUrl = 'http://localhost:8080/api'; // Endpoint de login
+  private baseUrl = environment.apiUrl;
   private tokenSubject: BehaviorSubject<string | null>;
   public token: Observable<string | null>;
 

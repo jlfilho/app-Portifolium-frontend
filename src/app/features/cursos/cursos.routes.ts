@@ -3,6 +3,7 @@ import { CardsCursosComponent } from './components/cards-cursos/cards-cursos.com
 import { FormCursoComponent } from './components/form-curso/form-curso.component';
 import { ListaCategoriasComponent } from './components/lista-categorias/lista-categorias.component';
 import { FormCategoriaComponent } from './components/form-categoria/form-categoria.component';
+import { adminGuard } from '../../shared/guards/admin.guard';
 
 export const CURSOS_ROUTES: Routes = [
   {
@@ -23,11 +24,13 @@ export const CURSOS_ROUTES: Routes = [
   },
   {
     path: 'categorias/novo',
-    component: FormCategoriaComponent
+    component: FormCategoriaComponent,
+    canActivate: [adminGuard] // Apenas ADMINISTRADOR pode criar categorias
   },
   {
     path: 'categorias/editar/:id',
-    component: FormCategoriaComponent
+    component: FormCategoriaComponent,
+    canActivate: [adminGuard] // Apenas ADMINISTRADOR pode editar categorias
   }
 ];
 

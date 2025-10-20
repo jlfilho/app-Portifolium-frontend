@@ -1,53 +1,594 @@
-.menu-spacer {
-  margin-left: 10px;
+/* ========================================
+   🎨 VARIÁVEIS - PALETA MINIMAL TECH LIGHT+
+   ======================================== */
+:host {
+  --primary-color: #3B82F6;
+  --secondary-color: #8B5CF6;
+  --accent-color: #6366F1;
+  --success-color: #10B981;
+  --warning-color: #F59E0B;
+  --error-color: #EF4444;
+
+  /* versão clara */
+  --bg-dark: #F8FAFC;     /* fundo principal */
+  --bg-darker: #F1F5F9;   /* seções contrastantes */
+  --card-bg: #FFFFFF;     /* cartões */
+  --text-light: #0F172A;  /* texto principal escuro */
+  --text-secondary: #475569; /* cinza frio */
+  --border-color: #CBD5E1;
 }
 
-.header-image {
-  background-image: url('/imagens/logo.webp');
-  background-size: cover;
-  margin-left: 20px;
-}
 
-.dashboard-container {
-  height: 100vh;
-}
-
-.sidenav {
-  background-color: #08080f;
-  width: 250px;
-  transition: width 0.3s ease;
-}
-
-.sidenav.mat-drawer-collapsed {
-  width: 70px;
-}
-
+/* ========================================
+   🎯 TOOLBAR PRINCIPAL
+   ======================================== */
 .header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: linear-gradient(90deg, #3B82F6, #6366F1) !important;
+  box-shadow: var(--shadow-primary);
+  padding: 0 24px;
+  min-height: 64px;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Botão Menu */
+.menu-button {
+  color: var(--text-light) !important;
+  transition: all 0.3s ease;
+}
+
+.menu-button:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  transform: scale(1.1);
+}
+
+.menu-button mat-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+}
+
+/* Logo e Brand */
+.header-brand {
   display: flex;
   align-items: center;
-  background-color: #3233A6;
-  ;
+  gap: 12px;
+  margin-left: 8px;
+}
+
+.header-logo {
+  width: 40px;
+  height: 40px;
+  background-image: url('/imagens/logo.webp');
+  background-size: cover;
+  background-position: center;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.header-logo:hover {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.header-title {
+  display: flex;
+  flex-direction: column;
+  color: var(--text-light);
+}
+
+.header-title strong {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+.header-subtitle {
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.9;
+  margin-top: 2px;
 }
 
 .spacer {
   flex: 1;
 }
 
+/* Informações do Usuário */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Botão de Notificações */
+.notification-button {
+  color: var(--text-light) !important;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.notification-button:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  transform: scale(1.1);
+}
+
+::ng-deep .notification-button .mat-badge-content {
+  background-color: var(--error-color);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* Botão do Usuário */
+.user-menu-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-light) !important;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  text-transform: none;
+  font-weight: 500;
+}
+
+.user-menu-button:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.user-avatar {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: var(--text-light) !important;
+}
+
+.user-name {
+  font-size: 14px;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdown-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
+.user-menu-button[aria-expanded="true"] .dropdown-icon {
+  transform: rotate(180deg);
+}
+
+/* ========================================
+   📋 DROPDOWN DO USUÁRIO
+   ======================================== */
+::ng-deep .user-dropdown {
+  margin-top: 8px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  min-width: 280px;
+  background-color: white !important;
+}
+
+::ng-deep .user-dropdown .mat-mdc-menu-content {
+  padding: 0;
+  background-color: white !important;
+}
+
+::ng-deep .user-dropdown .mdc-list {
+  background-color: white !important;
+}
+
+.menu-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--gradient-primary);
+  color: white;
+}
+
+.menu-avatar {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+}
+
+.menu-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.menu-user-info strong {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.menu-user-info small {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+::ng-deep .user-dropdown .mat-mdc-menu-item {
+  padding: 12px 16px;
+  min-height: 48px;
+  transition: all 0.2s ease;
+  color: var(--text-dark) !important;
+}
+
+::ng-deep .user-dropdown .mat-mdc-menu-item .mdc-list-item__primary-text {
+  color: var(--text-dark) !important;
+}
+
+::ng-deep .user-dropdown .mat-mdc-menu-item:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+::ng-deep .user-dropdown .mat-mdc-menu-item mat-icon {
+  color: var(--primary-color) !important;
+  margin-right: 12px;
+}
+
+.logout-item {
+  color: var(--error-color) !important;
+}
+
+::ng-deep .user-dropdown .logout-item mat-icon {
+  color: var(--error-color) !important;
+}
+
+::ng-deep .user-dropdown .logout-item .mdc-list-item__primary-text {
+  color: var(--error-color) !important;
+}
+
+/* ========================================
+   📦 CONTAINER PRINCIPAL
+   ======================================== */
+.dashboard-container {
+  height: calc(100vh - 64px);
+  background-color: var(--bg-content);
+}
+
+/* ========================================
+   📂 SIDEBAR - PALETA MINIMAL TECH LIGHT+
+   ======================================== */
+.sidenav {
+  background-color: var(--bg-darker);
+  border-right: 1px solid #E2E8F0;
+  width: 280px;
+  transition: width 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: var(--shadow-soft);
+  overflow-x: hidden;
+}
+
+.sidenav.collapsed {
+  width: 70px;
+}
+
+/* Lista de Navegação */
+.nav-list {
+  padding: 16px 8px;
+}
+
+/* Item de Navegação */
+.nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px !important;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  color: var(--text-dark) !important;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.nav-item:hover {
+  background-color: var(--bg-hover) !important;
+  color: var(--primary-color) !important;
+  transform: translateX(4px);
+}
+
+.nav-item.active-link {
+  background: var(--gradient-hover) !important;
+  color: white !important;
+  font-weight: 600;
+  box-shadow: var(--shadow-primary);
+}
+
+.nav-item.active-link .nav-icon {
+  color: white !important;
+  transform: scale(1.1);
+}
+
+/* Ícone de Navegação */
+.nav-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  color: var(--text-dark) !important;
+  transition: all 0.3s ease;
+}
+
+.nav-item:hover .nav-icon {
+  color: var(--primary-color) !important;
+}
+
+/* Override do Material Design para cores do nav-item */
+::ng-deep .nav-item .mdc-list-item__primary-text {
+  color: var(--text-dark) !important;
+}
+
+::ng-deep .nav-item:hover .mdc-list-item__primary-text {
+  color: var(--primary-color) !important;
+}
+
+::ng-deep .nav-item.active-link .mdc-list-item__primary-text {
+  color: white !important;
+}
+
+::ng-deep .nav-item .mat-icon {
+  color: var(--text-dark) !important;
+}
+
+::ng-deep .nav-item:hover .mat-icon {
+  color: var(--primary-color) !important;
+}
+
+::ng-deep .nav-item.active-link .mat-icon {
+  color: white !important;
+}
+
+/* Texto de Navegação */
+.nav-text {
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity 0.3s ease;
+}
+
+/* Indicador Ativo */
+.active-indicator {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 60%;
+  background: var(--gradient-primary);
+  border-radius: 0 4px 4px 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.nav-item.active-link .active-indicator {
+  opacity: 1;
+}
+
+/* Divider */
+.nav-divider {
+  margin: 16px 0;
+  background-color: var(--border-color);
+}
+
+/* Footer da Sidebar */
+.sidebar-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  background-color: rgba(241, 245, 249, 0.8);
+  border-top: 1px solid #E2E8F0;
+  text-align: center;
+}
+
+.version-info small {
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+/* ========================================
+   📄 CONTEÚDO PRINCIPAL
+   ======================================== */
+.main-content {
+  background-color: var(--bg-content);
+}
+
 .content {
-  padding: 20px;
+  padding: 24px;
+  min-height: calc(100vh - 64px);
+  background-color: var(--bg-content);
 }
 
-.mdc-list-item {
-  display: flex; /* Garante layout flexível */
-  align-items: center; /* Alinha verticalmente ícones e textos */
+/* ========================================
+   📱 RESPONSIVIDADE
+   ======================================== */
+
+/* Tablet (≤1024px) */
+@media (max-width: 1024px) {
+  .header {
+    padding: 0 16px;
+  }
+
+  .header-subtitle {
+    display: none;
+  }
+
+  .user-name {
+    display: none;
+  }
+
+  .sidenav {
+    width: 250px;
+  }
+
+  .sidenav.collapsed {
+    width: 60px;
+  }
 }
 
-.mdc-list-item mat-icon {
-  margin-right: 8px; /* Espaço entre o ícone e o texto */
-  font-size: 24px; /* Tamanho padrão do ícone */
-  line-height: 1; /* Ajusta altura da linha para centralização */
+/* Mobile (≤768px) */
+@media (max-width: 768px) {
+  .header {
+    min-height: 56px;
+    padding: 0 12px;
+  }
+
+  .header-logo {
+    width: 32px;
+    height: 32px;
+  }
+
+  .header-title strong {
+    font-size: 16px;
+  }
+
+  .header-subtitle {
+    display: none;
+  }
+
+  .user-name {
+    display: none;
+  }
+
+  .dropdown-icon {
+    display: none;
+  }
+
+  .notification-button {
+    display: none;
+  }
+
+  .sidenav {
+    width: 100%;
+    position: fixed;
+    z-index: 999;
+  }
+
+  .dashboard-container {
+    height: calc(100vh - 56px);
+  }
+
+  .content {
+    padding: 16px;
+  }
 }
 
-.mdc-list-item span {
-  vertical-align: top; /* Garante alinhamento do texto com o ícone */
+/* Small Mobile (≤480px) */
+@media (max-width: 480px) {
+  .header {
+    padding: 0 8px;
+  }
+
+  .header-brand {
+    gap: 8px;
+    margin-left: 4px;
+  }
+
+  .header-logo {
+    width: 28px;
+    height: 28px;
+  }
+
+  .header-title strong {
+    font-size: 14px;
+  }
+
+  .content {
+    padding: 12px;
+  }
+}
+
+/* ========================================
+   🎬 ANIMAÇÕES
+   ======================================== */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.nav-item {
+  animation: slideIn 0.3s ease-out;
+}
+
+.nav-item:nth-child(1) { animation-delay: 0.05s; }
+.nav-item:nth-child(2) { animation-delay: 0.1s; }
+.nav-item:nth-child(3) { animation-delay: 0.15s; }
+.nav-item:nth-child(4) { animation-delay: 0.2s; }
+.nav-item:nth-child(5) { animation-delay: 0.25s; }
+
+/* ========================================
+   ♿ ACESSIBILIDADE
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .nav-item {
+    border: 1px solid var(--border-color);
+  }
+
+  .nav-item.active-link {
+    border: 2px solid var(--primary-color);
+  }
+}
+
+/* ========================================
+   🎨 MELHORIAS VISUAIS
+   ======================================== */
+
+/* Scroll customizado da sidebar */
+.sidenav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidenav::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.sidenav::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+  border-radius: 3px;
+}
+
+.sidenav::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color);
+}
+
+/* Ripple effect customizado */
+::ng-deep .nav-item .mat-ripple-element {
+  background-color: rgba(91, 91, 234, 0.2) !important;
+}
+
+/* Menu overlay */
+::ng-deep .cdk-overlay-dark-backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
 }

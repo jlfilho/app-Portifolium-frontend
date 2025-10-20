@@ -1,42 +1,50 @@
 /* ============================================
-   PALETA DE CORES - EDUCAÇÃO MODERNA
+   PALETA DE CORES - MINIMAL TECH LIGHT+
    ============================================ */
 
 :root {
   /* Cores Primárias */
-  --primary-color: #5B5BEA;           /* Azul violeta suave */
-  --secondary-color: #38BDF8;         /* Azul ciano leve */
-  --accent-color: #7C3AED;            /* Roxo vibrante */
+  --primary-color: #3B82F6;           /* Azul principal */
+  --secondary-color: #8B5CF6;         /* Lilás suave */
+  --accent-color: #6366F1;            /* Azul-violeta */
 
   /* Backgrounds */
-  --bg-dark: #111827;                 /* Cinza azulado escuro */
-  --bg-card: #1F2937;                 /* Cinza carvão */
-  --bg-light: #F9FAFB;                /* Branco gelo */
-  --bg-hover: rgba(91, 91, 234, 0.1); /* Hover sutil */
+  --bg-dark: #F8FAFC;                 /* Fundo principal (branco levemente azulado) */
+  --bg-darker: #F1F5F9;              /* Painel lateral/navbar */
+  --bg-card: #FFFFFF;                 /* Card background */
+  --bg-content: #F8FAFC;              /* Fundo de conteúdo */
+  --bg-actions: #F1F5F9;             /* Fundo de ações */
+  --bg-hover: rgba(59, 130, 246, 0.1); /* Hover sutil */
 
   /* Texto */
-  --text-primary: #F9FAFB;            /* Branco gelo */
-  --text-secondary: #9CA3AF;          /* Cinza claro */
-  --text-dark: #111827;               /* Texto em fundo claro */
+  --text-primary: #0F172A;            /* Texto principal (azul-acinzentado) */
+  --text-secondary: #475569;          /* Texto secundário (cinza frio) */
+  --text-dark: #0F172A;               /* Texto em fundo claro */
+  --text-medium: #64748B;             /* Cinza médio */
+
+  /* Bordas */
+  --border-color: #CBD5E1;            /* Bordas/linhas (cinza claro) */
 
   /* Gradientes */
-  --gradient-primary: linear-gradient(135deg, #5B5BEA 0%, #7C3AED 100%);
-  --gradient-secondary: linear-gradient(135deg, #38BDF8 0%, #5B5BEA 100%);
-  --gradient-accent: linear-gradient(135deg, #7C3AED 0%, #5B5BEA 100%);
+  --gradient-primary: linear-gradient(90deg, #3B82F6 0%, #8B5CF6 100%);
+  --gradient-secondary: linear-gradient(90deg, #8B5CF6 0%, #6366F1 100%);
+  --gradient-accent: linear-gradient(90deg, #6366F1 0%, #3B82F6 100%);
+  --gradient-hover: linear-gradient(90deg, #3B82F6, #8B5CF6);
 
   /* Estados */
-  --success-color: #10B981;           /* Verde */
-  --error-color: #EF4444;             /* Vermelho */
-  --warning-color: #F59E0B;           /* Laranja */
-  --info-color: #38BDF8;              /* Azul ciano */
+  --success-color: #10B981;           /* Verde esmeralda */
+  --error-color: #EF4444;             /* Vermelho consistente */
+  --warning-color: #F59E0B;           /* Laranja quente */
+  --info-color: #3B82F6;              /* Azul principal */
 
   /* Sombras */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
-  --shadow-primary: 0 4px 12px rgba(91, 91, 234, 0.4);
-  --shadow-accent: 0 4px 12px rgba(124, 58, 237, 0.4);
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-primary: 0 4px 12px rgba(59, 130, 246, 0.4);
+  --shadow-accent: 0 4px 16px rgba(99, 102, 241, 0.4);
 
   /* Bordas */
   --border-radius-sm: 4px;

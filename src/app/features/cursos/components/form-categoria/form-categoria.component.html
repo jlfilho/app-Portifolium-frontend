@@ -1,1 +1,95 @@
-<p>form-categoria works!</p>
+<div class="form-container">
+  <!-- Header -->
+  <div class="form-header">
+    <button
+      mat-icon-button
+      class="back-button"
+      matTooltip="Voltar"
+      (click)="onCancel()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h2>
+      <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
+      {{ isEditMode ? 'Editar' : 'Novo' }} Tipo de Atividade
+    </h2>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Carregando...</p>
+  </div>
+
+  <!-- Formulário -->
+  <mat-card *ngIf="!isLoading" class="form-card">
+    <mat-card-content>
+      <form [formGroup]="categoriaForm" (ngSubmit)="onSubmit()">
+        <!-- Campo Nome -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nome do Tipo de Atividade</mat-label>
+          <mat-icon matPrefix>label</mat-icon>
+          <input
+            matInput
+            formControlName="nome"
+            maxlength="100">
+          <mat-hint align="start">
+            <span *ngIf="nome?.value">{{ nome?.value.length }}/100</span>
+          </mat-hint>
+          <mat-error *ngIf="nome?.hasError('required')">
+            Nome é obrigatório
+          </mat-error>
+          <mat-error *ngIf="nome?.hasError('minlength')">
+            Nome deve ter no mínimo 3 caracteres
+          </mat-error>
+          <mat-error *ngIf="nome?.hasError('maxlength')">
+            Nome deve ter no máximo 100 caracteres
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Informação -->
+        <div class="info-box">
+          <mat-icon>info</mat-icon>
+          <div>
+            <strong>Dica:</strong>
+            <p>Tipos de atividades são usados para categorizar as atividades dos cursos. Exemplos: Extensão, Pesquisa, Ensino, Monitoria, etc.</p>
+          </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="form-actions">
+          <button
+            mat-stroked-button
+            type="button"
+            class="cancel-button"
+            (click)="onCancel()"
+            [disabled]="isSaving">
+            <mat-icon>close</mat-icon>
+            Cancelar
+          </button>
+
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            class="submit-button"
+            [disabled]="categoriaForm.invalid || isSaving">
+            <mat-spinner
+              *ngIf="isSaving"
+              diameter="20"
+              class="button-spinner">
+            </mat-spinner>
+            <span *ngIf="!isSaving">
+              <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+              {{ isEditMode ? 'Salvar' : 'Criar' }}
+            </span>
+            <span *ngIf="isSaving">
+              {{ isEditMode ? 'Salvando...' : 'Criando...' }}
+            </span>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

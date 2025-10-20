@@ -7,6 +7,10 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "test:headless": "ng test --watch=false --browsers=ChromeHeadless",
+    "test:coverage": "ng test --code-coverage --watch=false --browsers=ChromeHeadless",
+    "test:ci": "ng test --watch=false --code-coverage --browsers=ChromeHeadless",
+    "test:categorias": "ng test --include='**/cursos/**/*.spec.ts'",
     "serve:ssr:acadmanage-frontend": "node dist/acadmanage-frontend/server/server.mjs"
   },
   "private": true,

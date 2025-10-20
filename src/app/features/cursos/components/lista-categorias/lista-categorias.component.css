@@ -1,37 +1,835 @@
-table {
-  width: 100%;
+/* ========================================
+   🎨 VARIÁVEIS E PALETA - MINIMAL TECH LIGHT+
+   ======================================== */
+:host {
+  --primary-color: #3B82F6;
+  --secondary-color: #8B5CF6;
+  --accent-color: #6366F1;
+  --error-color: #EF4444;
+  --text-dark: #0F172A;
+  --text-medium: #475569;
+  --text-light: #64748B;
+  --bg-hover: rgba(59, 130, 246, 0.1);
+  --border-color: #CBD5E1;
 }
 
-.mat-mdc-form-field {
-  font-size: 14px;
-  width: 100%;
+/* ========================================
+   📦 CONTAINER PRINCIPAL
+   ======================================== */
+.categorias-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: calc(100vh - 100px);
 }
 
-td, th {
-  width: 25%;
-}
-
-.button-row {
-  display: table-cell;
-  max-width: 300px;
-}
-
-.button-row .mat-mdc-button-base {
-  margin: 8px 8px 8px 0;
-}
-
-.flex-container {
+/* ========================================
+   🎯 HEADER
+   ======================================== */
+.categorias-header {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
+  margin-bottom: 24px;
+  padding: 16px 0;
+  gap: 16px;
 }
 
-.button-container {
+.categorias-header h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin: 0;
   display: flex;
-  justify-content: center;
-  width: 70px;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
 }
 
-button {
-  background-color: #3233A6;
+.categorias-header h2 mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: var(--primary-color);
+}
+
+.space {
+  flex: 1;
+}
+
+/* Botão Adicionar - Mesmo estilo da listagem de usuários */
+.add-button {
+  background: var(--gradient-primary) !important;
+  color: white !important;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(91, 91, 234, 0.4);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.add-button:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6);
+}
+
+.add-button:active {
+  transform: scale(1.05) translateY(-1px);
+}
+
+.add-button:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+.add-button mat-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  color: white !important;
+}
+
+::ng-deep .add-button .mat-mdc-button-persistent-ripple,
+::ng-deep .add-button .mat-mdc-button-ripple {
+  display: none;
+}
+
+/* Divider */
+mat-divider {
+  margin-bottom: 24px;
+}
+
+/* ========================================
+   🃏 CARD DA TABELA
+   ======================================== */
+.table-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 24px;
+  background-color: #ffffff;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 16px;
+  gap: 16px;
+}
+
+.loading-container p {
+  color: var(--text-medium);
+  font-size: 16px;
+  margin: 0;
+}
+
+/* ========================================
+   🔍 CAMPO DE BUSCA
+   ======================================== */
+.filter-field {
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 24px;
+}
+
+::ng-deep .filter-field .mat-mdc-form-field-icon-prefix {
+  color: var(--primary-color);
+}
+
+/* ========================================
+   ⚠️ MENSAGEM DE ERRO
+   ======================================== */
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(239, 68, 68, 0.15);
+  border-left: 3px solid var(--error-color);
+  border-radius: 8px;
+  color: var(--error-color);
+  font-size: 14px;
+  margin-bottom: 16px;
+  animation: shake 0.4s ease-in-out;
+}
+
+.error-message mat-icon {
+  color: var(--error-color);
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+/* ========================================
+   📊 TABELA (Desktop/Notebook)
+   ======================================== */
+.table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  display: block;
+}
+
+.categorias-table {
+  width: 100%;
+  background: #ffffff;
+}
+
+/* Header da Tabela */
+::ng-deep .categorias-table .mat-mdc-header-cell {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%) !important;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 16px 12px;
+  border: none;
+  color: white !important;
+}
+
+::ng-deep .categorias-table .mat-mdc-header-cell .mat-sort-header-content,
+::ng-deep .categorias-table .mat-mdc-header-cell .mat-sort-header-arrow,
+::ng-deep .categorias-table thead tr th,
+::ng-deep .categorias-table thead tr th * {
+  color: white !important;
+}
+
+/* Células da Tabela */
+::ng-deep .categorias-table .mat-mdc-cell {
+  padding: 16px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+}
+
+/* Linhas da Tabela */
+.table-row {
+  transition: background-color 0.2s ease;
+}
+
+.table-row:hover {
+  background-color: var(--bg-hover);
+}
+
+/* ID Badge */
+.id-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: rgba(91, 91, 234, 0.1);
+  color: var(--primary-color);
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+/* Categoria Info */
+.categoria-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.categoria-icon {
+  color: var(--secondary-color);
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+}
+
+.categoria-nome {
+  font-weight: 500;
+  color: var(--text-dark);
+  font-size: 15px;
+}
+
+/* Actions */
+.actions-header {
+  text-align: right;
+}
+
+.actions-cell {
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.actions-cell button {
+  transition: all 0.2s ease;
+}
+
+.actions-cell button:hover {
+  transform: scale(1.1);
+}
+
+.no-actions {
+  color: var(--text-light);
+  font-size: 18px;
+}
+
+/* No Data */
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  gap: 12px;
+}
+
+.no-data mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: #ccc;
+}
+
+.no-data p {
+  font-size: 18px;
+  color: var(--text-medium);
+  margin: 0;
+}
+
+.no-data small {
+  color: var(--text-light);
+  font-size: 14px;
+}
+
+/* Paginador */
+.categorias-paginator {
+  border-top: 1px solid var(--border-color);
+  margin-top: 16px;
+  background: transparent;
+}
+
+::ng-deep .categorias-paginator .mat-mdc-paginator-container {
+  padding: 8px 0;
+}
+
+/* ========================================
+   📱 VIEW DE CARDS (Mobile/Tablet)
+   ======================================== */
+.cards-container {
+  display: none;
+  gap: 16px;
+}
+
+.categoria-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  animation: slideIn 0.3s ease-out;
+}
+
+.categoria-card:hover {
+  box-shadow: 0 4px 12px rgba(91, 91, 234, 0.2);
+  transform: translateY(-2px);
+}
+
+.categoria-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.categoria-card-icon {
+  color: var(--secondary-color);
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+}
+
+.categoria-card-title {
+  flex: 1;
+}
+
+.categoria-card-nome {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin: 0 0 4px 0;
+}
+
+.categoria-card-id {
+  font-size: 12px;
+  color: var(--text-medium);
+  margin: 0;
+}
+
+.categoria-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.categoria-card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.categoria-card-actions button {
+  width: 40px;
+  height: 40px;
+}
+
+/* ========================================
+   🎬 ANIMAÇÕES
+   ======================================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ========================================
+   🎨 SCROLLBAR PERSONALIZADA
+   ======================================== */
+.table-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
+}
+
+/* ========================================
+   📱 RESPONSIVIDADE
+   ======================================== */
+
+/* 🖥️ DESKTOP GRANDE (>1400px) */
+@media (min-width: 1401px) {
+  .categorias-container {
+    padding: 32px;
+  }
+
+  .table-card {
+    padding: 32px;
+  }
+}
+
+/* 💻 NOTEBOOK/DESKTOP MÉDIO (1025px - 1400px) */
+@media (max-width: 1400px) {
+  .categorias-container {
+    max-width: 1200px;
+  }
+
+  ::ng-deep .categorias-table .mat-mdc-header-cell,
+  ::ng-deep .categorias-table .mat-mdc-cell {
+    padding: 12px 8px;
+    font-size: 13px;
+  }
+}
+
+/* 📱 TABLET HORIZONTAL (769px - 1024px) */
+@media (max-width: 1024px) {
+  .categorias-container {
+    padding: 20px;
+  }
+
+  .categorias-header h2 {
+    font-size: 24px;
+  }
+
+  .categorias-header h2 mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .categorias-table {
+    min-width: 600px;
+  }
+
+  .add-button {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+  }
+
+  .add-button mat-icon {
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+  }
+
+  .table-card {
+    padding: 20px;
+  }
+}
+
+/* 📱 TABLET VERTICAL (601px - 768px) */
+@media (max-width: 768px) {
+  .categorias-container {
+    padding: 16px;
+  }
+
+  .categorias-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .categorias-header h2 {
+    font-size: 22px;
+    flex: 1;
+  }
+
+  .add-button {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+  }
+
+  .add-button mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+
+  .filter-field {
+    max-width: 100%;
+  }
+
+  .table-card {
+    padding: 16px;
+  }
+
+  /* TROCAR PARA VIEW DE CARDS */
+  .table-container {
+    display: none !important;
+  }
+
+  .cards-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .categorias-paginator {
+    border-top: none;
+    margin-top: 8px;
+  }
+
+  ::ng-deep .categorias-paginator .mat-mdc-paginator-container {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+}
+
+/* 📱 SMARTPHONE GRANDE (481px - 600px) */
+@media (max-width: 600px) {
+  .categorias-container {
+    padding: 12px;
+  }
+
+  .categorias-header h2 {
+    font-size: 20px;
+  }
+
+  .categorias-header h2 mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+
+  .table-card {
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  .categoria-card {
+    padding: 14px;
+  }
+
+  .categoria-card-nome {
+    font-size: 15px;
+  }
+
+  .categoria-card-id {
+    font-size: 11px;
+  }
+
+  ::ng-deep .categorias-paginator .mat-mdc-icon-button {
+    width: 36px;
+    height: 36px;
+    padding: 6px;
+  }
+}
+
+/* 📱 SMARTPHONE PEQUENO (≤480px) */
+@media (max-width: 480px) {
+  .categorias-container {
+    padding: 8px;
+  }
+
+  .categorias-header {
+    padding: 8px 0;
+    margin-bottom: 16px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .categorias-header h2 {
+    font-size: 18px;
+    flex: 1;
+  }
+
+  .add-button {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+  }
+
+  .add-button mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+
+  .table-card {
+    padding: 10px;
+  }
+
+  .filter-field {
+    margin-bottom: 16px;
+  }
+
+  .categoria-card {
+    padding: 12px;
+  }
+
+  .categoria-card-header {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+  }
+
+  .categoria-card-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .categoria-card-nome {
+    font-size: 14px;
+  }
+
+  .categoria-card-id {
+    font-size: 11px;
+  }
+
+  .categoria-card-footer {
+    padding-top: 10px;
+  }
+
+  .categoria-card-actions button {
+    width: 36px;
+    height: 36px;
+  }
+
+  ::ng-deep .categoria-card-actions .mat-mdc-mini-fab {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  ::ng-deep .categoria-card-actions .mat-mdc-mini-fab mat-icon {
+    font-size: 18px;
+  }
+
+  ::ng-deep .categorias-paginator .mat-mdc-paginator-container {
+    padding: 4px 0;
+  }
+
+  ::ng-deep .categorias-paginator .mat-mdc-paginator-page-size-label,
+  ::ng-deep .categorias-paginator .mat-mdc-paginator-range-label {
+    font-size: 11px;
+  }
+
+  .loading-container {
+    padding: 32px 8px;
+  }
+
+  .no-data {
+    padding: 32px 8px;
+  }
+
+  .no-data mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .no-data p {
+    font-size: 16px;
+  }
+
+  .no-data small {
+    font-size: 12px;
+  }
+}
+
+/* 📱 SMARTPHONE MUITO PEQUENO (≤360px) */
+@media (max-width: 360px) {
+  .categorias-container {
+    padding: 6px;
+  }
+
+  .categorias-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .categorias-header h2 {
+    font-size: 16px;
+    gap: 8px;
+    flex: 1;
+  }
+
+  .add-button {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+  }
+
+  .add-button mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .categoria-card {
+    padding: 10px;
+  }
+
+  .categoria-card-actions button {
+    width: 32px;
+    height: 32px;
+  }
+
+  ::ng-deep .categoria-card-actions .mat-mdc-mini-fab {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  ::ng-deep .categoria-card-actions .mat-mdc-mini-fab mat-icon {
+    font-size: 16px;
+  }
+
+  ::ng-deep .categorias-paginator .mat-mdc-icon-button {
+    width: 32px;
+    height: 32px;
+    padding: 4px;
+  }
+
+  ::ng-deep .categorias-paginator .mat-mdc-icon-button mat-icon {
+    font-size: 18px;
+  }
+}
+
+/* ========================================
+   📱 ORIENTAÇÃO PAISAGEM (Landscape)
+   ======================================== */
+@media (max-width: 768px) and (orientation: landscape) {
+  .categorias-container {
+    padding: 12px;
+  }
+
+  .categorias-header {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .add-button {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+  }
+
+  .categoria-card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .categoria-card-header {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .categoria-card-footer {
+    border-top: none;
+    padding-top: 0;
+  }
+}
+
+/* ========================================
+   ♿ ACESSIBILIDADE
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .categoria-card {
+    border-width: 2px;
+  }
+
+  .id-badge {
+    border: 1px solid var(--primary-color);
+  }
 }

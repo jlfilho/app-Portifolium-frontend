@@ -33,7 +33,6 @@
             <input
               matInput
               formControlName="nome"
-              placeholder="Ex: Introdução ao Angular"
               maxlength="100"
               autofocus>
             <mat-hint align="end">{{ nome?.value?.length || 0 }}/100</mat-hint>
@@ -60,7 +59,7 @@
               </div>
             </mat-slide-toggle>
             <mat-hint class="toggle-hint">
-              {{ cursoForm.get('ativo')?.value ? 'Visível para alunos' : 'Oculto para alunos' }}
+              {{ cursoForm.get('ativo')?.value ? 'Visível para o público' : 'Oculto para o público' }}
             </mat-hint>
           </div>
         </div>

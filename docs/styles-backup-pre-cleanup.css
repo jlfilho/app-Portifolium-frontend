@@ -1,0 +1,757 @@
+/* ============================================
+   IMPORTS
+   ============================================ */
+@import './styles/variables.css';
+
+/* ============================================
+   OVERRIDE COMPLETO DO TEMA MATERIAL
+   ============================================ */
+
+/* Forçar cores corretas em todo o tema Material */
+:root {
+  /* Override das cores padrão do Material Design */
+  --mdc-theme-primary: #3B82F6 !important;
+  --mdc-theme-secondary: #8B5CF6 !important;
+  --mdc-theme-surface: #FFFFFF !important;
+  --mdc-theme-background: #F8FAFC !important;
+  --mdc-theme-on-primary: #FFFFFF !important;
+  --mdc-theme-on-secondary: #FFFFFF !important;
+  --mdc-theme-on-surface: #0F172A !important;
+  --mdc-theme-on-background: #0F172A !important;
+  --mdc-theme-error: #EF4444 !important;
+  --mdc-theme-on-error: #FFFFFF !important;
+}
+
+/* ============================================
+   ESTILOS GLOBAIS - MINIMAL TECH LIGHT+
+   ============================================ */
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+}
+
+/* ============================================
+   SNACKBAR - NOVA PALETA
+   ============================================ */
+
+.snackbar-success {
+  --mdc-snackbar-container-color: #10B981 !important;
+  --mat-mdc-snack-bar-button-color: #fff !important;
+  --mdc-snackbar-supporting-text-color: #fff !important;
+}
+
+.snackbar-error {
+  --mdc-snackbar-container-color: #EF4444 !important;
+  --mat-mdc-snack-bar-button-color: #fff !important;
+  --mdc-snackbar-supporting-text-color: #fff !important;
+}
+
+.snackbar-warning {
+  --mdc-snackbar-container-color: #F59E0B !important;
+  --mat-mdc-snack-bar-button-color: #fff !important;
+  --mdc-snackbar-supporting-text-color: #fff !important;
+}
+
+.info-snackbar {
+  --mdc-snackbar-container-color: var(--info-color) !important;
+  --mat-mdc-snack-bar-button-color: #fff !important;
+  --mdc-snackbar-supporting-text-color: #fff !important;
+}
+
+/* ============================================
+   SCROLLBAR CUSTOMIZADA
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-light);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gradient-primary);
+  border-radius: var(--border-radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gradient-accent);
+}
+
+/* ============================================
+   MATERIAL OVERRIDES - NOVA PALETA
+   ============================================ */
+
+/* Primary Color */
+::ng-deep .mat-mdc-raised-button.mat-primary {
+  --mdc-protected-button-container-color: var(--primary-color) !important;
+  --mdc-protected-button-label-text-color: white !important;
+}
+
+::ng-deep .mat-mdc-raised-button.mat-primary:hover {
+  --mdc-protected-button-container-color: var(--accent-color) !important;
+  box-shadow: var(--shadow-primary);
+}
+
+/* Accent Color */
+::ng-deep .mat-mdc-button.mat-accent {
+  --mdc-text-button-label-text-color: var(--accent-color) !important;
+}
+
+/* Icons */
+::ng-deep .mat-icon {
+  color: inherit;
+}
+
+/* Form Fields */
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-form-field-focus-overlay {
+  background-color: var(--bg-hover) !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
+  color: var(--primary-color) !important;
+}
+
+/* Tooltips */
+::ng-deep .mat-mdc-tooltip {
+  --mdc-plain-tooltip-container-color: var(--bg-dark) !important;
+  --mdc-plain-tooltip-supporting-text-color: var(--text-primary) !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Remover contornos dos tooltips globalmente */
+::ng-deep .mat-mdc-tooltip .mdc-tooltip__surface {
+  border: none !important;
+  outline: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Chips */
+::ng-deep .mat-mdc-chip.mat-primary {
+  --mdc-chip-elevated-container-color: var(--primary-color) !important;
+  --mdc-chip-label-text-color: white !important;
+}
+
+::ng-deep .mat-mdc-chip.mat-accent {
+  --mdc-chip-elevated-container-color: var(--secondary-color) !important;
+  --mdc-chip-label-text-color: white !important;
+}
+
+::ng-deep .mat-mdc-chip.mat-warn {
+  --mdc-chip-elevated-container-color: var(--error-color) !important;
+  --mdc-chip-label-text-color: white !important;
+}
+
+/* ============================================
+   MATERIAL COMPONENTS - PALETA COMPLETA
+   ============================================ */
+
+/* Botões */
+::ng-deep .mat-mdc-button.mat-primary {
+  --mdc-text-button-label-text-color: var(--primary-color) !important;
+}
+
+::ng-deep .mat-mdc-unelevated-button.mat-primary {
+  --mdc-filled-button-container-color: var(--primary-color) !important;
+  --mdc-filled-button-label-text-color: white !important;
+}
+
+::ng-deep .mat-mdc-unelevated-button.mat-primary:hover {
+  --mdc-filled-button-container-color: var(--accent-color) !important;
+}
+
+::ng-deep .mat-mdc-outlined-button.mat-primary {
+  --mdc-outlined-button-label-text-color: var(--primary-color) !important;
+  --mdc-outlined-button-outline-color: var(--primary-color) !important;
+}
+
+::ng-deep .mat-mdc-outlined-button.mat-primary:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+::ng-deep .mat-mdc-icon-button.mat-primary {
+  --mdc-icon-button-icon-color: var(--primary-color) !important;
+}
+
+::ng-deep .mat-mdc-icon-button.mat-accent {
+  --mdc-icon-button-icon-color: var(--accent-color) !important;
+}
+
+/* FAB (Floating Action Button) */
+::ng-deep .mat-mdc-fab.mat-primary,
+::ng-deep .mat-mdc-mini-fab.mat-primary {
+  --mdc-fab-container-color: var(--primary-color) !important;
+  --mdc-fab-icon-color: white !important;
+}
+
+::ng-deep .mat-mdc-fab.mat-primary:hover,
+::ng-deep .mat-mdc-mini-fab.mat-primary:hover {
+  --mdc-fab-container-color: var(--accent-color) !important;
+}
+
+::ng-deep .mat-mdc-fab.mat-accent,
+::ng-deep .mat-mdc-mini-fab.mat-accent {
+  --mdc-fab-container-color: var(--secondary-color) !important;
+  --mdc-fab-icon-color: white !important;
+}
+
+/* Checkbox */
+::ng-deep .mat-mdc-checkbox.mat-primary {
+  --mdc-checkbox-selected-checkmark-color: white !important;
+  --mdc-checkbox-selected-focus-icon-color: var(--primary-color) !important;
+  --mdc-checkbox-selected-hover-icon-color: var(--primary-color) !important;
+  --mdc-checkbox-selected-icon-color: var(--primary-color) !important;
+  --mdc-checkbox-selected-pressed-icon-color: var(--primary-color) !important;
+}
+
+::ng-deep .mat-mdc-checkbox.mat-accent {
+  --mdc-checkbox-selected-checkmark-color: white !important;
+  --mdc-checkbox-selected-focus-icon-color: var(--accent-color) !important;
+  --mdc-checkbox-selected-hover-icon-color: var(--accent-color) !important;
+  --mdc-checkbox-selected-icon-color: var(--accent-color) !important;
+  --mdc-checkbox-selected-pressed-icon-color: var(--accent-color) !important;
+}
+
+/* Radio Button */
+::ng-deep .mat-mdc-radio-button.mat-primary {
+  --mdc-radio-selected-focus-icon-color: var(--primary-color) !important;
+  --mdc-radio-selected-hover-icon-color: var(--primary-color) !important;
+  --mdc-radio-selected-icon-color: var(--primary-color) !important;
+  --mdc-radio-selected-pressed-icon-color: var(--primary-color) !important;
+}
+
+::ng-deep .mat-mdc-radio-button.mat-accent {
+  --mdc-radio-selected-focus-icon-color: var(--accent-color) !important;
+  --mdc-radio-selected-hover-icon-color: var(--accent-color) !important;
+  --mdc-radio-selected-icon-color: var(--accent-color) !important;
+  --mdc-radio-selected-pressed-icon-color: var(--accent-color) !important;
+}
+
+/* Slide Toggle */
+::ng-deep .mat-mdc-slide-toggle.mat-primary {
+  --mdc-switch-selected-focus-state-layer-color: var(--primary-color) !important;
+  --mdc-switch-selected-handle-color: var(--primary-color) !important;
+  --mdc-switch-selected-hover-state-layer-color: var(--primary-color) !important;
+  --mdc-switch-selected-pressed-state-layer-color: var(--primary-color) !important;
+  --mdc-switch-selected-focus-handle-color: var(--primary-color) !important;
+  --mdc-switch-selected-hover-handle-color: var(--primary-color) !important;
+  --mdc-switch-selected-pressed-handle-color: var(--primary-color) !important;
+  --mdc-switch-selected-focus-track-color: rgba(59, 130, 246, 0.5) !important;
+  --mdc-switch-selected-hover-track-color: rgba(59, 130, 246, 0.5) !important;
+  --mdc-switch-selected-pressed-track-color: rgba(59, 130, 246, 0.5) !important;
+  --mdc-switch-selected-track-color: rgba(59, 130, 246, 0.5) !important;
+}
+
+::ng-deep .mat-mdc-slide-toggle.mat-accent {
+  --mdc-switch-selected-focus-state-layer-color: var(--accent-color) !important;
+  --mdc-switch-selected-handle-color: var(--accent-color) !important;
+  --mdc-switch-selected-hover-state-layer-color: var(--accent-color) !important;
+  --mdc-switch-selected-pressed-state-layer-color: var(--accent-color) !important;
+  --mdc-switch-selected-focus-handle-color: var(--accent-color) !important;
+  --mdc-switch-selected-hover-handle-color: var(--accent-color) !important;
+  --mdc-switch-selected-pressed-handle-color: var(--accent-color) !important;
+  --mdc-switch-selected-focus-track-color: rgba(99, 102, 241, 0.5) !important;
+  --mdc-switch-selected-hover-track-color: rgba(99, 102, 241, 0.5) !important;
+  --mdc-switch-selected-pressed-track-color: rgba(99, 102, 241, 0.5) !important;
+  --mdc-switch-selected-track-color: rgba(99, 102, 241, 0.5) !important;
+}
+
+/* Progress Bar */
+::ng-deep .mat-mdc-progress-bar.mat-primary {
+  --mdc-linear-progress-active-indicator-color: var(--primary-color) !important;
+}
+
+::ng-deep .mat-mdc-progress-bar.mat-accent {
+  --mdc-linear-progress-active-indicator-color: var(--accent-color) !important;
+}
+
+/* Progress Spinner */
+::ng-deep .mat-mdc-progress-spinner.mat-primary,
+::ng-deep .mat-mdc-spinner.mat-primary {
+  --mdc-circular-progress-active-indicator-color: var(--primary-color) !important;
+}
+
+::ng-deep .mat-mdc-progress-spinner.mat-accent,
+::ng-deep .mat-mdc-spinner.mat-accent {
+  --mdc-circular-progress-active-indicator-color: var(--accent-color) !important;
+}
+
+/* Slider */
+::ng-deep .mat-mdc-slider.mat-primary {
+  --mdc-slider-handle-color: var(--primary-color) !important;
+  --mdc-slider-focus-handle-color: var(--primary-color) !important;
+  --mdc-slider-hover-handle-color: var(--primary-color) !important;
+  --mdc-slider-active-track-color: var(--primary-color) !important;
+  --mdc-slider-inactive-track-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+::ng-deep .mat-mdc-slider.mat-accent {
+  --mdc-slider-handle-color: var(--accent-color) !important;
+  --mdc-slider-focus-handle-color: var(--accent-color) !important;
+  --mdc-slider-hover-handle-color: var(--accent-color) !important;
+  --mdc-slider-active-track-color: var(--accent-color) !important;
+  --mdc-slider-inactive-track-color: rgba(99, 102, 241, 0.3) !important;
+}
+
+/* Tabs */
+::ng-deep .mat-mdc-tab-group.mat-primary .mat-mdc-tab .mdc-tab__text-label {
+  color: var(--text-dark) !important;
+}
+
+::ng-deep .mat-mdc-tab-group.mat-primary .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+  color: var(--primary-color) !important;
+}
+
+::ng-deep .mat-mdc-tab-group.mat-primary .mat-mdc-tab-header {
+  --mat-tab-header-active-focus-indicator-color: var(--primary-color) !important;
+  --mat-tab-header-active-hover-indicator-color: var(--primary-color) !important;
+  --mdc-tab-indicator-active-indicator-color: var(--primary-color) !important;
+}
+
+::ng-deep .mat-mdc-tab-group.mat-accent .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+  color: var(--accent-color) !important;
+}
+
+::ng-deep .mat-mdc-tab-group.mat-accent .mat-mdc-tab-header {
+  --mat-tab-header-active-focus-indicator-color: var(--accent-color) !important;
+  --mat-tab-header-active-hover-indicator-color: var(--accent-color) !important;
+  --mdc-tab-indicator-active-indicator-color: var(--accent-color) !important;
+}
+
+/* Select */
+::ng-deep .mat-mdc-select.mat-primary .mat-mdc-select-arrow {
+  color: var(--primary-color) !important;
+}
+
+::ng-deep .mat-mdc-option.mat-mdc-option-active {
+  background-color: var(--bg-hover) !important;
+}
+
+::ng-deep .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+  background-color: var(--bg-hover) !important;
+}
+
+::ng-deep .mat-mdc-option.mdc-list-item--selected .mdc-list-item__primary-text {
+  color: var(--primary-color) !important;
+}
+
+/* Form Field (Input, Textarea) */
+::ng-deep .mat-mdc-form-field.mat-focused.mat-primary .mat-mdc-select-arrow {
+  color: var(--primary-color) !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused.mat-primary .mat-mdc-notch-piece {
+  border-color: var(--primary-color) !important;
+}
+
+::ng-deep .mat-mdc-text-field-wrapper.mdc-text-field--focused .mat-mdc-form-field-focus-overlay {
+  opacity: 0.12 !important;
+}
+
+/* Override específico para cores rosa/purple padrão do Material */
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
+  color: var(--primary-color) !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-form-field-focus-overlay {
+  background-color: var(--bg-hover) !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-outline-notch .mat-mdc-outline-notch-piece {
+  border-color: var(--primary-color) !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-outline-notch .mat-mdc-outline-notch-piece-start,
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-outline-notch .mat-mdc-outline-notch-piece-end {
+  border-color: var(--primary-color) !important;
+}
+
+/* Forçar cores corretas em todos os form fields */
+::ng-deep .mat-mdc-form-field .mat-mdc-floating-label {
+  color: var(--text-dark) !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
+  color: var(--primary-color) !important;
+}
+
+::ng-deep .mat-mdc-form-field .mat-mdc-outline-notch .mat-mdc-outline-notch-piece {
+  border-color: var(--text-secondary) !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-outline-notch .mat-mdc-outline-notch-piece {
+  border-color: var(--primary-color) !important;
+}
+
+/* Input text color */
+::ng-deep .mat-mdc-form-field .mat-mdc-text-field-wrapper .mat-mdc-form-field-input-control input {
+  color: var(--text-dark) !important;
+}
+
+/* Error messages */
+::ng-deep .mat-mdc-form-field .mat-mdc-form-field-error {
+  color: var(--error-color) !important;
+}
+
+/* Hint text */
+::ng-deep .mat-mdc-form-field .mat-mdc-form-field-hint {
+  color: var(--text-secondary) !important;
+}
+
+/* Datepicker */
+::ng-deep .mat-datepicker-content .mat-calendar-body-selected {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+}
+
+::ng-deep .mat-datepicker-content .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover .mat-calendar-body-cell-content {
+  background-color: var(--bg-hover) !important;
+}
+
+::ng-deep .mat-datepicker-content .mat-calendar-body-today:not(.mat-calendar-body-selected) {
+  border-color: var(--primary-color) !important;
+}
+
+/* Paginator */
+::ng-deep .mat-mdc-paginator {
+  background-color: transparent !important;
+}
+
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button {
+  color: var(--text-dark) !important;
+}
+
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button[disabled] {
+  color: var(--text-secondary) !important;
+  opacity: 0.5 !important;
+}
+
+/* Table */
+::ng-deep .mat-mdc-table {
+  background-color: transparent !important;
+}
+
+::ng-deep .mat-mdc-header-row {
+  background-color: transparent !important;
+}
+
+::ng-deep .mat-mdc-row:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+/* Sort Header */
+::ng-deep .mat-sort-header-arrow {
+  color: var(--primary-color) !important;
+}
+
+::ng-deep .mat-sort-header-sorted {
+  color: var(--primary-color) !important;
+}
+
+/* Menu */
+::ng-deep .mat-mdc-menu-panel {
+  --mat-menu-container-color: white !important;
+  background-color: white !important;
+}
+
+::ng-deep .mat-mdc-menu-panel .mat-mdc-menu-content {
+  background-color: white !important;
+}
+
+::ng-deep .mat-mdc-menu-panel .mdc-list {
+  background-color: white !important;
+}
+
+::ng-deep .mat-mdc-menu-item {
+  color: var(--text-dark) !important;
+}
+
+::ng-deep .mat-mdc-menu-item:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+::ng-deep .mat-mdc-menu-item .mat-icon {
+  color: var(--primary-color) !important;
+}
+
+/* Dialog */
+::ng-deep .mat-mdc-dialog-container {
+  --mdc-dialog-container-color: white !important;
+}
+
+::ng-deep .mat-mdc-dialog-title {
+  color: var(--text-dark) !important;
+}
+
+/* Snackbar já configurado acima */
+
+/* Card */
+::ng-deep .mat-mdc-card {
+  --mdc-elevated-card-container-color: white !important;
+}
+
+/* List */
+::ng-deep .mat-mdc-list-base .mat-mdc-list-item:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+::ng-deep .mat-mdc-list-base .mat-mdc-list-item.mdc-list-item--selected {
+  background-color: var(--bg-hover) !important;
+}
+
+::ng-deep .mat-mdc-list-base .mat-mdc-list-item .mat-icon {
+  color: var(--text-dark) !important;
+}
+
+::ng-deep .mat-mdc-list-base .mat-mdc-list-item .mdc-list-item__primary-text {
+  color: var(--text-dark) !important;
+}
+
+::ng-deep .mat-mdc-list-base .mat-mdc-list-item .mdc-list-item__secondary-text {
+  color: var(--text-secondary) !important;
+}
+
+/* Stepper */
+::ng-deep .mat-step-header.cdk-keyboard-focused,
+::ng-deep .mat-step-header.cdk-program-focused,
+::ng-deep .mat-step-header:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+::ng-deep .mat-step-header .mat-step-icon-selected {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+}
+
+::ng-deep .mat-step-header .mat-step-icon-state-edit {
+  background-color: var(--accent-color) !important;
+  color: white !important;
+}
+
+/* Expansion Panel */
+::ng-deep .mat-expansion-panel-header:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+::ng-deep .mat-expansion-indicator::after {
+  color: var(--primary-color) !important;
+}
+
+/* Badge */
+::ng-deep .mat-badge-content.mat-badge-active {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+}
+
+::ng-deep .mat-badge-accent .mat-badge-content {
+  background-color: var(--accent-color) !important;
+  color: white !important;
+}
+
+/* Bottom Sheet */
+::ng-deep .mat-bottom-sheet-container {
+  background-color: white !important;
+}
+
+/* Ripple Effect */
+::ng-deep .mat-ripple-element {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+/* ============================================
+   OVERRIDES ESPECÍFICOS - REMOVER CORES ROSA/PURPLE
+   ============================================ */
+
+/* Forçar remoção de cores padrão do Material */
+::ng-deep .mat-mdc-form-field.mat-focused {
+  --mat-form-field-focus-overlay: rgba(59, 130, 246, 0.1) !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
+  --mat-form-field-focus-label-color: #3B82F6 !important;
+  color: #3B82F6 !important;
+}
+
+/* Forçar cor azul no foco - Todas as variantes */
+::ng-deep .mat-mdc-form-field.mat-focused .mdc-floating-label {
+  color: #3B82F6 !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused label {
+  color: #3B82F6 !important;
+}
+
+/* Bordas focadas - Azul */
+::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing,
+::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch {
+  border-color: #3B82F6 !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-notched-outline-leading,
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-notched-outline-trailing,
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-notched-outline-notch {
+  border-color: #3B82F6 !important;
+}
+
+/* Override para cores de erro */
+::ng-deep .mat-mdc-form-field.mat-form-field-invalid .mat-mdc-floating-label {
+  color: var(--error-color) !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-form-field-invalid .mat-mdc-outline-notch .mat-mdc-outline-notch-piece {
+  border-color: var(--error-color) !important;
+}
+
+/* Override para ícones nos form fields */
+::ng-deep .mat-mdc-form-field .mat-icon {
+  color: var(--text-secondary) !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-icon {
+  color: var(--primary-color) !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-form-field-invalid .mat-icon {
+  color: var(--error-color) !important;
+}
+
+/* Override para prefix icons */
+::ng-deep .mat-mdc-form-field .mat-mdc-text-field-wrapper .mat-mdc-form-field-icon-prefix .mat-icon {
+  color: var(--text-secondary) !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper .mat-mdc-form-field-icon-prefix .mat-icon {
+  color: var(--primary-color) !important;
+}
+
+/* Override para suffix icons */
+::ng-deep .mat-mdc-form-field .mat-mdc-text-field-wrapper .mat-mdc-form-field-icon-suffix .mat-icon {
+  color: var(--text-secondary) !important;
+}
+
+/* Override para select arrow */
+::ng-deep .mat-mdc-select .mat-mdc-select-arrow {
+  color: var(--text-secondary) !important;
+}
+
+::ng-deep .mat-mdc-select.mat-focused .mat-mdc-select-arrow {
+  color: var(--primary-color) !important;
+}
+
+/* Override para placeholder text */
+::ng-deep .mat-mdc-form-field .mat-mdc-text-field-wrapper .mat-mdc-form-field-input-control input::placeholder {
+  color: var(--text-secondary) !important;
+}
+
+/* Override para mat-error específico */
+::ng-deep .mat-mdc-form-field .mat-mdc-form-field-error-wrapper .mat-mdc-form-field-error {
+  color: var(--error-color) !important;
+}
+
+/* Override para mat-hint específico */
+::ng-deep .mat-mdc-form-field .mat-mdc-form-field-hint-wrapper .mat-mdc-form-field-hint {
+  color: var(--text-secondary) !important;
+}
+
+/* ============================================
+   ANIMAÇÕES GLOBAIS
+   ============================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+.scale-in {
+  animation: scaleIn 0.3s ease-out;
+}
+
+/* ============================================
+   UTILIDADES GLOBAIS
+   ============================================ */
+
+.container-fluid {
+  width: 100%;
+  padding: 0 var(--spacing-lg);
+  margin: 0 auto;
+}
+
+.container {
+  max-width: 1400px;
+  padding: 0 var(--spacing-lg);
+  margin: 0 auto;
+}
+
+.card-modern {
+  background: white;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-lg);
+  transition: all var(--transition-base);
+}
+
+.card-modern:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.btn-gradient {
+  background: var(--gradient-primary) !important;
+  color: white !important;
+  border: none;
+  transition: all var(--transition-base);
+}
+
+.btn-gradient:hover {
+  background: var(--gradient-accent) !important;
+  box-shadow: var(--shadow-primary);
+  transform: translateY(-2px);
+}

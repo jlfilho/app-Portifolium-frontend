@@ -1,3 +1,20 @@
+/* ========================================
+   🎨 VARIÁVEIS E PALETA - MINIMAL TECH LIGHT+
+   ======================================== */
+:host {
+  --primary-color: #3B82F6;
+  --secondary-color: #8B5CF6;
+  --accent-color: #6366F1;
+  --success-color: #10B981;
+  --error-color: #EF4444;
+  --warning-color: #F59E0B;
+  --text-dark: #0F172A;
+  --text-medium: #475569;
+  --text-light: #64748B;
+  --bg-hover: rgba(59, 130, 246, 0.1);
+  --border-color: #CBD5E1;
+}
+
 .dialog-container {
   min-width: 400px;
   max-width: 500px;
@@ -38,15 +55,15 @@
 }
 
 .icon-warning {
-  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  background: linear-gradient(135deg, var(--warning-color) 0%, #D97706 100%);
 }
 
 .icon-danger {
-  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  background: linear-gradient(135deg, var(--error-color) 0%, #DC2626 100%);
 }
 
 .icon-info {
-  background: linear-gradient(135deg, #38BDF8 0%, #0EA5E9 100%);
+  background: linear-gradient(135deg, var(--info-color) 0%, #0EA5E9 100%);
 }
 
 .dialog-icon {

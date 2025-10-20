@@ -1,63 +1,176 @@
-<div>
-  <h2>Tipos de Atividades</h2>
-  <mat-divider></mat-divider>
-  <!-- Mostra mensagem de erro caso ocorra -->
-  <div *ngIf="errorMessage" class="error">
-    {{ errorMessage }}
+<div class="categorias-container">
+  <!-- Header -->
+  <div class="categorias-header">
+    <h2>
+      <mat-icon>category</mat-icon>
+      Tipos de Atividades
+    </h2>
+    <span class="space"></span>
+    <button
+      *ngIf="isAdmin()"
+      mat-icon-button
+      class="add-button"
+      matTooltip="Adicionar novo tipo de atividade"
+      matTooltipPosition="below"
+      (click)="addCategoria()">
+      <mat-icon>add</mat-icon>
+    </button>
   </div>
 
-  <mat-form-field>
-    <mat-label>Filtro</mat-label>
-    <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Extensão" #input>
-  </mat-form-field>
+  <mat-divider></mat-divider>
 
-  <div class="mat-elevation-z8">
-    <table mat-table [dataSource]="dataSource" matSort>
+  <!-- Card com Tabela -->
+  <mat-card class="table-card">
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Carregando tipos de atividades...</p>
+    </div>
 
-      <!-- ID Column -->
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 3%;"> Código </th>
-        <td mat-cell *matCellDef="let row" style="width: 3%;"> {{row.id}} </td>
-      </ng-container>
+    <!-- Conteúdo -->
+    <div *ngIf="!isLoading">
+      <!-- Campo de Busca -->
+      <mat-form-field class="filter-field" appearance="outline">
+        <mat-label>Buscar tipos de atividades</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input
+          matInput
+          (keyup)="applyFilter($event)"
+          placeholder="Nome do tipo..."
+          #input>
+        <button
+          mat-icon-button
+          matSuffix
+          *ngIf="input.value"
+          (click)="input.value=''; applyFilter($event)"
+          matTooltip="Limpar busca">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
 
-      <!-- Nome Column -->
-      <ng-container matColumnDef="nome">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 10%;"> Nome </th>
-        <td mat-cell *matCellDef="let row" style="width: 10%;"> {{row.nome}} </td>
-      </ng-container>
+      <!-- Mensagem de erro -->
+      <div *ngIf="errorMessage" class="error-message">
+        <mat-icon>error</mat-icon>
+        <span>{{ errorMessage }}</span>
+      </div>
 
-      <!-- Ação Column -->
-      <ng-container matColumnDef="acao">
-        <th mat-header-cell *matHeaderCellDef style="padding-left:60px;"> Ação </th>
-        <td mat-cell *matCellDef="let row">
-          <div class="button-row">
-            <div class="flex-container">
-              <div class="button-container">
-                <button mat-mini-fab aria-label="Example icon button with a menu icon">
+      <!-- Tabela (Desktop/Notebook) -->
+      <div class="table-container">
+        <table mat-table [dataSource]="dataSource" matSort class="categorias-table">
+
+          <!-- Coluna ID -->
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Código </th>
+            <td mat-cell *matCellDef="let categoria">
+              <span class="id-badge">{{ categoria.id }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Coluna Nome -->
+          <ng-container matColumnDef="nome">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Nome </th>
+            <td mat-cell *matCellDef="let categoria">
+              <div class="categoria-info">
+                <mat-icon class="categoria-icon">label</mat-icon>
+                <span class="categoria-nome">{{ categoria.nome }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Coluna Ações -->
+          <ng-container matColumnDef="acao">
+            <th mat-header-cell *matHeaderCellDef class="actions-header"> Ações </th>
+            <td mat-cell *matCellDef="let categoria" class="actions-cell">
+              <ng-container *ngIf="isAdmin()">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  matTooltip="Editar tipo de atividade"
+                  (click)="editCategoria(categoria)">
                   <mat-icon>edit</mat-icon>
                 </button>
-              </div>
-              <div class="button-container">
-                <button mat-mini-fab aria-label="Example icon button with a home icon">
+                <button
+                  mat-icon-button
+                  color="warn"
+                  matTooltip="Excluir tipo de atividade"
+                  (click)="deleteCategoria(categoria)">
                   <mat-icon>delete</mat-icon>
                 </button>
+              </ng-container>
+              <span *ngIf="!isAdmin()" class="no-actions">—</span>
+            </td>
+          </ng-container>
+
+          <!-- Row Definitions -->
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+
+          <!-- Row shown when there is no matching data -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+              <div class="no-data">
+                <mat-icon>category_off</mat-icon>
+                <p>Nenhum tipo de atividade encontrado</p>
+                <small *ngIf="input.value">Tente ajustar sua busca</small>
               </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Cards (Tablet/Mobile) -->
+      <div class="cards-container">
+        <div
+          *ngFor="let categoria of dataSource.data"
+          class="categoria-card">
+          <!-- Header do Card -->
+          <div class="categoria-card-header">
+            <mat-icon class="categoria-card-icon">label</mat-icon>
+            <div class="categoria-card-title">
+              <h3 class="categoria-card-nome">{{ categoria.nome }}</h3>
+              <p class="categoria-card-id">Código: {{ categoria.id }}</p>
             </div>
           </div>
-        </td>
-      </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          <!-- Footer do Card (Ações) -->
+          <div class="categoria-card-footer" *ngIf="isAdmin()">
+            <div class="categoria-card-actions">
+              <button
+                mat-mini-fab
+                color="primary"
+                matTooltip="Editar"
+                (click)="editCategoria(categoria)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                mat-mini-fab
+                color="warn"
+                matTooltip="Excluir"
+                (click)="deleteCategoria(categoria)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
 
-      <!-- Row shown when there is no matching data. -->
-      <tr class="mat-row" *matNoDataRow>
-        <td class="mat-cell" colspan="3">Nenhum valor corresponde ao filtro "{{input.value}}"</td>
-      </tr>
-    </table>
+        <!-- Mensagem quando não há dados -->
+        <div *ngIf="dataSource.data.length === 0" class="no-data">
+          <mat-icon>category_off</mat-icon>
+          <p>Nenhum tipo de atividade encontrado</p>
+          <small *ngIf="input.value">Tente ajustar sua busca</small>
+        </div>
+      </div>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Selecione páginas de categorias."></mat-paginator>
-  </div>
-
-
+      <!-- Paginador (Server-side) -->
+      <mat-paginator
+        [length]="totalElements"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="[5, 10, 25, 50, 100]"
+        (page)="onPageChange($event)"
+        showFirstLastButtons
+        class="categorias-paginator">
+      </mat-paginator>
+    </div>
+  </mat-card>
 </div>

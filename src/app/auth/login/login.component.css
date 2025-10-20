@@ -1,16 +1,16 @@
 /* ========================================
-   🎨 PALETA "EDUCAÇÃO MODERNA"
+   🎨 PALETA "MINIMAL TECH LIGHT+"
    ======================================== */
 :host {
-  --primary-color: #5B5BEA;      /* Azul violeta suave */
-  --secondary-color: #38BDF8;    /* Azul ciano leve */
-  --background-dark: #111827;    /* Cinza azulado escuro */
-  --card-bg: #1F2937;            /* Cinza carvão */
-  --text-primary: #F9FAFB;       /* Branco gelo */
-  --text-secondary: #9CA3AF;     /* Cinza claro */
-  --accent-color: #7C3AED;       /* Roxo vibrante */
+  --primary-color: #3B82F6;      /* Azul principal */
+  --secondary-color: #8B5CF6;    /* Lilás suave */
+  --background-dark: #F8FAFC;    /* Fundo principal */
+  --card-bg: #FFFFFF;            /* Card background */
+  --text-primary: #0F172A;       /* Texto principal */
+  --text-secondary: #475569;     /* Texto secundário */
+  --accent-color: #6366F1;       /* Azul-violeta */
   --error-color: #EF4444;        /* Vermelho */
-  --warning-color: #F59E0B;      /* Âmbar */
+  --warning-color: #F59E0B;      /* Laranja */
   --success-color: #10B981;      /* Verde */
 }
 
@@ -22,7 +22,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--background-dark) 0%, #1a1f35 50%, #0f172a 100%);
+  background: linear-gradient(135deg, var(--background-dark) 0%, #F1F5F9 50%, #E2E8F0 100%);
   position: relative;
   overflow: hidden;
   padding: 20px;

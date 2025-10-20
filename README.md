@@ -146,7 +146,17 @@ npm run watch
 
 ## 📚 Documentação Adicional
 
-- 📖 **[REFACTORING_SUMMARY.md](./REFACTORING_SUMMARY.md)** - Detalhes da refatoração implementada
+### **Documentação Completa:**
+📁 **[Acesse a pasta `docs/`](./docs/)** - Toda a documentação técnica organizada
+
+**Documentos principais:**
+- 📖 **[INDEX.md](./docs/INDEX.md)** - Índice categorizado de toda a documentação
+- 🔄 **[REFACTORING_SUMMARY.md](./docs/REFACTORING_SUMMARY.md)** - Resumo da refatoração
+- 🎨 **[APLICACAO_PALETA_MINIMAL_TECH_LIGHT_PLUS.md](./docs/APLICACAO_PALETA_MINIMAL_TECH_LIGHT_PLUS.md)** - Paleta de cores atual
+- 👥 **[IMPLEMENTACAO_USUARIOS_COMPLETA.md](./docs/IMPLEMENTACAO_USUARIOS_COMPLETA.md)** - Módulo de usuários
+- 📚 **[FORM_CURSO_IMPLEMENTATION.md](./docs/FORM_CURSO_IMPLEMENTATION.md)** - Formulário de curso
+
+### **Links Úteis:**
 - 🔗 [Angular CLI Documentation](https://angular.dev/tools/cli)
 - 🔗 [Angular Material Components](https://material.angular.io/components)
 

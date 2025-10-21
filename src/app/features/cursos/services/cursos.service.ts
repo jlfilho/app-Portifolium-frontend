@@ -54,8 +54,63 @@ export class CursosService {
     return this.http.put(`${this.baseUrl}/cursos/${id}`, courseData);
   }
 
+  /**
+   * DELETE /cursos/{cursoId}
+   * Excluir um curso
+   * @PreAuthorize("hasRole('ADMINISTRADOR')")
+   * Retorna: 204 No Content
+   */
   deleteCourse(id: number): Observable<any> {
+    console.log('🗑️ Service: Excluindo curso ID:', id);
+    console.log('📡 URL:', `${this.baseUrl}/cursos/${id}`);
     return this.http.delete(`${this.baseUrl}/cursos/${id}`);
+  }
+
+  /**
+   * PUT /cursos/{cursoId}/status
+   * Atualizar status (ativo/inativo) de um curso
+   * @PreAuthorize("hasRole('ADMINISTRADOR')")
+   * Body: { ativo: boolean }
+   */
+  updateCourseStatus(id: number, ativo: boolean): Observable<any> {
+    console.log('🔄 Atualizando status do curso:', id, 'Ativo:', ativo);
+    return this.http.put(`${this.baseUrl}/cursos/${id}/status`, { ativo });
+  }
+
+  /**
+   * GET /cursos/permissoes/{cursoId}
+   * Buscar usuários com acesso ao curso e suas permissões
+   * @PreAuthorize("hasRole('ADMINISTRADOR') or hasRole('GERENTE') or hasRole('SECRETARIO')")
+   * Retorna: List<PermissaoCursoDTO>
+   */
+  getCoursePermissions(cursoId: number): Observable<any[]> {
+    console.log('👥 Buscando permissões do curso ID:', cursoId);
+    console.log('📡 URL:', `${this.baseUrl}/cursos/permissoes/${cursoId}`);
+    return this.http.get<any[]>(`${this.baseUrl}/cursos/permissoes/${cursoId}`);
+  }
+
+  /**
+   * PUT /cursos/{cursoId}/usuarios/{usuarioId}
+   * Adicionar usuário a um curso
+   * @PreAuthorize("hasRole('ADMINISTRADOR') or hasRole('GERENTE')")
+   * Retorna: List<PermissaoCursoDTO>
+   */
+  addUserToCourse(cursoId: number, usuarioId: number): Observable<any[]> {
+    console.log('➕ Adicionando usuário ao curso:', { cursoId, usuarioId });
+    console.log('📡 URL:', `${this.baseUrl}/cursos/${cursoId}/usuarios/${usuarioId}`);
+    return this.http.put<any[]>(`${this.baseUrl}/cursos/${cursoId}/usuarios/${usuarioId}`, {});
+  }
+
+  /**
+   * DELETE /cursos/{cursoId}/usuarios/{usuarioId}
+   * Remover usuário de um curso
+   * @PreAuthorize("hasRole('ADMINISTRADOR') or hasRole('GERENTE')")
+   * Retorna: List<PermissaoCursoDTO>
+   */
+  removeUserFromCourse(cursoId: number, usuarioId: number): Observable<any[]> {
+    console.log('➖ Removendo usuário do curso:', { cursoId, usuarioId });
+    console.log('📡 URL:', `${this.baseUrl}/cursos/${cursoId}/usuarios/${usuarioId}`);
+    return this.http.delete<any[]>(`${this.baseUrl}/cursos/${cursoId}/usuarios/${usuarioId}`);
   }
 
   /**

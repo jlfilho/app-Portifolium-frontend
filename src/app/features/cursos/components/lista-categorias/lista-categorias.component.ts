@@ -20,6 +20,7 @@ import { MatDividerModule } from '@angular/material/divider';
 // Services e Models
 import { CursosService } from '../../services/cursos.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { SimpleConfirmDialogComponent } from '../../../../shared/components/simple-confirm-dialog/simple-confirm-dialog.component';
 import { PageRequest } from '../../../../shared/models/page.model';
 import { ApiService } from '../../../../shared/api.service';
 
@@ -155,14 +156,14 @@ export class ListaCategoriasComponent implements OnInit {
   deleteCategoria(categoria: Categoria): void {
     console.log('🗑️ Solicitando confirmação para excluir tipo de atividade:', categoria);
 
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+    const dialogRef = this.dialog.open(SimpleConfirmDialogComponent, {
       width: '400px',
+      panelClass: 'custom-dialog-panel',
       data: {
         title: 'Confirmar Exclusão',
         message: `Tem certeza que deseja excluir o tipo de atividade "${categoria.nome}"?`,
         confirmText: 'Excluir',
-        cancelText: 'Cancelar',
-        type: 'danger'
+        cancelText: 'Cancelar'
       }
     });
 

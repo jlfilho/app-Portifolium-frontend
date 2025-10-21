@@ -7,6 +7,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './shared/interceptors/auth.interceptor';
 import { errorInterceptor } from './shared/interceptors/error.interceptor';
+import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,6 +21,16 @@ export const appConfig: ApplicationConfig = {
         authInterceptor,
         errorInterceptor  // Detecta token expirado (401/403)
       ])
-    )
+    ),
+    {
+      provide: MAT_DIALOG_DEFAULT_OPTIONS,
+      useValue: {
+        hasBackdrop: true,
+        disableClose: false,
+        autoFocus: true,
+        restoreFocus: true,
+        panelClass: 'custom-dialog-panel'
+      }
+    }
   ]
 };

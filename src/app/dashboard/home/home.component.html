@@ -52,9 +52,14 @@
       <div class="menu-user-info">
         <strong>{{ userName }}</strong>
         <small>{{ userEmail }}</small>
+        <span class="user-role">{{ getUserRole() }}</span>
       </div>
     </div>
     <mat-divider></mat-divider>
+    <button mat-menu-item (click)="testDialog()">
+      <mat-icon>bug_report</mat-icon>
+      <span>Teste Diálogo</span>
+    </button>
     <button mat-menu-item (click)="goToProfile()">
       <mat-icon>person</mat-icon>
       <span>Meu Perfil</span>

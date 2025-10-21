@@ -215,3 +215,310 @@ body {
   }
 }
 
+/* ============================================
+   DIALOG DE CONFIRMAÇÃO - FORÇAR VISIBILIDADE
+   ============================================ */
+
+/* Garantir fundo branco e texto visível em todos os dialogs */
+.cdk-overlay-pane .mat-mdc-dialog-container {
+  background-color: #ffffff !important;
+  color: #0F172A !important;
+}
+
+.cdk-overlay-pane .mdc-dialog__surface {
+  background-color: #ffffff !important;
+  color: #0F172A !important;
+}
+
+/* Confirm Dialog específico */
+.confirm-dialog-panel {
+  background-color: #ffffff !important;
+}
+
+.confirm-dialog-panel * {
+  color: inherit !important;
+}
+
+.confirm-dialog-panel h2,
+.confirm-dialog-panel .dialog-title,
+.confirm-dialog-panel [mat-dialog-title] {
+  color: #0F172A !important;
+}
+
+.confirm-dialog-panel p,
+.confirm-dialog-panel .dialog-message {
+  color: #475569 !important;
+}
+
+.confirm-dialog-panel .mat-mdc-button-base {
+  color: #475569 !important;
+}
+
+.confirm-dialog-panel .mat-mdc-raised-button {
+  color: #ffffff !important;
+}
+
+/* ============================================
+   CORREÇÃO GLOBAL PARA TODOS OS DIALOGS
+   ============================================ */
+
+/* Forçar fundo branco APENAS em dialogs do Angular Material */
+.mat-mdc-dialog-container,
+.mdc-dialog__surface,
+.cdk-overlay-pane .mat-mdc-dialog-container,
+.cdk-overlay-pane .mdc-dialog__surface {
+  background-color: #ffffff !important;
+  color: #0F172A !important;
+}
+
+/* Forçar cores de texto APENAS em elementos de dialog */
+.mat-mdc-dialog-container h1,
+.mat-mdc-dialog-container h2,
+.mat-mdc-dialog-container h3,
+.mat-mdc-dialog-container h4,
+.mat-mdc-dialog-container h5,
+.mat-mdc-dialog-container h6,
+.mat-mdc-dialog-container [mat-dialog-title],
+.mat-mdc-dialog-container .mat-mdc-dialog-title {
+  color: #0F172A !important;
+}
+
+.mat-mdc-dialog-container p,
+.mat-mdc-dialog-container span,
+.mat-mdc-dialog-container div,
+.mat-mdc-dialog-container mat-dialog-content,
+.mat-mdc-dialog-container .mat-mdc-dialog-content {
+  color: #475569 !important;
+}
+
+/* Forçar cores de botões APENAS em dialogs */
+.mat-mdc-dialog-container .mat-mdc-button {
+  color: #475569 !important;
+}
+
+.mat-mdc-dialog-container .mat-mdc-raised-button {
+  color: #ffffff !important;
+}
+
+.mat-mdc-dialog-container .mat-mdc-raised-button.mat-primary {
+  background-color: #3B82F6 !important;
+  color: #ffffff !important;
+}
+
+.mat-mdc-dialog-container .mat-mdc-raised-button.mat-warn {
+  background-color: #EF4444 !important;
+  color: #ffffff !important;
+}
+
+/* Forçar cores de ícones APENAS em dialogs */
+.mat-mdc-dialog-container .mat-icon {
+  color: inherit !important;
+}
+
+/* Forçar cores de form fields APENAS em dialogs */
+.mat-mdc-dialog-container .mat-mdc-form-field {
+  color: #0F172A !important;
+}
+
+.mat-mdc-dialog-container .mat-mdc-form-field .mat-mdc-text-field-wrapper {
+  background-color: #ffffff !important;
+}
+
+.mat-mdc-dialog-container .mat-mdc-form-field .mat-mdc-form-field-label {
+  color: #475569 !important;
+}
+
+.mat-mdc-dialog-container .mat-mdc-form-field.mat-focused .mat-mdc-form-field-label {
+  color: #3B82F6 !important;
+}
+
+/* Forçar cores de chips APENAS em dialogs */
+.mat-mdc-dialog-container .mat-mdc-chip {
+  color: #ffffff !important;
+}
+
+.mat-mdc-dialog-container .mat-mdc-chip.mat-primary {
+  background-color: #3B82F6 !important;
+}
+
+.mat-mdc-dialog-container .mat-mdc-chip.mat-warn {
+  background-color: #EF4444 !important;
+}
+
+.mat-mdc-dialog-container .mat-mdc-chip.mat-accent {
+  background-color: #8B5CF6 !important;
+}
+
+/* Forçar cores de listas APENAS em dialogs */
+.mat-mdc-dialog-container .mat-mdc-list-item {
+  color: #0F172A !important;
+}
+
+.mat-mdc-dialog-container .mat-mdc-list-item .mat-mdc-list-item-title {
+  color: #0F172A !important;
+}
+
+.mat-mdc-dialog-container .mat-mdc-list-item .mat-mdc-list-item-line {
+  color: #475569 !important;
+}
+
+/* ============================================
+   CORREÇÃO EXTRA PARA DIALOGS COM PROBLEMAS
+   ============================================ */
+
+/* Forçar visibilidade APENAS em elementos de dialog */
+.cdk-overlay-container .mat-mdc-dialog-container * {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Forçar cores específicas APENAS para elementos de dialog */
+.cdk-overlay-container .mat-mdc-dialog-container h2,
+.cdk-overlay-container .mat-mdc-dialog-container [mat-dialog-title],
+.cdk-overlay-container .mat-mdc-dialog-container .mat-mdc-dialog-title {
+  color: #0F172A !important;
+  font-weight: 500 !important;
+  font-size: 20px !important;
+}
+
+.cdk-overlay-container .mat-mdc-dialog-container p,
+.cdk-overlay-container .mat-mdc-dialog-container mat-dialog-content,
+.cdk-overlay-container .mat-mdc-dialog-container .mat-mdc-dialog-content {
+  color: #475569 !important;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+}
+
+.cdk-overlay-container .mat-mdc-dialog-container button {
+  color: #475569 !important;
+  font-weight: 500 !important;
+}
+
+.cdk-overlay-container .mat-mdc-dialog-container .mat-mdc-raised-button {
+  color: #ffffff !important;
+}
+
+/* Forçar fundo branco APENAS em dialogs */
+.cdk-overlay-container .mat-mdc-dialog-container,
+.cdk-overlay-container .mdc-dialog__surface,
+.cdk-overlay-container .mdc-dialog__container {
+  background-color: #ffffff !important;
+}
+
+/* Garantir que o backdrop seja escuro APENAS para dialogs */
+.cdk-overlay-container .cdk-overlay-backdrop {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ============================================
+   CORREÇÃO PARA TOOLTIPS - NÃO AFETAR OUTROS COMPONENTES
+   ============================================ */
+
+/* Garantir que tooltips funcionem corretamente */
+.cdk-overlay-container .mat-mdc-tooltip {
+  background-color: #0F172A !important;
+  color: #ffffff !important;
+  font-size: 12px !important;
+  padding: 8px 12px !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+.cdk-overlay-container .mat-mdc-tooltip .mdc-tooltip__surface {
+  background-color: #0F172A !important;
+  color: #ffffff !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* ============================================
+   CORREÇÃO PARA OUTROS COMPONENTES OVERLAY
+   ============================================ */
+
+/* Garantir que outros componentes overlay não sejam afetados */
+.cdk-overlay-container .mat-mdc-menu-panel {
+  background-color: #ffffff !important;
+  color: #0F172A !important;
+}
+
+.cdk-overlay-container .mat-mdc-menu-panel .mat-mdc-menu-item {
+  color: #0F172A !important;
+}
+
+.cdk-overlay-container .mat-mdc-menu-panel .mat-mdc-menu-item:hover {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+.cdk-overlay-container .mat-mdc-menu-panel .mat-mdc-menu-item .mat-icon {
+  color: #475569 !important;
+}
+
+/* Garantir que snackbars funcionem */
+.cdk-overlay-container .mat-mdc-snack-bar-container {
+  background-color: inherit !important;
+  color: inherit !important;
+}
+
+/* ============================================
+   CONFIGURAÇÃO ESPECÍFICA PARA DIALOGS
+   ============================================ */
+
+/* Estilos para a classe custom-dialog-panel */
+.custom-dialog-panel {
+  background-color: #ffffff !important;
+  color: #0F172A !important;
+  border-radius: 12px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+}
+
+.custom-dialog-panel .mat-mdc-dialog-container {
+  background-color: #ffffff !important;
+  color: #0F172A !important;
+  padding: 0 !important;
+}
+
+.custom-dialog-panel .mdc-dialog__surface {
+  background-color: #ffffff !important;
+  color: #0F172A !important;
+}
+
+.custom-dialog-panel .mat-mdc-dialog-title {
+  color: #0F172A !important;
+  font-weight: 500 !important;
+  font-size: 20px !important;
+  margin: 0 0 16px 0 !important;
+}
+
+.custom-dialog-panel .mat-mdc-dialog-content {
+  color: #475569 !important;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+  margin: 0 0 24px 0 !important;
+}
+
+.custom-dialog-panel .mat-mdc-dialog-actions {
+  margin: 0 !important;
+  padding: 0 !important;
+  justify-content: flex-end !important;
+}
+
+.custom-dialog-panel .mat-mdc-button {
+  color: #475569 !important;
+  margin-left: 8px !important;
+}
+
+.custom-dialog-panel .mat-mdc-raised-button {
+  color: #ffffff !important;
+}
+
+.custom-dialog-panel .mat-mdc-raised-button.mat-primary {
+  background-color: #3B82F6 !important;
+  color: #ffffff !important;
+}
+
+.custom-dialog-panel .mat-mdc-raised-button.mat-warn {
+  background-color: #EF4444 !important;
+  color: #ffffff !important;
+}
+

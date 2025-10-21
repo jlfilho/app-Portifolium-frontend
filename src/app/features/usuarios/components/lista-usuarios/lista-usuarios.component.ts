@@ -23,6 +23,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { UsuariosService } from '../../services/usuarios.service';
 import { Usuario } from '../../models/usuario.model';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { SimpleConfirmDialogComponent } from '../../../../shared/components/simple-confirm-dialog/simple-confirm-dialog.component';
 import { CursosUsuarioDialogComponent } from '../cursos-usuario-dialog/cursos-usuario-dialog.component';
 import { ChangePasswordDialogComponent } from '../../../../shared/components/change-password-dialog/change-password-dialog.component';
 import { PageRequest } from '../../../../shared/models/page.model';
@@ -174,15 +175,14 @@ export class ListaUsuariosComponent implements OnInit {
   }
 
   deleteUser(usuario: Usuario): void {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+    const dialogRef = this.dialog.open(SimpleConfirmDialogComponent, {
       width: '500px',
-      panelClass: 'confirm-dialog-panel',
+      panelClass: 'custom-dialog-panel',
       data: {
         title: 'Excluir Usuário',
         message: `Tem certeza que deseja excluir o usuário "${usuario.nome}"? Esta ação não pode ser desfeita.`,
         confirmText: 'Sim, Excluir',
-        cancelText: 'Cancelar',
-        type: 'danger'
+        cancelText: 'Cancelar'
       }
     });
 

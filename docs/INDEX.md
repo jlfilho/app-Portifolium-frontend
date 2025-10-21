@@ -51,6 +51,7 @@ Correções específicas para resolver problemas de cores, contraste e overrides
 | `CORRECAO_BOTOES_FORMULARIO_CURSO.md` | Correção das cores dos botões |
 | `CORRECAO_SLIDE_TOGGLE_CURSO_ATIVO.md` | Correção do slide toggle (curso ativo) |
 | `ATUALIZACAO_ESTILO_FORMULARIO_USUARIO.md` | Atualização de estilo do formulário de usuário |
+| `LIMPEZA_LOGIN_STYLES.md` | Limpeza e aplicação da paleta no login |
 
 ---
 
@@ -86,6 +87,19 @@ Documentação sobre a implementação de funcionalidades relacionadas a cursos.
 | `AJUSTES_FORMULARIO_CURSO.md` | Ajustes no formulário de curso |
 | `MELHORIAS_LISTAGEM_CURSOS.md` | Melhorias na listagem de cursos |
 | `IMPLEMENTACAO_DIALOG_EXCLUSAO.md` | Implementação do diálogo de exclusão |
+| `IMPLEMENTACAO_TOGGLE_STATUS_CURSO.md` | Implementação do toggle de status (ativar/desativar) |
+| `TROUBLESHOOTING_TOGGLE_STATUS.md` | Troubleshooting do toggle de status |
+| `GUIA_TESTE_TOGGLE_STATUS.md` | Guia de teste do toggle de status |
+| `FUNCIONALIDADE_EXCLUIR_CURSO.md` | Implementação da exclusão de curso |
+| `EXIBICAO_MENSAGENS_ERRO_SERVIDOR.md` | Exibição de mensagens de erro do servidor |
+| `IMPLEMENTACAO_GERENCIAR_PERMISSOES.md` | Implementação do gerenciamento de permissões |
+| `CORRECAO_ENDPOINT_PERMISSOES.md` | Correção do endpoint de permissões |
+| `ADICIONAR_USUARIO_CURSO.md` | Funcionalidade de adicionar usuário ao curso |
+| `REMOVER_USUARIO_CURSO.md` | Funcionalidade de remover usuário do curso |
+| `CORRECAO_REMOCAO_USUARIO_CURSO.md` | Correção de bugs na remoção de usuário |
+| `CORRECAO_ERRO_FILTER_USUARIOS.md` | Correção do erro TypeError: this.usuarios.filter is not a function |
+| `CORRECAO_SORTBY_USUARIOS.md` | Correção do erro 500 ao carregar usuários (sortBy inválido) |
+| `TROUBLESHOOTING_ADICIONAR_PERMISSOES.md` | Guia de troubleshooting para adicionar permissões |
 
 ---
 
@@ -106,6 +120,7 @@ Documentação sobre autenticação, autorização e validação de tokens.
 | Arquivo | Descrição |
 |---------|-----------|
 | `IMPLEMENTACAO_VALIDACAO_TOKEN.md` | Validação de expiração de token JWT |
+| `EXIBICAO_INFO_USUARIO_TOKEN.md` | Extração e exibição de informações do usuário do token JWT |
 
 ---
 
@@ -116,6 +131,10 @@ Documentação sobre refatorações e migrações da arquitetura.
 |---------|-----------|
 | `REFACTORING_SUMMARY.md` | Resumo da refatoração para standalone components |
 | `MIGRATION_CHECKLIST.md` | Checklist de migração |
+| `TEMAS_ANGULAR_MATERIAL.md` | Temas disponíveis no Angular Material |
+| `LIMPEZA_OVERRIDES_MATERIAL.md` | Limpeza de overrides após troca de tema |
+| `ORGANIZACAO_DOCUMENTACAO.md` | Organização da documentação em pasta `docs/` |
+| `ORGANIZACAO_CONCLUIDA.md` | Confirmação da organização |
 
 ---
 
@@ -125,10 +144,25 @@ Documentação sobre componentes reutilizáveis.
 | Arquivo | Descrição |
 |---------|-----------|
 | `CONFIRM_DIALOG_README.md` | Diálogo de confirmação |
+| `CORRECAO_DIALOG_CONFIRMACAO_BRANCO.md` | Correção do diálogo aparecendo branco |
 
 ---
 
 ## 🔍 Documentação Recente (Últimas Atualizações)
+
+### **Gerenciamento de Cursos (Outubro 2025)**
+1. `IMPLEMENTACAO_TOGGLE_STATUS_CURSO.md` - Toggle ativar/desativar curso
+2. `FUNCIONALIDADE_EXCLUIR_CURSO.md` - Exclusão de curso
+3. `EXIBICAO_MENSAGENS_ERRO_SERVIDOR.md` - Mensagens de erro do servidor
+4. `IMPLEMENTACAO_GERENCIAR_PERMISSOES.md` - Gerenciamento de permissões de curso
+5. `ADICIONAR_USUARIO_CURSO.md` - Adicionar usuário ao curso
+6. `REMOVER_USUARIO_CURSO.md` - Remover usuário do curso
+7. `CORRECAO_REMOCAO_USUARIO_CURSO.md` - Correção de bugs na remoção
+
+### **Limpeza de Estilos (Outubro 2025)**
+1. `TEMAS_ANGULAR_MATERIAL.md` - Troca para tema `azure-blue`
+2. `LIMPEZA_OVERRIDES_MATERIAL.md` - Limpeza massiva de overrides
+3. `LIMPEZA_LOGIN_STYLES.md` - Limpeza e aplicação da paleta no login
 
 ### **Paleta "Minimal Tech Light+" (Outubro 2025)**
 1. `APLICACAO_PALETA_MINIMAL_TECH_LIGHT_PLUS.md` - Aplicação geral
@@ -148,14 +182,14 @@ Documentação sobre componentes reutilizáveis.
 | Categoria | Quantidade de Arquivos |
 |-----------|------------------------|
 | **Paletas e Design** | 5 arquivos |
-| **Correções de Estilo** | 12 arquivos |
+| **Correções de Estilo** | 13 arquivos |
 | **Usuários** | 14 arquivos |
-| **Cursos** | 5 arquivos |
+| **Cursos** | 18 arquivos |
 | **Testes** | 3 arquivos |
-| **Segurança** | 1 arquivo |
-| **Refatoração** | 2 arquivos |
-| **Componentes** | 1 arquivo |
-| **TOTAL** | **43 arquivos** ✅ |
+| **Segurança** | 3 arquivos |
+| **Refatoração** | 6 arquivos |
+| **Componentes** | 2 arquivos |
+| **TOTAL** | **64 arquivos** ✅ |
 
 ---
 
@@ -207,7 +241,7 @@ Documentação sobre componentes reutilizáveis.
 
 ---
 
-**Última Atualização:** 20 de outubro de 2025  
-**Total de Arquivos:** 43 arquivos  
+**Última Atualização:** 21 de outubro de 2025  
+**Total de Arquivos:** 64 arquivos  
 **Status:** ✅ **ORGANIZADO**
 

@@ -2,16 +2,18 @@
    🎨 PALETA "MINIMAL TECH LIGHT+"
    ======================================== */
 :host {
-  --primary-color: #3B82F6;      /* Azul principal */
-  --secondary-color: #8B5CF6;    /* Lilás suave */
-  --background-dark: #F8FAFC;    /* Fundo principal */
-  --card-bg: #FFFFFF;            /* Card background */
-  --text-primary: #0F172A;       /* Texto principal */
-  --text-secondary: #475569;     /* Texto secundário */
-  --accent-color: #6366F1;       /* Azul-violeta */
-  --error-color: #EF4444;        /* Vermelho */
-  --warning-color: #F59E0B;      /* Laranja */
-  --success-color: #10B981;      /* Verde */
+  --primary-color: #3B82F6;
+  --secondary-color: #8B5CF6;
+  --accent-color: #6366F1;
+  --background-light: #F8FAFC;
+  --background-lighter: #F1F5F9;
+  --background-gradient: #E2E8F0;
+  --card-bg: #FFFFFF;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --error-color: #EF4444;
+  --warning-color: #F59E0B;
+  --success-color: #10B981;
 }
 
 /* ========================================
@@ -22,7 +24,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--background-dark) 0%, #F1F5F9 50%, #E2E8F0 100%);
+  background: linear-gradient(135deg, var(--background-light) 0%, var(--background-lighter) 50%, var(--background-gradient) 100%);
   position: relative;
   overflow: hidden;
   padding: 20px;
@@ -123,18 +125,18 @@
   background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
   border-radius: 20px;
   margin-bottom: 16px;
-  box-shadow: 0 8px 32px rgba(91, 91, 234, 0.3);
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
   animation: pulse 2s infinite ease-in-out;
 }
 
 @keyframes pulse {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 8px 32px rgba(91, 91, 234, 0.3);
+    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
   }
   50% {
     transform: scale(1.05);
-    box-shadow: 0 12px 40px rgba(91, 91, 234, 0.5);
+    box-shadow: 0 12px 40px rgba(59, 130, 246, 0.5);
   }
 }
 
@@ -142,7 +144,7 @@
   font-size: 48px;
   width: 48px;
   height: 48px;
-  color: var(--text-primary) !important;
+  color: white !important;
 }
 
 .app-title {
@@ -220,9 +222,8 @@
 .login-card {
   background: var(--card-bg) !important;
   border-radius: 16px !important;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(59, 130, 246, 0.1);
   padding: 8px !important;
 }
 
@@ -265,86 +266,13 @@ form {
   width: 100%;
 }
 
-/* Form Fields */
-::ng-deep .login-card .mat-mdc-form-field {
-  width: 100%;
-}
-
-::ng-deep .login-card .mat-mdc-text-field-wrapper {
-  background-color: rgba(31, 41, 55, 0.6) !important;
-  border-radius: 8px;
-}
-
-::ng-deep .login-card .mat-mdc-form-field-focus-overlay {
-  background-color: transparent !important;
-}
-
-::ng-deep .login-card .mdc-text-field--outlined .mdc-notched-outline__leading,
-::ng-deep .login-card .mdc-text-field--outlined .mdc-notched-outline__notch,
-::ng-deep .login-card .mdc-text-field--outlined .mdc-notched-outline__trailing {
-  border-color: rgba(156, 163, 175, 0.3) !important;
-}
-
-::ng-deep .login-card .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
-::ng-deep .login-card .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
-::ng-deep .login-card .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
-  border-color: var(--primary-color) !important;
-  border-width: 2px !important;
-}
-
-::ng-deep .login-card .mat-mdc-form-field:hover .mdc-notched-outline__leading,
-::ng-deep .login-card .mat-mdc-form-field:hover .mdc-notched-outline__notch,
-::ng-deep .login-card .mat-mdc-form-field:hover .mdc-notched-outline__trailing {
-  border-color: rgba(91, 91, 234, 0.5) !important;
-}
-
-::ng-deep .login-card .mat-mdc-form-field-infix {
-  color: var(--text-primary) !important;
-}
-
-::ng-deep .login-card .mat-mdc-input-element {
-  color: var(--text-primary) !important;
-  caret-color: var(--primary-color) !important;
-}
-
-::ng-deep .login-card .mat-mdc-input-element::placeholder {
-  color: var(--text-secondary) !important;
-  opacity: 0.7;
-}
-
-::ng-deep .login-card .mat-mdc-form-field-label,
-::ng-deep .login-card .mdc-floating-label {
-  color: var(--text-secondary) !important;
-}
-
-::ng-deep .login-card .mat-mdc-form-field.mat-focused .mat-mdc-form-field-label,
-::ng-deep .login-card .mat-mdc-form-field.mat-focused .mdc-floating-label {
-  color: var(--primary-color) !important;
-}
-
-/* Ícones do formulário */
-::ng-deep .login-card .mat-mdc-form-field .mat-icon {
-  color: var(--text-secondary) !important;
-}
-
+/* Apenas customizações específicas do login - o tema base já cuida do resto */
 ::ng-deep .login-card .mat-mdc-form-field.mat-focused .mat-icon[matprefix] {
   color: var(--primary-color) !important;
 }
 
-/* Botão de visibilidade da senha */
-::ng-deep .login-card .mat-mdc-icon-button {
-  color: var(--text-secondary) !important;
-}
-
 ::ng-deep .login-card .mat-mdc-icon-button:hover {
   color: var(--primary-color) !important;
-}
-
-/* Mensagens de erro do formulário */
-::ng-deep .login-card .mat-mdc-form-field-error {
-  color: var(--error-color) !important;
-  font-size: 12px;
-  margin-top: 4px;
 }
 
 /* ========================================
@@ -389,30 +317,22 @@ form {
   letter-spacing: 0.5px !important;
   transition: all 0.3s ease !important;
   margin-top: 8px;
-  position: relative;
-  overflow: hidden;
 }
 
-::ng-deep .login-button.mat-mdc-raised-button {
+/* Gradient especial para o botão de login */
+::ng-deep .login-button.mat-mdc-raised-button:not([disabled]) {
   background: linear-gradient(135deg, var(--primary-color), var(--accent-color)) !important;
-  color: var(--text-primary) !important;
-  box-shadow: 0 4px 20px rgba(91, 91, 234, 0.4) !important;
+  color: white !important;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4) !important;
 }
 
 ::ng-deep .login-button.mat-mdc-raised-button:hover:not([disabled]) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(91, 91, 234, 0.6) !important;
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.6) !important;
 }
 
 ::ng-deep .login-button.mat-mdc-raised-button:active:not([disabled]) {
   transform: translateY(0);
-}
-
-::ng-deep .login-button.mat-mdc-raised-button[disabled] {
-  background: rgba(156, 163, 175, 0.2) !important;
-  color: var(--text-secondary) !important;
-  box-shadow: none !important;
-  cursor: not-allowed;
 }
 
 .login-button span {
@@ -433,7 +353,7 @@ form {
 }
 
 ::ng-deep .button-spinner circle {
-  stroke: var(--text-primary) !important;
+  stroke: white !important;
 }
 
 /* ========================================

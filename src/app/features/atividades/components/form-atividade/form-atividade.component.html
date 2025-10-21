@@ -1,0 +1,417 @@
+<mat-card class="form-card" appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon class="title-icon">{{ isEditMode ? 'edit' : 'add_circle' }}</mat-icon>
+      {{ isEditMode ? 'Editar Atividade' : 'Nova Atividade' }}
+    </mat-card-title>
+    <mat-card-subtitle *ngIf="atividade">{{ atividade.nome }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="loading" *ngIf="isLoading">
+      <mat-progress-spinner mode="indeterminate" diameter="28"></mat-progress-spinner>
+      <span>Carregando dados da atividade...</span>
+    </div>
+
+    <div *ngIf="!isLoading && errorMessage" class="error-message">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <form [formGroup]="atividadeForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading && !errorMessage">
+      <div class="form-grid">
+        <!-- Nome da Atividade -->
+        <mat-form-field appearance="outline" class="form-field full-width">
+          <mat-label>Nome da Atividade *</mat-label>
+          <input matInput formControlName="nome" placeholder="Digite o nome da atividade">
+          <mat-icon matPrefix>event</mat-icon>
+          <mat-error *ngIf="nome?.hasError('required')">
+            O nome da atividade é obrigatório
+          </mat-error>
+          <mat-error *ngIf="nome?.hasError('minlength')">
+            O nome deve ter pelo menos 3 caracteres
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Objetivo -->
+        <mat-form-field appearance="outline" class="form-field full-width">
+          <mat-label>Objetivo</mat-label>
+          <textarea matInput formControlName="objetivo" placeholder="Descreva o objetivo da atividade" rows="3"></textarea>
+          <mat-icon matPrefix>flag</mat-icon>
+        </mat-form-field>
+
+        <!-- Público Alvo -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Público Alvo</mat-label>
+          <input matInput formControlName="publicoAlvo" placeholder="Ex: Estudantes, Professores">
+          <mat-icon matPrefix>groups</mat-icon>
+        </mat-form-field>
+
+        <!-- Coordenador -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Coordenador *</mat-label>
+          <mat-select [(ngModel)]="coordenadorId" [ngModelOptions]="{standalone: true}" (selectionChange)="onCoordenadorChange($event.value)">
+            <mat-option *ngFor="let pessoa of pessoas" [value]="pessoa.id">
+              {{ pessoa.nome || pessoa.name }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>person</mat-icon>
+          <mat-hint>O coordenador será automaticamente adicionado aos integrantes</mat-hint>
+        </mat-form-field>
+
+        <!-- Data de Realização -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Data de Realização *</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="dataRealizacao">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-icon matPrefix>event</mat-icon>
+          <mat-error *ngIf="dataRealizacao?.hasError('required')">
+            A data de realização é obrigatória
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Status de Publicação -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Status de Publicação</mat-label>
+          <mat-select formControlName="statusPublicacao">
+            <mat-option [value]="true">Publicada</mat-option>
+            <mat-option [value]="false">Não Publicada</mat-option>
+          </mat-select>
+          <mat-icon matPrefix>publish</mat-icon>
+        </mat-form-field>
+
+        <!-- Curso (Somente Leitura) -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Curso</mat-label>
+          <input matInput [value]="isEditMode ? (atividade?.curso?.nome || '') : cursoNome" readonly>
+          <mat-icon matPrefix>school</mat-icon>
+          <mat-hint>{{ isEditMode ? 'O curso não pode ser alterado após a criação da atividade' : 'Curso selecionado para esta atividade' }}</mat-hint>
+        </mat-form-field>
+
+        <!-- Categoria -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Categoria *</mat-label>
+          <mat-select formControlName="categoriaId">
+            <mat-option *ngFor="let categoria of categorias" [value]="categoria.id">
+              {{ categoria.nome }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>category</mat-icon>
+          <mat-error *ngIf="categoriaId?.hasError('required')">
+            A categoria é obrigatória
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Fontes Financiadoras -->
+      <div class="fontes-section">
+        <h3 class="section-title">
+          <mat-icon>attach_money</mat-icon>
+          Fontes Financiadoras
+        </h3>
+
+        <!-- Adicionar Fonte Financiadora -->
+        <div class="add-fonte-row">
+          <mat-form-field appearance="outline" class="fonte-select">
+            <mat-label>Adicionar Fonte Financiadora</mat-label>
+            <mat-select [(ngModel)]="fonteFinanciadoraSelecionada" [ngModelOptions]="{standalone: true}">
+              <mat-option *ngFor="let fonte of getFontesFinanciadorasDisponiveis()" [value]="fonte.id">
+                {{ fonte.nome }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>search</mat-icon>
+            <mat-hint *ngIf="getFontesFinanciadorasDisponiveis().length === 0">
+              Todas as fontes disponíveis já foram adicionadas
+            </mat-hint>
+          </mat-form-field>
+
+          <button
+            type="button"
+            mat-raised-button
+            color="primary"
+            (click)="adicionarFonteFinanciadora()"
+            [disabled]="!fonteFinanciadoraSelecionada">
+            <mat-icon>add</mat-icon>
+            Adicionar
+          </button>
+        </div>
+
+        <!-- Lista de Fontes Selecionadas -->
+        <div class="fontes-lista" *ngIf="fontesFinanciadorasSelecionadas.length > 0">
+          <div class="stats-info">
+            <mat-icon>info</mat-icon>
+            <span>{{ fontesFinanciadorasSelecionadas.length }} fonte(s) financiadora(s) selecionada(s)</span>
+          </div>
+
+          <div class="fontes-chips">
+            <mat-chip-set>
+              <mat-chip
+                *ngFor="let fonte of fontesFinanciadorasSelecionadas"
+                class="fonte-chip"
+                [removable]="true"
+                (removed)="removerFonteFinanciadora(fonte)">
+                <mat-icon matChipAvatar>attach_money</mat-icon>
+                {{ fonte.nome }}
+                <button matChipRemove>
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+        </div>
+
+        <!-- Mensagem quando não há fontes selecionadas -->
+        <div class="empty-fontes" *ngIf="fontesFinanciadorasSelecionadas.length === 0">
+          <mat-icon class="empty-icon">attach_money</mat-icon>
+          <p>Nenhuma fonte financiadora adicionada</p>
+          <p class="empty-hint">Selecione uma fonte financiadora acima e clique em "Adicionar"</p>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Integrantes / Participantes -->
+      <div class="integrantes-section">
+        <h3 class="section-title">
+          <mat-icon>people</mat-icon>
+          Integrantes / Participantes
+        </h3>
+
+        <!-- Adicionar Integrante -->
+        <div class="add-integrante-row">
+          <mat-form-field appearance="outline" class="pessoa-select">
+            <mat-label>Selecionar Pessoa</mat-label>
+            <mat-select [(ngModel)]="pessoaSelecionada" [ngModelOptions]="{standalone: true}">
+              <mat-option *ngFor="let pessoa of getPessoasDisponiveis()" [value]="pessoa.id">
+                {{ pessoa.nome || pessoa.name }} ({{ pessoa.cpf }})
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>person_search</mat-icon>
+            <mat-hint *ngIf="getPessoasDisponiveis().length === 0">
+              Todas as pessoas disponíveis já foram adicionadas
+            </mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="papel-select">
+            <mat-label>Papel</mat-label>
+            <mat-select [(ngModel)]="papelSelecionado" [ngModelOptions]="{standalone: true}">
+              <mat-option *ngFor="let papel of papeisDisponiveis" [value]="papel.value">
+                <mat-icon [style.color]="papel.color">{{ papel.icon }}</mat-icon>
+                {{ papel.label }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>badge</mat-icon>
+          </mat-form-field>
+
+          <button
+            type="button"
+            mat-raised-button
+            color="primary"
+            (click)="adicionarIntegrante()"
+            [disabled]="!pessoaSelecionada">
+            <mat-icon>person_add</mat-icon>
+            Adicionar
+          </button>
+        </div>
+
+        <!-- Lista de Integrantes Selecionados -->
+        <div class="integrantes-lista" *ngIf="integrantesSelecionados.length > 0">
+          <div class="stats-info">
+            <mat-icon>info</mat-icon>
+            <span>{{ integrantesSelecionados.length }} integrante(s) selecionado(s)</span>
+          </div>
+
+          <div class="integrantes-table">
+            <div *ngFor="let integrante of integrantesSelecionados" class="integrante-row">
+              <div class="integrante-info">
+                <mat-icon class="integrante-avatar" [style.color]="getPapelColor(integrante.papel)">
+                  {{ getPapelIcon(integrante.papel) }}
+                </mat-icon>
+                <div class="integrante-dados">
+                  <span class="integrante-nome">{{ integrante.nome }}</span>
+                  <span class="integrante-cpf">CPF: {{ integrante.cpf }}</span>
+                </div>
+              </div>
+
+              <div class="integrante-actions">
+                <mat-form-field appearance="outline" class="papel-change">
+                  <mat-label>Papel</mat-label>
+                  <mat-select
+                    [value]="integrante.papel"
+                    (selectionChange)="alterarPapelIntegrante(integrante, $event.value)">
+                    <mat-option *ngFor="let papel of papeisDisponiveis" [value]="papel.value">
+                      <mat-icon [style.color]="papel.color">{{ papel.icon }}</mat-icon>
+                      {{ papel.label }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <button
+                  type="button"
+                  mat-icon-button
+                  color="warn"
+                  (click)="removerIntegrante(integrante)"
+                  matTooltip="Remover integrante">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mensagem quando não há integrantes selecionados -->
+        <div class="empty-integrantes" *ngIf="integrantesSelecionados.length === 0">
+          <mat-icon class="empty-icon">people_outline</mat-icon>
+          <p>Nenhum integrante adicionado</p>
+          <p class="empty-hint">Selecione uma pessoa e um papel acima e clique em "Adicionar"</p>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Upload de Foto de Capa -->
+      <div class="image-upload-section">
+        <h3 class="section-title">
+          <mat-icon>image</mat-icon>
+          Foto de Capa
+        </h3>
+
+        <div class="image-upload-container">
+          <!-- Área de Drop -->
+          <div
+            class="drop-zone"
+            [class.drag-over]="dragOver"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event)">
+
+            <!-- Preview da Imagem -->
+            <div class="image-preview" *ngIf="previewUrl">
+              <img [src]="previewUrl" alt="Preview da imagem" class="preview-image">
+              <div class="image-overlay" *ngIf="selectedFile">
+                <mat-icon class="overlay-icon">cloud_upload</mat-icon>
+                <span class="overlay-text">Nova imagem selecionada</span>
+              </div>
+            </div>
+
+            <!-- Placeholder quando não há imagem -->
+            <div class="upload-placeholder" *ngIf="!previewUrl">
+              <mat-icon class="placeholder-icon">cloud_upload</mat-icon>
+              <p class="placeholder-text">Arraste uma imagem aqui ou clique para selecionar</p>
+              <p class="placeholder-hint">Formatos aceitos: JPG, PNG, GIF (máx. 5MB)</p>
+            </div>
+
+            <!-- Input de arquivo -->
+            <input
+              type="file"
+              accept="image/*"
+              (change)="onFileSelected($event)"
+              class="file-input"
+              #fileInput>
+          </div>
+
+          <!-- Controles de Upload -->
+          <div class="upload-controls" *ngIf="selectedFile">
+            <div class="file-info">
+              <mat-icon>insert_drive_file</mat-icon>
+              <div class="file-details">
+                <span class="file-name">{{ selectedFile.name }}</span>
+                <span class="file-size">{{ (selectedFile.size / 1024).toFixed(2) }} KB</span>
+              </div>
+            </div>
+
+            <!-- Informações de Compressão -->
+            <div class="compression-info">
+              <mat-icon class="compression-icon">compress</mat-icon>
+              <span class="compression-text">Imagem otimizada para upload</span>
+            </div>
+
+            <!-- Barra de Progresso -->
+            <mat-progress-bar
+              *ngIf="isUploading"
+              mode="determinate"
+              [value]="uploadProgress"
+              class="upload-progress">
+            </mat-progress-bar>
+
+            <!-- Botões de Ação -->
+            <div class="action-buttons">
+              <button
+                type="button"
+                mat-raised-button
+                color="primary"
+                (click)="uploadImage()"
+                [disabled]="isUploading">
+                <mat-icon>cloud_upload</mat-icon>
+                {{ isUploading ? 'Enviando...' : 'Enviar Imagem' }}
+              </button>
+
+              <button
+                type="button"
+                mat-stroked-button
+                (click)="removeImage()"
+                [disabled]="isUploading">
+                <mat-icon>close</mat-icon>
+                Cancelar
+              </button>
+            </div>
+          </div>
+
+          <!-- Botão para selecionar arquivo -->
+          <button
+            type="button"
+            mat-stroked-button
+            (click)="fileInput.click()"
+            class="select-file-btn"
+            *ngIf="!selectedFile">
+            <mat-icon>add_photo_alternate</mat-icon>
+            Selecionar Imagem
+          </button>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Informações da Atividade -->
+      <div class="activity-info" *ngIf="atividade">
+        <h3 class="info-title">
+          <mat-icon>info</mat-icon>
+          Informações da Atividade
+        </h3>
+
+        <div class="info-grid">
+          <div class="info-item" *ngIf="atividade.fontesFinanciadora && atividade.fontesFinanciadora.length > 0">
+            <mat-icon class="info-icon">attach_money</mat-icon>
+            <div class="info-content">
+              <span class="info-label">Fontes Financiadoras</span>
+              <span class="info-value">{{ atividade.fontesFinanciadora.length }} fonte(s)</span>
+            </div>
+          </div>
+
+          <div class="info-item" *ngIf="atividade.integrantes && atividade.integrantes.length > 0">
+            <mat-icon class="info-icon">people</mat-icon>
+            <div class="info-content">
+              <span class="info-label">Integrantes</span>
+              <span class="info-value">{{ atividade.integrantes.length }} integrante(s)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </mat-card-content>
+
+  <mat-card-actions align="end" *ngIf="!isLoading && !errorMessage">
+    <button mat-stroked-button type="button" (click)="goBack()" [disabled]="isSaving">
+      <mat-icon>arrow_back</mat-icon>
+      Voltar
+    </button>
+    <button mat-raised-button color="primary" type="button" (click)="onSubmit()" [disabled]="isSaving">
+      <mat-icon *ngIf="!isSaving">save</mat-icon>
+      <mat-progress-spinner *ngIf="isSaving" mode="indeterminate" diameter="20"></mat-progress-spinner>
+      {{ isSaving ? 'Salvando...' : 'Salvar' }}
+    </button>
+  </mat-card-actions>
+</mat-card>

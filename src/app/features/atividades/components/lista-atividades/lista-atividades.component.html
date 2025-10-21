@@ -1,0 +1,237 @@
+<mat-card class="form-card" appearance="outlined">
+  <mat-card-header>
+    <div class="header-content">
+      <div class="header-text">
+        <mat-card-title>
+          <mat-icon class="title-icon">event</mat-icon>
+          Atividades do Curso
+        </mat-card-title>
+        <mat-card-subtitle *ngIf="cursoNome">{{ cursoNome }}</mat-card-subtitle>
+      </div>
+      <button mat-raised-button color="primary" (click)="novaAtividade()" class="btn-nova-atividade">
+        <mat-icon>add_circle</mat-icon>
+        Nova Atividade
+      </button>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content>
+    <!-- Filtros -->
+    <div class="filters-section">
+      <h3 class="filters-title">
+        <mat-icon>filter_list</mat-icon>
+        Filtros
+      </h3>
+
+      <div class="filters-grid">
+        <!-- Filtro por Nome -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Nome da Atividade</mat-label>
+          <input matInput [(ngModel)]="filtroNome" placeholder="Digite parte do nome...">
+          <mat-icon matPrefix>search</mat-icon>
+        </mat-form-field>
+
+        <!-- Filtro por Categoria -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Categoria</mat-label>
+          <mat-select [(ngModel)]="filtroCategoriaId">
+            <mat-option [value]="null">Todas</mat-option>
+            <mat-option *ngFor="let categoria of categorias" [value]="categoria.id">
+              {{ categoria.nome }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>category</mat-icon>
+        </mat-form-field>
+
+        <!-- Filtro por Status de Publicação -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Status de Publicação</mat-label>
+          <mat-select [(ngModel)]="filtroStatusPublicacao">
+            <mat-option *ngFor="let status of statusOptions" [value]="status.value">
+              {{ status.label }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>publish</mat-icon>
+        </mat-form-field>
+
+        <!-- Filtro por Data Início -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Data Início</mat-label>
+          <input matInput [matDatepicker]="pickerInicio" [(ngModel)]="filtroDataInicio">
+          <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+          <mat-datepicker #pickerInicio></mat-datepicker>
+          <mat-icon matPrefix>event</mat-icon>
+        </mat-form-field>
+
+        <!-- Filtro por Data Fim -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Data Fim</mat-label>
+          <input matInput [matDatepicker]="pickerFim" [(ngModel)]="filtroDataFim">
+          <mat-datepicker-toggle matSuffix [for]="pickerFim"></mat-datepicker-toggle>
+          <mat-datepicker #pickerFim></mat-datepicker>
+          <mat-icon matPrefix>event</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <!-- Botões de Ação dos Filtros -->
+      <div class="filters-actions">
+        <button mat-raised-button color="primary" (click)="aplicarFiltros()" [disabled]="isLoading">
+          <mat-icon>search</mat-icon>
+          Buscar
+        </button>
+        <button mat-stroked-button (click)="limparFiltros()" [disabled]="isLoading">
+          <mat-icon>clear</mat-icon>
+          Limpar Filtros
+        </button>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="stats-row" *ngIf="!isLoading">
+      <span>Total de atividades: <strong>{{ totalElements }}</strong></span>
+      <span *ngIf="atividades.length > 0">Exibindo: <strong>{{ atividades.length }}</strong> de <strong>{{ totalElements }}</strong></span>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="atividades-list" *ngIf="!isLoading; else loadingTpl">
+      <div class="empty" *ngIf="atividades.length === 0">
+        <mat-icon class="empty-icon">event_busy</mat-icon>
+        <p>Nenhuma atividade cadastrada para este curso.</p>
+      </div>
+
+      <!-- Grid de Cards de Atividades -->
+      <div class="atividades-grid" *ngIf="atividades.length > 0">
+        <mat-card *ngFor="let atividade of atividades; trackBy: trackByAtividadeId" class="atividade-card" appearance="outlined">
+          <!-- Foto de Capa -->
+          <img
+            *ngIf="atividade.fotoCapa"
+            mat-card-image
+            [src]="getImageUrl(atividade.fotoCapa)"
+            [alt]="'Foto de capa de ' + atividade.nome"
+            class="card-image"
+            (error)="onImageError($event)"
+            (load)="onImageLoad($event)">
+
+          <!-- Placeholder se não houver foto -->
+          <div *ngIf="!atividade.fotoCapa" class="card-image-placeholder">
+            <mat-icon>event</mat-icon>
+          </div>
+
+                 <mat-card-content>
+                   <!-- Título e Status -->
+                   <div class="card-header">
+                     <h3 class="atividade-nome">{{ atividade.nome }}</h3>
+                     <div class="card-actions">
+                       <mat-chip
+                         [class.chip-publicada]="atividade.statusPublicacao"
+                         [class.chip-nao-publicada]="!atividade.statusPublicacao"
+                         class="status-chip">
+                         <mat-icon class="chip-icon">
+                           {{ atividade.statusPublicacao ? 'check_circle' : 'unpublished' }}
+                         </mat-icon>
+                         {{ atividade.statusPublicacao ? 'Publicada' : 'Não Publicada' }}
+                       </mat-chip>
+                       <button
+                         mat-icon-button
+                         matTooltip="Editar atividade"
+                         matTooltipPosition="above"
+                         (click)="editarAtividade(atividade)"
+                         class="edit-button">
+                         <mat-icon>edit</mat-icon>
+                       </button>
+                     </div>
+                   </div>
+
+            <!-- Informações -->
+            <div class="card-info">
+              <div class="info-item">
+                <mat-icon class="info-icon">flag</mat-icon>
+                <div class="info-content">
+                  <span class="info-label">Objetivo</span>
+                  <span class="info-value">{{ atividade.objetivo }}</span>
+                </div>
+              </div>
+
+              <div class="info-item">
+                <mat-icon class="info-icon">groups</mat-icon>
+                <div class="info-content">
+                  <span class="info-label">Público Alvo</span>
+                  <span class="info-value">{{ atividade.publicoAlvo }}</span>
+                </div>
+              </div>
+
+              <div class="info-item">
+                <mat-icon class="info-icon">person</mat-icon>
+                <div class="info-content">
+                  <span class="info-label">Coordenador</span>
+                  <span class="info-value">{{ atividade.coordenador }}</span>
+                </div>
+              </div>
+
+              <div class="info-item">
+                <mat-icon class="info-icon">event</mat-icon>
+                <div class="info-content">
+                  <span class="info-label">Data de Realização</span>
+                  <span class="info-value">{{ formatarData(atividade.dataRealizacao) }}</span>
+                </div>
+              </div>
+
+              <div class="info-item">
+                <mat-icon class="info-icon">category</mat-icon>
+                <div class="info-content">
+                  <span class="info-label">Categoria</span>
+                  <span class="info-value">{{ atividade.categoria.nome }}</span>
+                </div>
+              </div>
+
+              <div class="info-item" *ngIf="atividade.fontesFinanciadora.length > 0">
+                <mat-icon class="info-icon">attach_money</mat-icon>
+                <div class="info-content">
+                  <span class="info-label">Fontes Financiadoras</span>
+                  <span class="info-value">{{ atividadesService.getFontesFinanciadoras(atividade).join(', ') }}</span>
+                </div>
+              </div>
+
+              <div class="info-item" *ngIf="atividade.integrantes.length > 0">
+                <mat-icon class="info-icon">people</mat-icon>
+                <div class="info-content">
+                  <span class="info-label">Integrantes ({{ atividade.integrantes.length }})</span>
+                  <span class="info-value">{{ atividadesService.getIntegrantes(atividade).join(', ') }}</span>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <ng-template #loadingTpl>
+      <div class="loading">
+        <mat-progress-spinner mode="indeterminate" diameter="28"></mat-progress-spinner>
+        <span>Carregando atividades...</span>
+      </div>
+    </ng-template>
+
+    <!-- Paginação -->
+    <mat-paginator
+      *ngIf="!isLoading && atividades.length > 0"
+      [length]="totalElements"
+      [pageSize]="pageSize"
+      [pageIndex]="pageIndex"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="onPageChange($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+  </mat-card-content>
+
+  <mat-card-actions align="end">
+    <button mat-stroked-button color="primary" (click)="back()">
+      <mat-icon>arrow_back</mat-icon>
+      Voltar
+    </button>
+  </mat-card-actions>
+</mat-card>
+
+

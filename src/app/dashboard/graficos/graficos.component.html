@@ -1,1 +1,254 @@
-<p>graficos works!</p>
+<div class="dashboard-container">
+  <!-- Header do Dashboard -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1 class="dashboard-title">
+        <mat-icon class="title-icon">dashboard</mat-icon>
+        Dashboard Acadêmico
+      </h1>
+      <p class="dashboard-subtitle">Visão geral do sistema AcadManage</p>
+    </div>
+    <button mat-icon-button matTooltip="Atualizar dados" class="refresh-btn">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </div>
+
+  <!-- Cards Estatísticos -->
+  <div class="stats-grid">
+    <mat-card *ngFor="let card of statsCards" class="stat-card" [style.border-left-color]="card.color">
+      <mat-card-content>
+        <div class="stat-header">
+          <div class="stat-icon" [style.background-color]="card.color + '20'">
+            <mat-icon [style.color]="card.color">{{ card.icon }}</mat-icon>
+          </div>
+          <div class="stat-trend" [class.positive]="card.trend && card.trend > 0" [class.negative]="card.trend && card.trend < 0">
+            <mat-icon>{{ card.trend && card.trend > 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+            <span>{{ card.trend }}%</span>
+          </div>
+        </div>
+        <div class="stat-body">
+          <h2 class="stat-value">{{ card.value }}</h2>
+          <p class="stat-title">{{ card.title }}</p>
+          <p class="stat-description" *ngIf="card.description">{{ card.description }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Gráficos e Informações -->
+  <div class="charts-grid">
+    <!-- Atividades por Categoria -->
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>pie_chart</mat-icon>
+          Atividades por Categoria
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="chart-container">
+          <div class="pie-chart">
+            <div class="pie-center">
+              <span class="pie-total">{{ getTotalAtividades() }}</span>
+              <span class="pie-label">Total</span>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <div *ngFor="let item of atividadesPorCategoria" class="legend-item">
+              <div class="legend-color" [style.background-color]="item.color"></div>
+              <span class="legend-label">{{ item.label }}</span>
+              <span class="legend-value">{{ item.value }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Atividades por Status -->
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>donut_small</mat-icon>
+          Status de Publicação
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="chart-container">
+          <div class="donut-chart">
+            <div class="donut-center">
+              <span class="donut-percentage">65%</span>
+              <span class="donut-label">Publicadas</span>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <div *ngFor="let item of atividadesPorStatus" class="legend-item">
+              <div class="legend-color" [style.background-color]="item.color"></div>
+              <span class="legend-label">{{ item.label }}</span>
+              <span class="legend-value">{{ item.value }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Usuários por Role -->
+    <mat-card class="chart-card full-width">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>bar_chart</mat-icon>
+          Distribuição de Usuários
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="bar-chart">
+          <div *ngFor="let item of usuariosPorRole" class="bar-item">
+            <div class="bar-info">
+              <span class="bar-label">{{ item.label }}</span>
+              <span class="bar-value">{{ item.value }}</span>
+            </div>
+            <div class="bar-container">
+              <div
+                class="bar-fill"
+                [style.width.%]="(item.value / 234) * 100"
+                [style.background-color]="item.color">
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Cursos em Destaque e Atividades Recentes -->
+  <div class="content-grid">
+    <!-- Cursos em Destaque -->
+    <mat-card class="content-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>star</mat-icon>
+          Cursos em Destaque
+        </mat-card-title>
+        <button mat-icon-button routerLink="/cursos" matTooltip="Ver todos os cursos">
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="curso-list">
+          <div *ngFor="let curso of topCursos" class="curso-item">
+            <div class="curso-icon" [style.background-color]="curso.color + '20'">
+              <mat-icon [style.color]="curso.color">school</mat-icon>
+            </div>
+            <div class="curso-info">
+              <h4 class="curso-nome">{{ curso.nome }}</h4>
+              <div class="curso-stats">
+                <span class="curso-stat">
+                  <mat-icon>event</mat-icon>
+                  {{ curso.atividades }} atividades
+                </span>
+                <span class="curso-stat">
+                  <mat-icon>people</mat-icon>
+                  {{ curso.usuarios }} usuários
+                </span>
+              </div>
+            </div>
+            <mat-chip class="status-chip active">{{ curso.status }}</mat-chip>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Atividades Recentes -->
+    <mat-card class="content-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>history</mat-icon>
+          Atividades Recentes
+        </mat-card-title>
+        <button mat-icon-button matTooltip="Ver todas">
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="activity-list">
+          <div *ngFor="let activity of recentActivities" class="activity-item">
+            <div class="activity-icon" [style.background-color]="getActivityColor(activity.status) + '20'">
+              <mat-icon [style.color]="getActivityColor(activity.status)">{{ activity.icon }}</mat-icon>
+            </div>
+            <div class="activity-info">
+              <p class="activity-title">{{ activity.title }}</p>
+              <span class="activity-date">{{ activity.date }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Metas e Progresso -->
+  <mat-card class="metas-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>flag</mat-icon>
+        Metas e Progresso
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="metas-grid">
+        <div *ngFor="let meta of metas" class="meta-item">
+          <div class="meta-header">
+            <div class="meta-info">
+              <h4 class="meta-titulo">{{ meta.titulo }}</h4>
+              <p class="meta-valores">
+                <span class="meta-atual" [style.color]="meta.color">
+                  {{ meta.unidade === 'R$' ? formatCurrency(meta.atual) : formatNumber(meta.atual) }}
+                </span>
+                <span class="meta-separator">/</span>
+                <span class="meta-total">
+                  {{ meta.unidade === 'R$' ? formatCurrency(meta.meta) : formatNumber(meta.meta) }} {{ meta.unidade !== 'R$' ? meta.unidade : '' }}
+                </span>
+              </p>
+            </div>
+            <div class="meta-percentage" [style.color]="meta.color">
+              {{ meta.progresso }}%
+            </div>
+          </div>
+          <mat-progress-bar
+            mode="determinate"
+            [value]="meta.progresso"
+            [color]="meta.progresso >= 80 ? 'primary' : meta.progresso >= 50 ? 'accent' : 'warn'">
+          </mat-progress-bar>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Ações Rápidas -->
+  <mat-card class="actions-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>flash_on</mat-icon>
+        Ações Rápidas
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="quick-actions">
+        <button mat-raised-button color="primary" class="action-btn" routerLink="/cursos">
+          <mat-icon>add</mat-icon>
+          Nova Atividade
+        </button>
+        <button mat-raised-button color="primary" class="action-btn" routerLink="/cursos">
+          <mat-icon>school</mat-icon>
+          Gerenciar Cursos
+        </button>
+        <button mat-raised-button color="primary" class="action-btn" routerLink="/usuarios">
+          <mat-icon>people</mat-icon>
+          Gerenciar Usuários
+        </button>
+        <button mat-raised-button color="primary" class="action-btn">
+          <mat-icon>assessment</mat-icon>
+          Relatórios
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

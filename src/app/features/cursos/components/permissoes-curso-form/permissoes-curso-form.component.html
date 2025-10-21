@@ -1,0 +1,101 @@
+<mat-card class="form-card" appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon class="title-icon">manage_accounts</mat-icon>
+      Gerenciar Permissões
+    </mat-card-title>
+    <mat-card-subtitle *ngIf="cursoNome">{{ cursoNome }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="stats-row" *ngIf="!isLoading">
+      <span>Total com acesso: <strong>{{ permissoes.length }}</strong></span>
+    </div>
+
+    <div class="add-user-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Adicionar usuário ao curso</mat-label>
+        <mat-select [(ngModel)]="usuarioSelecionado" [disabled]="isAdding || isLoadingUsers || usuarios.length === 0">
+          <mat-option *ngFor="let u of getAvailableUsers()" [value]="u.id">
+            {{ u.nome || u.name || u.email }} (ID: {{ u.id }})
+          </mat-option>
+        </mat-select>
+        <mat-hint *ngIf="isLoadingUsers">
+          <mat-icon style="font-size: 14px; height: 14px; width: 14px; vertical-align: middle;">hourglass_empty</mat-icon>
+          Carregando usuários...
+        </mat-hint>
+        <mat-hint *ngIf="!isLoadingUsers && usuarios.length === 0" style="color: #EF4444;">
+          <mat-icon style="font-size: 14px; height: 14px; width: 14px; vertical-align: middle;">warning</mat-icon>
+          Nenhum usuário disponível. Verifique suas permissões ou contate o administrador.
+        </mat-hint>
+        <mat-hint *ngIf="!isLoadingUsers && usuarios.length > 0 && getAvailableUsers().length === 0" style="color: #10B981;">
+          <mat-icon style="font-size: 14px; height: 14px; width: 14px; vertical-align: middle;">check_circle</mat-icon>
+          Todos os usuários já têm acesso a este curso
+        </mat-hint>
+        <mat-hint *ngIf="!isLoadingUsers && getAvailableUsers().length > 0">
+          {{ getAvailableUsers().length }} usuário(s) disponível(is)
+        </mat-hint>
+      </mat-form-field>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="addUserToCourse()"
+        [disabled]="!usuarioSelecionado || isAdding">
+        <mat-icon *ngIf="!isAdding">person_add</mat-icon>
+        <mat-progress-spinner
+          *ngIf="isAdding"
+          mode="indeterminate"
+          diameter="20"
+          style="display: inline-block;">
+        </mat-progress-spinner>
+        {{ isAdding ? 'Adicionando...' : 'Adicionar' }}
+      </button>
+      <span class="space"></span>
+      <button mat-stroked-button color="primary" (click)="back()">
+        <mat-icon>arrow_back</mat-icon>
+        Voltar
+      </button>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="permissions-list" *ngIf="!isLoading; else loadingTpl">
+      <div class="empty" *ngIf="permissoes.length === 0">Nenhum usuário com acesso a este curso.</div>
+
+      <mat-list *ngIf="permissoes.length > 0">
+        <mat-list-item *ngFor="let p of permissoes; trackBy: trackByUsuarioId">
+          <mat-icon matListItemIcon>person</mat-icon>
+          <div matListItemTitle class="user-title-row">
+            <span class="user-name">{{ p.usuarioNome }}</span>
+            <mat-chip [color]="getRoleColor(p.permissao)" selected class="role-chip">
+              <mat-icon class="role-icon">{{ getRoleIcon(p.permissao) }}</mat-icon>
+              {{ p.permissao }}
+            </mat-chip>
+          </div>
+          <div matListItemLine class="user-id">
+            <small>ID: {{ p.usuarioId }}</small>
+          </div>
+          <div matListItemMeta>
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="confirmRemove(p)"
+              matTooltip="Remover usuário do curso"
+              class="remove-button">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </mat-list-item>
+      </mat-list>
+    </div>
+
+    <ng-template #loadingTpl>
+      <div class="loading">
+        <mat-progress-spinner mode="indeterminate" diameter="28"></mat-progress-spinner>
+        <span>Carregando permissões...</span>
+      </div>
+    </ng-template>
+  </mat-card-content>
+</mat-card>
+
+

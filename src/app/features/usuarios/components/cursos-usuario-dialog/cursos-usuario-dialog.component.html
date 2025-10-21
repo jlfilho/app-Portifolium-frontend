@@ -17,21 +17,21 @@
   <mat-dialog-content class="dialog-content">
     <!-- Estatísticas -->
     <div class="stats-container">
-      <div class="stat-card">
+      <div class="stat-card stat-card-active">
         <mat-icon>check_circle</mat-icon>
         <div class="stat-info">
           <span class="stat-number">{{ getCursosAtivos() }}</span>
           <span class="stat-label">Ativos</span>
         </div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card stat-card-inactive">
         <mat-icon>cancel</mat-icon>
         <div class="stat-info">
           <span class="stat-number">{{ getCursosInativos() }}</span>
           <span class="stat-label">Inativos</span>
         </div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card stat-card-total">
         <mat-icon>school</mat-icon>
         <div class="stat-info">
           <span class="stat-number">{{ getTotalCursos() }}</span>
@@ -59,7 +59,7 @@
             ID: {{ curso.id }}
           </div>
           <mat-chip-set matListItemMeta>
-            <mat-chip 
+            <mat-chip
               [highlighted]="curso.ativo"
               class="status-chip">
               {{ curso.ativo ? 'Ativo' : 'Inativo' }}

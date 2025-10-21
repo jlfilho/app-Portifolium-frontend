@@ -5,7 +5,7 @@ import { tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment.development';
 import { AuthoritiesResponse } from '../features/usuarios/models/usuario.model';
-import { isTokenExpired, getTokenExpirationTime } from './utils/jwt.helper';
+import { isTokenExpired, getTokenExpirationTime, decodeToken, JwtPayload } from './utils/jwt.helper';
 
 @Injectable({
   providedIn: 'root',
@@ -164,5 +164,60 @@ export class ApiService {
     const token = this.getToken();
     if (!token) return 0;
     return getTokenExpirationTime(token);
+  }
+
+  /**
+   * Obter informações do usuário do token JWT
+   * Retorna: { username: string, email: string, authorities: string[], name?: string }
+   */
+  getUserInfoFromToken(): { username: string; email: string; authorities: string[]; name?: string } | null {
+    const token = this.getToken();
+    if (!token) {
+      console.warn('⚠️ Nenhum token encontrado');
+      return null;
+    }
+
+    const decoded = decodeToken(token);
+    if (!decoded) {
+      console.error('❌ Erro ao decodificar token');
+      return null;
+    }
+
+    console.log('🔍 Token decodificado:', decoded);
+
+    // Extrair informações do token
+    // O "sub" geralmente contém o username/email
+    const username = decoded.sub || '';
+    const email = decoded['email'] || decoded.sub || '';
+    const authorities = decoded.authorities || this.getAuthorities();
+    const name = decoded['name'] || decoded['nome'] || '';
+
+    return {
+      username,
+      email,
+      authorities,
+      name
+    };
+  }
+
+  /**
+   * Obter nome do usuário do token (se disponível)
+   */
+  getUserName(): string {
+    const userInfo = this.getUserInfoFromToken();
+    if (!userInfo) return 'Usuário';
+
+    // Priorizar o nome, senão username, senão email
+    return userInfo.name || userInfo.username || userInfo.email || 'Usuário';
+  }
+
+  /**
+   * Obter email do usuário do token
+   */
+  getUserEmail(): string {
+    const userInfo = this.getUserInfoFromToken();
+    if (!userInfo) return '';
+
+    return userInfo.email || userInfo.username || '';
   }
 }

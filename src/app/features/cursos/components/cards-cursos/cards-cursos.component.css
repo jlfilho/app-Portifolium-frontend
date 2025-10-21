@@ -390,3 +390,91 @@ mat-card-actions button mat-icon {
 .courses-container::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(135deg, #6366F1 0%, #3B82F6 100%);
 }
+
+/* ========================================
+   🔄 BOTÃO DE STATUS (ATIVAR/DESATIVAR)
+   ======================================== */
+
+/* Botão quando curso está ATIVO */
+.status-active {
+  color: var(--success-color) !important;
+  background-color: rgba(16, 185, 129, 0.1) !important;
+}
+
+.status-active:hover {
+  background-color: rgba(16, 185, 129, 0.2) !important;
+  transform: scale(1.1);
+}
+
+.status-active mat-icon {
+  color: var(--success-color) !important;
+}
+
+/* Botão quando curso está INATIVO */
+.status-inactive {
+  color: var(--text-medium) !important;
+  background-color: rgba(100, 116, 139, 0.1) !important;
+}
+
+.status-inactive:hover {
+  background-color: rgba(100, 116, 139, 0.2) !important;
+  transform: scale(1.1);
+}
+
+.status-inactive mat-icon {
+  color: var(--text-medium) !important;
+}
+
+/* ========================================
+   📦 CARD INATIVO - VISUAL APAGADO
+   ======================================== */
+
+/* Card quando curso está inativo */
+.card-inactive {
+  opacity: 0.6;
+  filter: grayscale(30%);
+  position: relative;
+}
+
+.card-inactive::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.card-inactive:hover {
+  opacity: 0.75;
+  filter: grayscale(20%);
+}
+
+/* Header do card inativo */
+.card-inactive .card-header {
+  opacity: 0.7;
+  filter: saturate(0.5);
+}
+
+/* Imagem do card inativo */
+.card-inactive .card-image {
+  opacity: 0.5;
+  filter: grayscale(50%);
+}
+
+/* Título do card inativo */
+.card-inactive mat-card-title {
+  opacity: 0.8;
+}
+
+/* Botões do card inativo (exceto o de status) */
+.card-inactive mat-card-actions button:not(.status-inactive) {
+  opacity: 0.6;
+}
+
+.card-inactive mat-card-actions button:not(.status-inactive):hover {
+  opacity: 0.9;
+}

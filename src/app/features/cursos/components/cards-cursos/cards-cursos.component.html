@@ -30,7 +30,7 @@
       [cols]="getColumns()">
       @for (curso of cursos; track curso.id) {
         <mat-grid-tile>
-          <mat-card class="card" appearance="outlined">
+          <mat-card class="card" appearance="outlined" [class.card-inactive]="!curso.ativo">
             <!-- Header do Card -->
             <mat-card-header class="card-header">
               <div mat-card-avatar class="header-image"></div>
@@ -61,22 +61,27 @@
               <button
                 mat-icon-button
                 matTooltip="Gerenciar atividades"
-                matTooltipPosition="above">
+                matTooltipPosition="above"
+                (click)="manageAtividades(curso); $event.stopPropagation()">
                 <mat-icon>hub</mat-icon>
               </button>
 
               <button
                 mat-icon-button
                 matTooltip="Gerenciar permissões"
-                matTooltipPosition="above">
+                matTooltipPosition="above"
+                (click)="managePermissions(curso); $event.stopPropagation()">
                 <mat-icon>manage_accounts</mat-icon>
               </button>
 
               <button
                 mat-icon-button
-                matTooltip="Publicar curso"
-                matTooltipPosition="above">
-                <mat-icon>visibility</mat-icon>
+                [matTooltip]="curso.ativo ? 'Desativar curso' : 'Ativar curso'"
+                matTooltipPosition="above"
+                [class.status-active]="curso.ativo"
+                [class.status-inactive]="!curso.ativo"
+                (click)="toggleCourseStatus(curso); $event.stopPropagation()">
+                <mat-icon>{{ curso.ativo ? 'visibility' : 'visibility_off' }}</mat-icon>
               </button>
 
               <button

@@ -4,11 +4,16 @@ import { FormCursoComponent } from './components/form-curso/form-curso.component
 import { ListaCategoriasComponent } from './components/lista-categorias/lista-categorias.component';
 import { FormCategoriaComponent } from './components/form-categoria/form-categoria.component';
 import { adminGuard } from '../../shared/guards/admin.guard';
+import { PermissoesCursoFormComponent } from './components/permissoes-curso-form/permissoes-curso-form.component';
 
 export const CURSOS_ROUTES: Routes = [
   {
     path: 'cursos',
     component: CardsCursosComponent
+  },
+  {
+    path: 'cursos/:id/permissoes',
+    component: PermissoesCursoFormComponent
   },
   {
     path: 'cursos/novo',

@@ -13,6 +13,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { CursosService } from '../../services/cursos.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { SimpleConfirmDialogComponent } from '../../../../shared/components/simple-confirm-dialog/simple-confirm-dialog.component';
+import { PermissoesCursoFormComponent } from '../permissoes-curso-form/permissoes-curso-form.component';
 
 @Component({
   selector: 'acadmanage-cards-cursos',
@@ -93,37 +95,151 @@ export class CardsCursosComponent  {
     this.router.navigate(['/cursos/editar', cursoId]);
   }
 
+  // Navegar para a tela de gerenciar permissões (formulário)
+  managePermissions(curso: any): void {
+    console.log('👥 Gerenciar permissões para curso:', curso);
+    this.router.navigate(['/cursos', curso.id, 'permissoes'], { state: { cursoNome: curso.nome } });
+  }
+
+  // Navegar para a tela de atividades do curso
+  manageAtividades(curso: any): void {
+    console.log('📚 Gerenciar atividades para curso:', curso);
+    this.router.navigate(['/atividades/curso', curso.id], { state: { cursoNome: curso.nome } });
+  }
+
   // Deletar curso com diálogo de confirmação
   deleteCourse(curso: any): void {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+    console.log('🗑️ Excluir curso chamado para:', curso);
+
+    const dialogRef = this.dialog.open(SimpleConfirmDialogComponent, {
       width: '500px',
-      panelClass: 'confirm-dialog-panel',
+      panelClass: 'custom-dialog-panel',
       data: {
         title: 'Excluir Curso',
         message: `Tem certeza que deseja excluir o curso "${curso.nome}"? Esta ação não pode ser desfeita.`,
         confirmText: 'Sim, Excluir',
-        cancelText: 'Cancelar',
-        type: 'danger'
+        cancelText: 'Cancelar'
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
+      console.log('💬 Resultado do diálogo de exclusão:', result);
       if (result === true) {
+        console.log('✅ Confirmado! Executando exclusão...');
         this.performDelete(curso.id, curso.nome);
+      } else {
+        console.log('❌ Exclusão cancelada pelo usuário');
       }
     });
   }
 
   // Executar a exclusão
   private performDelete(cursoId: number, cursoNome: string): void {
+    console.log('📡 Chamando API para excluir curso ID:', cursoId);
+
     this.cursosService.deleteCourse(cursoId).subscribe({
-      next: () => {
+      next: (response) => {
+        console.log('✅ Curso excluído com sucesso! Response:', response);
         this.showMessage(`Curso "${cursoNome}" excluído com sucesso!`, 'success');
+        console.log('🔄 Recarregando lista de cursos...');
         this.loadCourses(); // Recarrega a lista
       },
       error: (error) => {
-        console.error('Erro ao deletar curso:', error);
-        this.showMessage('Erro ao excluir curso. Tente novamente.', 'error');
+        console.error('❌ Erro ao deletar curso:', error);
+        console.error('📊 Detalhes do erro:', error.error);
+        console.error('🔢 Status HTTP:', error.status);
+
+        // Extrair mensagem de erro do servidor
+        let errorMessage = 'Erro ao excluir curso. Tente novamente.';
+
+        if (error.error) {
+          // Se o backend retornou uma mensagem
+          if (typeof error.error === 'string') {
+            errorMessage = error.error;
+          } else if (error.error.message) {
+            errorMessage = error.error.message;
+          } else if (error.error.error) {
+            errorMessage = error.error.error;
+          }
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+
+        console.log('📢 Mensagem de erro extraída:', errorMessage);
+        this.showMessage(errorMessage, 'error');
+      }
+    });
+  }
+
+  // Toggle status do curso (ativar/desativar) com confirmação
+  toggleCourseStatus(curso: any): void {
+    console.log('🔄 Toggle status chamado para curso:', curso);
+    console.log('📊 Status atual:', curso.ativo);
+
+    const novoStatus = !curso.ativo;
+    const acao = novoStatus ? 'ativar' : 'desativar';
+    const acaoCapitalizada = novoStatus ? 'Ativar' : 'Desativar';
+
+    console.log('🎯 Novo status será:', novoStatus);
+
+    const dialogRef = this.dialog.open(SimpleConfirmDialogComponent, {
+      width: '500px',
+      panelClass: 'custom-dialog-panel',
+      data: {
+        title: `${acaoCapitalizada} Curso`,
+        message: `Tem certeza que deseja ${acao} o curso "${curso.nome}"?`,
+        confirmText: `Sim, ${acaoCapitalizada}`,
+        cancelText: 'Cancelar'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('💬 Resultado do diálogo:', result);
+      if (result === true) {
+        console.log('✅ Confirmado! Executando atualização...');
+        this.performStatusUpdate(curso.id, curso.nome, novoStatus);
+      } else {
+        console.log('❌ Cancelado pelo usuário');
+      }
+    });
+  }
+
+  // Executar a atualização de status
+  private performStatusUpdate(cursoId: number, cursoNome: string, novoStatus: boolean): void {
+    console.log('📡 Chamando API para atualizar status...');
+    console.log('📋 Dados:', { cursoId, novoStatus });
+
+    this.cursosService.updateCourseStatus(cursoId, novoStatus).subscribe({
+      next: (response) => {
+        console.log('✅ Resposta da API:', response);
+        const statusTexto = novoStatus ? 'ativado' : 'desativado';
+        this.showMessage(`Curso "${cursoNome}" ${statusTexto} com sucesso!`, 'success');
+        console.log('🔄 Recarregando lista de cursos...');
+        this.loadCourses(); // Recarrega a lista
+      },
+      error: (error) => {
+        console.error('❌ Erro ao atualizar status do curso:', error);
+        console.error('📊 Detalhes do erro:', error.error);
+        console.error('🔢 Status HTTP:', error.status);
+
+        // Extrair mensagem de erro do servidor
+        let errorMessage = 'Erro ao atualizar status do curso. Tente novamente.';
+
+        if (error.error) {
+          // Se o backend retornou uma mensagem
+          if (typeof error.error === 'string') {
+            errorMessage = error.error;
+          } else if (error.error.message) {
+            errorMessage = error.error.message;
+          } else if (error.error.error) {
+            errorMessage = error.error.error;
+          }
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+
+        console.log('📢 Mensagem de erro extraída:', errorMessage);
+        this.showMessage(errorMessage, 'error');
       }
     });
   }

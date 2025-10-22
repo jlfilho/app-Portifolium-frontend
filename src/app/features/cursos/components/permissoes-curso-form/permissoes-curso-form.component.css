@@ -134,14 +134,32 @@ mat-card-content { padding: 24px; background: #fff; }
   font-size: 12px;
 }
 
+/* Cores por tipo de role */
+.role-chip.role-admin {
+  background-color: #EF4444 !important; /* Vermelho para Administrador */
+}
+
+.role-chip.role-gerente {
+  background-color: #3B82F6 !important; /* Azul para Gerente */
+}
+
+.role-chip.role-secretario {
+  background-color: #8B5CF6 !important; /* Roxo para Secretário */
+}
+
 .role-icon {
   font-size: 16px;
   width: 16px;
   height: 16px;
+  color: white !important;
 }
 
 ::ng-deep .role-chip span,
 ::ng-deep .role-chip .mat-mdc-chip-action-label {
+  color: white !important;
+}
+
+::ng-deep .role-chip mat-icon {
   color: white !important;
 }
 

@@ -119,90 +119,69 @@
             <mat-icon>event</mat-icon>
           </div>
 
-                 <mat-card-content>
-                   <!-- Título e Status -->
-                   <div class="card-header">
-                     <h3 class="atividade-nome">{{ atividade.nome }}</h3>
-                     <div class="card-actions">
-                       <mat-chip
-                         [class.chip-publicada]="atividade.statusPublicacao"
-                         [class.chip-nao-publicada]="!atividade.statusPublicacao"
-                         class="status-chip">
-                         <mat-icon class="chip-icon">
-                           {{ atividade.statusPublicacao ? 'check_circle' : 'unpublished' }}
-                         </mat-icon>
-                         {{ atividade.statusPublicacao ? 'Publicada' : 'Não Publicada' }}
-                       </mat-chip>
-                       <button
-                         mat-icon-button
-                         matTooltip="Editar atividade"
-                         matTooltipPosition="above"
-                         (click)="editarAtividade(atividade)"
-                         class="edit-button">
-                         <mat-icon>edit</mat-icon>
-                       </button>
-                     </div>
-                   </div>
+          <mat-card-content>
+            <!-- Título e Status -->
+            <div class="card-header">
+              <h3 class="atividade-nome">{{ atividade.nome }}</h3>
+              <mat-chip
+                [class.chip-publicada]="atividade.statusPublicacao"
+                [class.chip-nao-publicada]="!atividade.statusPublicacao"
+                class="status-chip">
+                <mat-icon class="chip-icon">
+                  {{ atividade.statusPublicacao ? 'check_circle' : 'unpublished' }}
+                </mat-icon>
+                {{ atividade.statusPublicacao ? 'Publicada' : 'Não Publicada' }}
+              </mat-chip>
+            </div>
 
-            <!-- Informações -->
-            <div class="card-info">
-              <div class="info-item">
-                <mat-icon class="info-icon">flag</mat-icon>
-                <div class="info-content">
-                  <span class="info-label">Objetivo</span>
-                  <span class="info-value">{{ atividade.objetivo }}</span>
-                </div>
-              </div>
-
-              <div class="info-item">
-                <mat-icon class="info-icon">groups</mat-icon>
-                <div class="info-content">
-                  <span class="info-label">Público Alvo</span>
-                  <span class="info-value">{{ atividade.publicoAlvo }}</span>
-                </div>
-              </div>
-
-              <div class="info-item">
-                <mat-icon class="info-icon">person</mat-icon>
-                <div class="info-content">
-                  <span class="info-label">Coordenador</span>
-                  <span class="info-value">{{ atividade.coordenador }}</span>
-                </div>
-              </div>
-
-              <div class="info-item">
+            <!-- Informações Resumidas -->
+            <div class="card-info-resumido">
+              <div class="info-row">
                 <mat-icon class="info-icon">event</mat-icon>
-                <div class="info-content">
-                  <span class="info-label">Data de Realização</span>
-                  <span class="info-value">{{ formatarData(atividade.dataRealizacao) }}</span>
-                </div>
+                <span class="info-text">{{ formatarData(atividade.dataRealizacao) }}</span>
               </div>
 
-              <div class="info-item">
+              <div class="info-row">
                 <mat-icon class="info-icon">category</mat-icon>
-                <div class="info-content">
-                  <span class="info-label">Categoria</span>
-                  <span class="info-value">{{ atividade.categoria.nome }}</span>
-                </div>
+                <span class="info-text">{{ atividade.categoria.nome }}</span>
               </div>
 
-              <div class="info-item" *ngIf="atividade.fontesFinanciadora.length > 0">
-                <mat-icon class="info-icon">attach_money</mat-icon>
-                <div class="info-content">
-                  <span class="info-label">Fontes Financiadoras</span>
-                  <span class="info-value">{{ atividadesService.getFontesFinanciadoras(atividade).join(', ') }}</span>
-                </div>
+              <div class="info-row">
+                <mat-icon class="info-icon">person</mat-icon>
+                <span class="info-text">{{ atividade.coordenador || 'Sem coordenador' }}</span>
               </div>
 
-              <div class="info-item" *ngIf="atividade.integrantes.length > 0">
+              <div class="info-row" *ngIf="atividade.integrantes.length > 0">
                 <mat-icon class="info-icon">people</mat-icon>
-                <div class="info-content">
-                  <span class="info-label">Integrantes ({{ atividade.integrantes.length }})</span>
-                  <span class="info-value">{{ atividadesService.getIntegrantes(atividade).join(', ') }}</span>
-                </div>
+                <span class="info-text">{{ atividade.integrantes.length }} participante(s)</span>
+              </div>
+
+              <div class="info-row" *ngIf="atividade.fontesFinanciadora.length > 0">
+                <mat-icon class="info-icon">attach_money</mat-icon>
+                <span class="info-text">{{ atividade.fontesFinanciadora.length }} fonte(s) financiadora(s)</span>
               </div>
             </div>
           </mat-card-content>
+
+          <!-- Ações do Card -->
+          <mat-card-actions class="card-actions">
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="visualizarAtividade(atividade)"
+              class="btn-visualizar">
+              <mat-icon>visibility</mat-icon>
+              Visualizar
+            </button>
+            <button
+              mat-stroked-button
+              color="primary"
+              (click)="editarAtividade(atividade)"
+              class="btn-editar">
+              <mat-icon>edit</mat-icon>
+              Editar
+            </button>
+          </mat-card-actions>
         </mat-card>
       </div>
     </div>

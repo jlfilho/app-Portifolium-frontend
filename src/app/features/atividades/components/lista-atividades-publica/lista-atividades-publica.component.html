@@ -1,0 +1,164 @@
+<div class="page-container">
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-content">
+      <button mat-icon-button class="btn-back" (click)="voltarParaCursos()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+
+      <div class="hero-text">
+        <p class="breadcrumb">
+          <span class="breadcrumb-link" (click)="voltarParaCursos()">Cursos</span>
+          <mat-icon>chevron_right</mat-icon>
+          <span>Atividades</span>
+        </p>
+        <h1 class="hero-title">
+          <mat-icon class="hero-icon">event</mat-icon>
+          {{ cursoNome }}
+        </h1>
+        <p class="hero-subtitle">Explore as atividades e projetos desenvolvidos neste curso</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Buscar atividades</mat-label>
+      <input
+        matInput
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange($event)"
+        placeholder="Digite o nome da atividade..."
+        autocomplete="off">
+      <mat-icon matPrefix>search</mat-icon>
+      <button
+        mat-icon-button
+        matSuffix
+        *ngIf="searchTerm"
+        (click)="clearSearch()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <!-- Results info -->
+    <div class="results-info" *ngIf="!isLoading && totalElements > 0">
+      <mat-icon>info</mat-icon>
+      <span>Encontradas <strong>{{ totalElements }}</strong> atividade(s) publicada(s)</span>
+      <span *ngIf="searchTerm" class="search-highlight">com "{{ searchTerm }}"</span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-progress-spinner mode="indeterminate" diameter="60"></mat-progress-spinner>
+    <p>Carregando atividades...</p>
+  </div>
+
+  <!-- Atividades Grid -->
+  <div class="atividades-grid" *ngIf="!isLoading && atividades.length > 0">
+    <mat-card
+      *ngFor="let atividade of atividades"
+      class="atividade-card"
+      matRipple
+      (click)="viewAtividade(atividade)">
+
+      <!-- Foto de Capa -->
+      <div class="card-header-image" [class.has-image]="atividade.fotoCapa">
+        <img
+          *ngIf="atividade.fotoCapa"
+          [src]="getImageUrl(atividade.fotoCapa)"
+          [alt]="'Foto de capa de ' + atividade.nome"
+          class="atividade-image"
+          (error)="onImageError($event)">
+
+        <!-- Overlay -->
+        <div class="header-overlay">
+          <h3 class="atividade-nome">{{ atividade.nome }}</h3>
+          <mat-chip class="status-chip-header">
+            <mat-icon>check_circle</mat-icon>
+            Publicada
+          </mat-chip>
+        </div>
+      </div>
+
+      <!-- Card Content -->
+      <mat-card-content class="card-content">
+        <!-- Objetivo -->
+        <div class="info-item" *ngIf="atividade.objetivo">
+          <mat-icon>flag</mat-icon>
+          <p class="info-text">{{ atividade.objetivo }}</p>
+        </div>
+
+        <!-- Informações -->
+        <div class="card-info-grid">
+          <div class="info-badge">
+            <mat-icon>event</mat-icon>
+            <span>{{ formatarData(atividade.dataRealizacao) }}</span>
+          </div>
+
+          <div class="info-badge">
+            <mat-icon>category</mat-icon>
+            <span>{{ atividade.categoria.nome }}</span>
+          </div>
+
+          <div class="info-badge" *ngIf="atividade.coordenador">
+            <mat-icon>person</mat-icon>
+            <span>{{ atividade.coordenador }}</span>
+          </div>
+
+          <div class="info-badge" *ngIf="atividade.integrantes && atividade.integrantes.length > 0">
+            <mat-icon>people</mat-icon>
+            <span>{{ atividade.integrantes.length }} participante(s)</span>
+          </div>
+        </div>
+
+        <!-- Botão Ver Mais -->
+        <button mat-raised-button color="primary" class="btn-view-full">
+          <mat-icon>visibility</mat-icon>
+          Ver Detalhes
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && atividades.length === 0">
+    <mat-icon class="empty-icon">event_busy</mat-icon>
+    <h3>Nenhuma atividade encontrada</h3>
+    <p *ngIf="searchTerm">
+      Não encontramos atividades com "<strong>{{ searchTerm }}</strong>"
+    </p>
+    <p *ngIf="!searchTerm">
+      Este curso ainda não possui atividades publicadas
+    </p>
+    <button
+      mat-raised-button
+      color="primary"
+      *ngIf="searchTerm"
+      (click)="clearSearch()">
+      <mat-icon>clear</mat-icon>
+      Limpar Busca
+    </button>
+    <button
+      mat-stroked-button
+      *ngIf="!searchTerm"
+      (click)="voltarParaCursos()">
+      <mat-icon>arrow_back</mat-icon>
+      Voltar para Cursos
+    </button>
+  </div>
+
+  <!-- Paginação -->
+  <mat-paginator
+    *ngIf="!isLoading && totalElements > 0"
+    [length]="totalElements"
+    [pageSize]="pageSize"
+    [pageIndex]="pageIndex"
+    [pageSizeOptions]="pageSizeOptions"
+    (page)="onPageChange($event)"
+    showFirstLastButtons
+    class="paginator">
+  </mat-paginator>
+</div>
+

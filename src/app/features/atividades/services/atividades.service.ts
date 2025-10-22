@@ -39,7 +39,7 @@ export class AtividadesService {
    * POST /api/atividades
    * Criar nova atividade
    */
-  createAtividade(atividade: AtividadeCreateDTO): Observable<AtividadeDTO> {
+  createAtividade(atividade: AtividadeDTO): Observable<AtividadeDTO> {
     const url = this.baseUrl;
     console.log('📡 Criando nova atividade:', url);
     console.log('📋 Dados da nova atividade:', atividade);

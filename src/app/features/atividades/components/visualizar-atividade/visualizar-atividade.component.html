@@ -1,0 +1,455 @@
+<div class="page-container">
+  <!-- Loading -->
+  <div class="loading" *ngIf="isLoading">
+    <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
+    <span>Carregando atividade...</span>
+  </div>
+
+  <!-- Error -->
+  <mat-card *ngIf="!isLoading && errorMessage" class="error-card" appearance="outlined">
+    <mat-card-content>
+      <mat-icon class="error-icon">error</mat-icon>
+      <p>{{ errorMessage }}</p>
+      <button mat-raised-button color="primary" (click)="voltar()">
+        <mat-icon>arrow_back</mat-icon>
+        Voltar
+      </button>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Content -->
+  <mat-card *ngIf="!isLoading && atividade" class="content-card" appearance="outlined">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="header-info">
+        <h1 class="page-title">
+          <mat-icon class="title-icon">visibility</mat-icon>
+          Visualizar Atividade
+        </h1>
+        <p class="breadcrumb">
+          <span class="breadcrumb-link" (click)="voltar()">Atividades</span>
+          <mat-icon>chevron_right</mat-icon>
+          <span>{{ atividade.nome }}</span>
+        </p>
+      </div>
+      <div class="header-actions">
+        <button mat-stroked-button (click)="voltar()">
+          <mat-icon>arrow_back</mat-icon>
+          Voltar
+        </button>
+        <button mat-raised-button color="primary" (click)="editarAtividade()">
+          <mat-icon>edit</mat-icon>
+          Editar
+        </button>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content class="page-content">
+      <!-- Foto de Capa -->
+      <div class="foto-capa-section" *ngIf="atividade.fotoCapa">
+        <img
+          [src]="getImageUrl(atividade.fotoCapa)"
+          [alt]="'Foto de capa de ' + atividade.nome"
+          class="foto-capa">
+      </div>
+
+      <div class="foto-capa-placeholder" *ngIf="!atividade.fotoCapa">
+        <mat-icon>event</mat-icon>
+        <span>Sem foto de capa</span>
+      </div>
+
+      <!-- Título e Status -->
+      <div class="titulo-section">
+        <h2 class="atividade-nome">{{ atividade.nome }}</h2>
+        <mat-chip
+          [class.chip-publicada]="atividade.statusPublicacao"
+          [class.chip-nao-publicada]="!atividade.statusPublicacao"
+          class="status-chip">
+          <mat-icon class="chip-icon">
+            {{ atividade.statusPublicacao ? 'check_circle' : 'unpublished' }}
+          </mat-icon>
+          {{ atividade.statusPublicacao ? 'Publicada' : 'Não Publicada' }}
+        </mat-chip>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Informações Principais -->
+      <div class="info-section">
+        <h3 class="section-title">
+          <mat-icon>info</mat-icon>
+          Informações Principais
+        </h3>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <mat-icon class="info-icon">flag</mat-icon>
+            <div class="info-content">
+              <span class="info-label">Objetivo</span>
+              <p class="info-value">{{ atividade.objetivo || 'Não informado' }}</p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <mat-icon class="info-icon">groups</mat-icon>
+            <div class="info-content">
+              <span class="info-label">Público Alvo</span>
+              <p class="info-value">{{ atividade.publicoAlvo || 'Não informado' }}</p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <mat-icon class="info-icon">person</mat-icon>
+            <div class="info-content">
+              <span class="info-label">Coordenador</span>
+              <p class="info-value">{{ atividade.coordenador || 'Não informado' }}</p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <mat-icon class="info-icon">event</mat-icon>
+            <div class="info-content">
+              <span class="info-label">Data de Realização</span>
+              <p class="info-value">{{ formatarData(atividade.dataRealizacao) }}</p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <mat-icon class="info-icon">school</mat-icon>
+            <div class="info-content">
+              <span class="info-label">Curso</span>
+              <p class="info-value">{{ atividade.curso.nome }}</p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <mat-icon class="info-icon">category</mat-icon>
+            <div class="info-content">
+              <span class="info-label">Categoria</span>
+              <p class="info-value">{{ atividade.categoria.nome }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Fontes Financiadoras -->
+      <div class="info-section" *ngIf="atividade.fontesFinanciadora && atividade.fontesFinanciadora.length > 0">
+        <h3 class="section-title">
+          <mat-icon>attach_money</mat-icon>
+          Fontes Financiadoras ({{ atividade.fontesFinanciadora.length }})
+        </h3>
+
+        <div class="chips-container">
+          <mat-chip-set>
+            <mat-chip *ngFor="let fonte of atividade.fontesFinanciadora" class="fonte-chip">
+              <mat-icon matChipAvatar>account_balance</mat-icon>
+              {{ fonte.nome }}
+            </mat-chip>
+          </mat-chip-set>
+        </div>
+      </div>
+
+      <div class="empty-section" *ngIf="!atividade.fontesFinanciadora || atividade.fontesFinanciadora.length === 0">
+        <mat-icon>money_off</mat-icon>
+        <span>Nenhuma fonte financiadora cadastrada</span>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Integrantes / Participantes -->
+      <div class="info-section" *ngIf="atividade.integrantes && atividade.integrantes.length > 0">
+        <h3 class="section-title">
+          <mat-icon>people</mat-icon>
+          Integrantes / Participantes ({{ atividade.integrantes.length }})
+        </h3>
+
+        <div class="integrantes-list">
+          <div *ngFor="let integrante of atividade.integrantes" class="integrante-item">
+            <div class="integrante-avatar">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="integrante-info">
+              <span class="integrante-nome">{{ integrante.nome }}</span>
+              <span class="integrante-cpf">{{ integrante.cpf }}</span>
+            </div>
+            <mat-chip class="papel-chip" [style.background-color]="getPapelColor(integrante.papel)">
+              <mat-icon matChipAvatar>{{ getPapelIcon(integrante.papel) }}</mat-icon>
+              {{ getPapelLabel(integrante.papel) }}
+            </mat-chip>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-section" *ngIf="!atividade.integrantes || atividade.integrantes.length === 0">
+        <mat-icon>person_off</mat-icon>
+        <span>Nenhum integrante cadastrado</span>
+      </div>
+
+      <!-- Carrossel de Evidências (só aparece se houver evidências OU formulário aberto) -->
+      <div *ngIf="evidencias.length > 0 || showUploadForm || isLoadingEvidencias">
+        <mat-divider></mat-divider>
+
+        <div class="info-section">
+          <div class="section-header">
+            <h3 class="section-title">
+              <mat-icon>photo_library</mat-icon>
+              Evidências Fotográficas
+              <span class="badge-counter" *ngIf="evidencias.length > 0">{{ evidencias.length }}</span>
+            </h3>
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="toggleUploadForm()"
+            class="btn-upload">
+            <mat-icon>{{ showUploadForm ? 'close' : 'add_photo_alternate' }}</mat-icon>
+            {{ showUploadForm ? 'Cancelar' : 'Postar Evidência' }}
+          </button>
+          </div>
+
+        <!-- Formulário de Upload -->
+        <div class="upload-form-container" *ngIf="showUploadForm">
+          <mat-card class="upload-form-card">
+            <mat-card-content>
+              <h4 class="upload-title">
+                <mat-icon>add_a_photo</mat-icon>
+                Nova Evidência
+              </h4>
+
+              <!-- Área de Drag and Drop -->
+              <div
+                class="drop-zone"
+                [class.drag-over]="dragOver"
+                [class.has-file]="selectedFile"
+                [class.is-compressing]="isCompressing"
+                (dragover)="onDragOver($event)"
+                (dragleave)="onDragLeave($event)"
+                (drop)="onDrop($event)"
+                (click)="!isCompressing && fileInput.click()">
+
+                <!-- Loading Compressão -->
+                <div class="compression-loading" *ngIf="isCompressing">
+                  <mat-progress-spinner mode="indeterminate" diameter="60"></mat-progress-spinner>
+                  <p class="compression-text">Comprimindo imagem...</p>
+                  <span class="compression-hint">Otimizando para melhor qualidade e tamanho</span>
+                </div>
+
+                <!-- Preview da imagem -->
+                <div class="preview-container" *ngIf="previewUrl && !isCompressing">
+                  <img [src]="previewUrl" alt="Preview" class="preview-image">
+                  <button
+                    mat-icon-button
+                    class="btn-remove-preview"
+                    (click)="removeSelectedFile(); $event.stopPropagation()">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </div>
+
+                <!-- Placeholder -->
+                <div class="drop-zone-content" *ngIf="!previewUrl && !isCompressing">
+                  <mat-icon class="drop-icon">cloud_upload</mat-icon>
+                  <p class="drop-text">
+                    <strong>Arraste e solte</strong> uma foto aqui<br>
+                    ou <strong>clique</strong> para selecionar
+                  </p>
+                  <span class="drop-hint">PNG, JPG, GIF até 10MB (será comprimida automaticamente)</span>
+                </div>
+
+                <input
+                  #fileInput
+                  type="file"
+                  accept="image/*"
+                  (change)="onFileSelected($event)"
+                  [disabled]="isCompressing"
+                  style="display: none;">
+              </div>
+
+              <!-- Info do arquivo -->
+              <div class="file-info" *ngIf="selectedFile && !isCompressing">
+                <mat-icon>image</mat-icon>
+                <div class="file-details">
+                  <span class="file-name">{{ selectedFile.name }}</span>
+                  <span class="file-size">{{ formatFileSize(selectedFile.size) }}</span>
+                </div>
+
+                <!-- Info de compressão -->
+                <div class="compression-stats" *ngIf="compressionInfo">
+                  <mat-icon class="compression-icon" matTooltip="Imagem comprimida com sucesso">compressed</mat-icon>
+                  <span class="compression-reduction">
+                    -{{ compressionInfo.compressionRatio.toFixed(0) }}%
+                  </span>
+                </div>
+              </div>
+
+              <!-- Campo de legenda -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Legenda da evidência</mat-label>
+                <textarea
+                  matInput
+                  [(ngModel)]="legenda"
+                  placeholder="Descreva o que esta foto representa..."
+                  rows="3"
+                  maxlength="500"
+                  [disabled]="isUploading"></textarea>
+                <mat-hint align="end">{{ legenda.length }}/500</mat-hint>
+                <mat-icon matPrefix>edit_note</mat-icon>
+              </mat-form-field>
+
+              <!-- Botões de ação -->
+              <div class="upload-actions">
+                <button
+                  mat-stroked-button
+                  (click)="toggleUploadForm()"
+                  [disabled]="isUploading || isCompressing">
+                  <mat-icon>cancel</mat-icon>
+                  Cancelar
+                </button>
+                <button
+                  mat-raised-button
+                  color="primary"
+                  (click)="salvarEvidencia()"
+                  [disabled]="!selectedFile || !legenda.trim() || isUploading || isCompressing">
+                  <mat-icon *ngIf="!isUploading">send</mat-icon>
+                  <mat-progress-spinner
+                    *ngIf="isUploading"
+                    mode="indeterminate"
+                    diameter="20"
+                    style="display: inline-block; margin-right: 8px;">
+                  </mat-progress-spinner>
+                  {{ isUploading ? 'Postando...' : 'Postar Evidência' }}
+                </button>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <!-- Loading evidências -->
+        <div class="loading-evidencias" *ngIf="isLoadingEvidencias">
+          <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+          <span>Carregando evidências...</span>
+        </div>
+
+        <!-- Carrossel -->
+        <div class="carousel-container" *ngIf="!isLoadingEvidencias && evidencias.length > 0">
+          <!-- Slide atual -->
+          <div class="carousel-slide">
+            <div class="carousel-image-wrapper">
+              <img
+                [src]="getEvidenciaImageUrl(currentEvidencia!.foto)"
+                [alt]="currentEvidencia!.legenda"
+                class="carousel-image">
+
+              <!-- Botões de navegação -->
+              <button
+                mat-icon-button
+                class="carousel-btn carousel-btn-prev"
+                (click)="previousSlide()"
+                [disabled]="evidenciasPaginadas.length <= 1"
+                *ngIf="evidenciasPaginadas.length > 1">
+                <mat-icon>chevron_left</mat-icon>
+              </button>
+
+              <button
+                mat-icon-button
+                class="carousel-btn carousel-btn-next"
+                (click)="nextSlide()"
+                [disabled]="evidenciasPaginadas.length <= 1"
+                *ngIf="evidenciasPaginadas.length > 1">
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+
+              <!-- Indicador de posição -->
+              <div class="carousel-indicator" *ngIf="evidenciasPaginadas.length > 1">
+                {{ currentSlideIndex + 1 }} / {{ evidenciasPaginadas.length }}
+              </div>
+            </div>
+
+            <!-- Legenda estilo rede social -->
+            <div class="carousel-caption">
+              <div class="caption-header">
+                <div class="caption-avatar">
+                  <mat-icon>account_circle</mat-icon>
+                </div>
+                <div class="caption-user-info">
+                  <span class="caption-username">{{ currentEvidencia!.criadoPor || 'Usuário' }}</span>
+                  <span class="caption-location">{{ atividade.nome }}</span>
+                </div>
+              </div>
+
+              <div class="caption-text">
+                <p>{{ currentEvidencia!.legenda }}</p>
+              </div>
+
+              <!-- Thumbnails da página atual -->
+              <div class="carousel-thumbnails" *ngIf="evidenciasPaginadas.length > 1">
+                <div
+                  *ngFor="let evidencia of evidenciasPaginadas; let i = index"
+                  class="thumbnail"
+                  [class.thumbnail-active]="i === currentSlideIndex"
+                  (click)="goToSlide(i)">
+                  <img [src]="getEvidenciaImageUrl(evidencia.foto)" [alt]="evidencia.legenda">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paginação do Carrossel -->
+          <div class="carousel-pagination" *ngIf="hasMultiplePages">
+            <button
+              mat-icon-button
+              (click)="previousCarrosselPage()"
+              [disabled]="carrosselPageIndex === 0"
+              matTooltip="Página anterior"
+              class="pagination-btn">
+              <mat-icon>navigate_before</mat-icon>
+            </button>
+
+            <div class="pagination-info">
+              <span class="page-indicator">
+                Página {{ carrosselPageIndex + 1 }} de {{ totalCarrosselPages }}
+              </span>
+              <span class="items-indicator">
+                (Exibindo {{ evidenciasPaginadas.length }} de {{ evidencias.length }} evidências)
+              </span>
+            </div>
+
+            <button
+              mat-icon-button
+              (click)="nextCarrosselPage()"
+              [disabled]="carrosselPageIndex === totalCarrosselPages - 1"
+              matTooltip="Próxima página"
+              class="pagination-btn">
+              <mat-icon>navigate_next</mat-icon>
+            </button>
+          </div>
+
+          <!-- Dots de paginação -->
+          <div class="pagination-dots" *ngIf="hasMultiplePages && totalCarrosselPages <= 10">
+            <span
+              *ngFor="let page of [].constructor(totalCarrosselPages); let i = index"
+              class="pagination-dot"
+              [class.pagination-dot-active]="i === carrosselPageIndex"
+              (click)="goToCarrosselPage(i)"
+              [matTooltip]="'Página ' + (i + 1)">
+            </span>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-section" *ngIf="!isLoadingEvidencias && evidencias.length === 0 && !showUploadForm">
+          <mat-icon>photo_library</mat-icon>
+          <span>Nenhuma evidência cadastrada para esta atividade</span>
+          <button mat-raised-button color="primary" (click)="toggleUploadForm()" class="btn-add-first">
+            <mat-icon>add_photo_alternate</mat-icon>
+            Postar Primeira Evidência
+          </button>
+        </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+

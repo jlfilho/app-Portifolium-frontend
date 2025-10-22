@@ -7,6 +7,16 @@ export const routes: Routes = [
     loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent)
   },
   {
+    path: 'cursos-publicos',
+    loadComponent: () => import('./features/cursos/components/lista-cursos-publica/lista-cursos-publica.component').then(m => m.ListaCursosPublicaComponent),
+    title: 'Cursos Disponíveis'
+  },
+  {
+    path: 'atividades-publicas/curso/:cursoId',
+    loadComponent: () => import('./features/atividades/components/lista-atividades-publica/lista-atividades-publica.component').then(m => m.ListaAtividadesPublicaComponent),
+    title: 'Atividades do Curso'
+  },
+  {
     path: '',
     loadComponent: () => import('./dashboard/home/home.component').then(m => m.HomeComponent),
     canActivate: [authGuard],

@@ -74,21 +74,40 @@ export class FormCursoComponent implements OnInit {
 
   loadCurso(id: number): void {
     this.isLoading = true;
-    this.cursosService.getUserCourses().subscribe({
-      next: (cursos: Curso[]) => {
-        const curso = cursos.find(c => c.id === id);
+    console.log('📚 Carregando curso para edição, ID:', id);
+
+    this.cursosService.getCourseById(id).subscribe({
+      next: (curso: Curso) => {
+        console.log('✅ Curso carregado:', curso);
+
         if (curso) {
           this.cursoForm.patchValue({
             nome: curso.nome,
-            ativo: curso.ativo
+            ativo: curso.ativo !== undefined ? curso.ativo : true
           });
+          console.log('📝 Formulário populado:', this.cursoForm.value);
+        } else {
+          console.warn('⚠️ Curso não encontrado');
+          this.showMessage('Curso não encontrado', 'error');
         }
+
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Erro ao carregar curso:', error);
-        this.showMessage('Erro ao carregar curso', 'error');
+        console.error('❌ Erro ao carregar curso:', error);
+        console.error('📊 Status:', error.status);
+        console.error('📊 Error body:', error.error);
+
+        if (error.status === 404) {
+          this.showMessage('Curso não encontrado', 'error');
+        } else if (error.status === 403) {
+          this.showMessage('Você não tem permissão para editar este curso', 'error');
+        } else {
+          this.showMessage('Erro ao carregar curso. Tente novamente.', 'error');
+        }
+
         this.isLoading = false;
+        this.router.navigate(['/cursos']);
       }
     });
   }

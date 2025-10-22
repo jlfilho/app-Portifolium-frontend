@@ -1,0 +1,126 @@
+<div class="page-container">
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        <mat-icon class="hero-icon">school</mat-icon>
+        Nossos Cursos
+      </h1>
+      <p class="hero-subtitle">Explore nossa variedade de cursos e encontre o conhecimento que você procura</p>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Buscar cursos</mat-label>
+      <input
+        matInput
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange($event)"
+        placeholder="Digite o nome do curso..."
+        autocomplete="off">
+      <mat-icon matPrefix>search</mat-icon>
+      <button
+        mat-icon-button
+        matSuffix
+        *ngIf="searchTerm"
+        (click)="clearSearch()"
+        matTooltip="Limpar busca">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <!-- Results info -->
+    <div class="results-info" *ngIf="!isLoading && totalElements > 0">
+      <mat-icon>info</mat-icon>
+      <span>Encontrados <strong>{{ totalElements }}</strong> curso(s)</span>
+      <span *ngIf="searchTerm" class="search-highlight">com "{{ searchTerm }}"</span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-progress-spinner mode="indeterminate" diameter="60"></mat-progress-spinner>
+    <p>Carregando cursos...</p>
+  </div>
+
+  <!-- Cursos Grid -->
+  <div class="cursos-grid" *ngIf="!isLoading && cursos.length > 0">
+    <mat-card
+      *ngFor="let curso of cursos"
+      class="curso-card"
+      matRipple
+      (click)="viewCurso(curso)">
+      <!-- Card Header com Imagem -->
+      <div class="card-header-image" [class.has-image]="curso.fotoCapa || curso.imagemCapa">
+        <!-- Imagem de capa se existir -->
+        <img
+          *ngIf="curso.fotoCapa || curso.imagemCapa"
+          [src]="getImageUrl(curso.fotoCapa || curso.imagemCapa)"
+          [alt]="'Capa do curso ' + curso.nome"
+          class="curso-image"
+          (error)="onImageError($event)">
+
+        <!-- Overlay com título -->
+        <div class="header-overlay">
+          <h3 class="curso-nome">{{ curso.nome }}</h3>
+        </div>
+      </div>
+
+      <!-- Card Content -->
+      <mat-card-content class="card-content">
+        <p class="curso-descricao" *ngIf="curso.descricao">
+          {{ curso.descricao }}
+        </p>
+        <p class="curso-descricao empty" *ngIf="!curso.descricao">
+          Curso sem descrição disponível
+        </p>
+
+        <!-- Footer Info -->
+        <div class="card-footer">
+          <div class="status-badge">
+            <mat-icon>check_circle</mat-icon>
+            <span>Ativo</span>
+          </div>
+          <button mat-icon-button class="btn-view" (click)="viewCurso(curso); $event.stopPropagation()">
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && cursos.length === 0">
+    <mat-icon class="empty-icon">school_outlined</mat-icon>
+    <h3>Nenhum curso encontrado</h3>
+    <p *ngIf="searchTerm">
+      Não encontramos cursos com "<strong>{{ searchTerm }}</strong>"
+    </p>
+    <p *ngIf="!searchTerm">
+      No momento não há cursos disponíveis
+    </p>
+    <button
+      mat-raised-button
+      color="primary"
+      *ngIf="searchTerm"
+      (click)="clearSearch()">
+      <mat-icon>clear</mat-icon>
+      Limpar Busca
+    </button>
+  </div>
+
+  <!-- Paginação -->
+  <mat-paginator
+    *ngIf="!isLoading && totalElements > 0"
+    [length]="totalElements"
+    [pageSize]="pageSize"
+    [pageIndex]="pageIndex"
+    [pageSizeOptions]="pageSizeOptions"
+    (page)="onPageChange($event)"
+    showFirstLastButtons
+    class="paginator">
+  </mat-paginator>
+</div>
+

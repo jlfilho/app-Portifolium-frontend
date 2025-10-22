@@ -28,6 +28,7 @@ import { UsuariosService } from '../../../usuarios/services/usuarios.service';
 import { ImageCompressionService, CompressionResult } from '../../../../shared/services/image-compression.service';
 import { AtividadeDTO, AtividadeUpdateDTO, AtividadeCreateDTO, PessoaPapelDTO } from '../../models/atividade.model';
 import { Papel, PapeisDisponiveis, PapelUtils } from '../../models/papel.enum';
+import { PageRequest } from '../../../../shared/models/page.model';
 
 @Component({
   selector: 'acadmanage-form-atividade',
@@ -185,10 +186,18 @@ export class FormAtividadeComponent implements OnInit {
 
   loadCursos(): Promise<void> {
     return new Promise((resolve) => {
-      this.cursosService.getAllCourses().subscribe({
-        next: (cursos: any[]) => {
-          this.cursos = cursos || [];
-          console.log('📚 Cursos carregados:', this.cursos);
+      // Buscar todos os cursos sem paginação (para dropdown)
+      const pageRequest: PageRequest = {
+        page: 0,
+        size: 1000, // Buscar muitos cursos para ter todos disponíveis
+        sortBy: 'nome',
+        direction: 'ASC' as 'ASC'
+      };
+
+      this.cursosService.getAllCoursesPaginado(pageRequest).subscribe({
+        next: (page: any) => {
+          this.cursos = page.content || [];
+          console.log('📚 Cursos carregados:', this.cursos.length);
 
           // Se estiver em modo criação e não tiver nome do curso, buscar
           if (!this.isEditMode && !this.cursoNome && this.cursoId) {
@@ -906,25 +915,62 @@ export class FormAtividadeComponent implements OnInit {
       dataRealizacao = dataRealizacao.toISOString().split('T')[0];
     }
 
-    // Extrair IDs
-    const fontesFinanciadoraIds = this.fontesFinanciadorasSelecionadas.map(f => f.id);
-    const integrantesIds = this.integrantesSelecionados.map(i => i.id);
+    // Buscar curso completo
+    const curso = this.cursos.find(c => c.id === this.cursoId);
+    if (!curso) {
+      console.error('❌ Curso não encontrado:', this.cursoId);
+      this.showMessage('Erro: Curso não encontrado', 'error');
+      this.isSaving = false;
+      return;
+    }
 
-    console.log('💰 IDs das fontes:', fontesFinanciadoraIds);
-    console.log('👥 IDs dos integrantes:', integrantesIds);
+    // Buscar categoria completa
+    const categoria = this.categorias.find(c => c.id === formData.categoriaId);
+    if (!categoria) {
+      console.error('❌ Categoria não encontrada:', formData.categoriaId);
+      this.showMessage('Erro: Categoria não encontrada', 'error');
+      this.isSaving = false;
+      return;
+    }
 
-    // Criar objeto AtividadeCreateDTO
-    const novaAtividade: AtividadeCreateDTO = {
+    // Formatar fontes financiadoras
+    const fontesFinanciadoraFormatadas = this.fontesFinanciadorasSelecionadas.map(fonte => ({
+      id: fonte.id,
+      nome: fonte.nome
+    }));
+
+    // Formatar integrantes
+    const integrantesFormatados = this.integrantesSelecionados.map(integrante => ({
+      id: integrante.id,
+      nome: integrante.nome,
+      cpf: integrante.cpf,
+      papel: integrante.papel
+    }));
+
+    console.log('💰 Fontes Formatadas:', fontesFinanciadoraFormatadas);
+    console.log('👥 Integrantes Formatados:', integrantesFormatados);
+
+    // Criar objeto AtividadeDTO completo
+    const novaAtividade: AtividadeDTO = {
       nome: formData.nome || '',
       objetivo: formData.objetivo || '',
       publicoAlvo: formData.publicoAlvo || '',
       statusPublicacao: formData.statusPublicacao !== null ? formData.statusPublicacao : false,
       coordenador: formData.coordenador || '',
       dataRealizacao: dataRealizacao || '',
-      cursoId: this.cursoId,
-      categoriaId: formData.categoriaId || 0,
-      fontesFinanciadoraIds: fontesFinanciadoraIds,
-      integrantesIds: integrantesIds
+      curso: {
+        id: curso.id,
+        nome: curso.nome,
+        descricao: curso.descricao || '',
+        ativo: curso.ativo !== undefined ? curso.ativo : true
+      },
+      categoria: {
+        id: categoria.id,
+        nome: categoria.nome,
+        descricao: categoria.descricao || ''
+      },
+      fontesFinanciadora: fontesFinanciadoraFormatadas,
+      integrantes: integrantesFormatados
     };
 
     console.log('➕ Criando nova atividade:', novaAtividade);
@@ -933,11 +979,34 @@ export class FormAtividadeComponent implements OnInit {
     this.atividadesService.createAtividade(novaAtividade).subscribe({
       next: (response) => {
         console.log('✅ Atividade criada com sucesso:', response);
-        this.showMessage('Atividade criada com sucesso!', 'success');
-        this.isSaving = false;
 
-        // Redirecionar para a lista de atividades do curso
-        this.router.navigate(['/atividades/curso', this.cursoId]);
+        // Se houver imagem selecionada, fazer upload
+        if (this.selectedFile && response.id) {
+          console.log('📤 Fazendo upload da foto de capa...');
+          this.atividadesService.uploadFotoCapa(response.id, this.selectedFile).subscribe({
+            next: (uploadResponse) => {
+              console.log('✅ Foto de capa enviada com sucesso:', uploadResponse);
+              this.showMessage('Atividade criada e foto de capa salva com sucesso!', 'success');
+              this.isSaving = false;
+
+              // Redirecionar para a lista de atividades do curso
+              this.router.navigate(['/atividades/curso', this.cursoId]);
+            },
+            error: (uploadError) => {
+              console.error('❌ Erro ao fazer upload da foto:', uploadError);
+              this.showMessage('Atividade criada, mas erro ao salvar foto de capa: ' + this.extractErrorMessage(uploadError), 'warning');
+              this.isSaving = false;
+
+              // Redirecionar mesmo com erro no upload
+              this.router.navigate(['/atividades/curso', this.cursoId]);
+            }
+          });
+        } else {
+          // Sem imagem, apenas redirecionar
+          this.showMessage('Atividade criada com sucesso!', 'success');
+          this.isSaving = false;
+          this.router.navigate(['/atividades/curso', this.cursoId]);
+        }
       },
       error: (error) => {
         console.error('❌ Erro ao criar atividade:', error);

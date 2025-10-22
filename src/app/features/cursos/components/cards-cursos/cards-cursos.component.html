@@ -15,13 +15,100 @@
 
   <mat-divider></mat-divider>
 
+  <!-- Filtros -->
+  <div class="filters-section">
+    <h3 class="filters-title">
+      <mat-icon>filter_list</mat-icon>
+      Filtros
+    </h3>
+
+    <div class="filters-grid">
+      <!-- Filtro por Nome -->
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Buscar por nome</mat-label>
+        <input
+          matInput
+          [(ngModel)]="filtroNome"
+          (ngModelChange)="onSearchChange($event)"
+          placeholder="Digite parte do nome...">
+        <mat-icon matPrefix>search</mat-icon>
+        <button
+          mat-icon-button
+          matSuffix
+          *ngIf="filtroNome"
+          (click)="filtroNome = ''; onSearchChange('')"
+          matTooltip="Limpar busca">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <!-- Filtro por Status -->
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Status do Curso</mat-label>
+        <mat-select
+          [(ngModel)]="filtroStatus"
+          (ngModelChange)="onStatusChange()">
+          <mat-option *ngFor="let status of statusOptions" [value]="status.value">
+            {{ status.label }}
+          </mat-option>
+        </mat-select>
+        <mat-icon matPrefix>toggle_on</mat-icon>
+      </mat-form-field>
+
+      <!-- Botão Limpar Filtros -->
+      <button
+        mat-stroked-button
+        (click)="limparFiltros()"
+        [disabled]="isLoading || (!filtroNome && filtroStatus === null)"
+        class="btn-clear-filters">
+        <mat-icon>clear_all</mat-icon>
+        Limpar Filtros
+      </button>
+    </div>
+
+    <!-- Filtros ativos -->
+    <div class="active-filters" *ngIf="filtroNome || filtroStatus !== null">
+      <span class="filters-label">Filtros ativos:</span>
+      <mat-chip-set>
+        <mat-chip *ngIf="filtroNome" class="filter-chip">
+          <mat-icon matChipAvatar>search</mat-icon>
+          Nome: "{{ filtroNome }}"
+          <button matChipRemove (click)="filtroNome = ''; onSearchChange('')">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip>
+        <mat-chip *ngIf="filtroStatus !== null" class="filter-chip">
+          <mat-icon matChipAvatar>toggle_on</mat-icon>
+          {{ filtroStatus ? 'Ativos' : 'Inativos' }}
+          <button matChipRemove (click)="filtroStatus = null; onStatusChange()">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip>
+      </mat-chip-set>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- Stats row -->
+  <div class="stats-row" *ngIf="!isLoading && cursos.length > 0">
+    <span>Total de cursos: <strong>{{ totalElements }}</strong></span>
+    <span>Exibindo: <strong>{{ cursos.length }}</strong> de <strong>{{ totalElements }}</strong></span>
+  </div>
+
   <!-- Mensagem de erro -->
   <div *ngIf="errorMessage" class="error">
     {{ errorMessage }}
   </div>
 
+  <!-- Loading -->
+  <div class="loading" *ngIf="isLoading">
+    <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
+    <span>Carregando cursos...</span>
+  </div>
+
   <!-- Grid de cursos -->
-  @if (cursos.length > 0) {
+  @if (!isLoading && cursos.length > 0) {
     <mat-grid-list
       cols="3"
       rowHeight="420px"
@@ -96,8 +183,26 @@
         </mat-grid-tile>
       }
     </mat-grid-list>
-  } @else {
+
+    <!-- Paginação -->
+    <mat-paginator
+      [length]="totalElements"
+      [pageSize]="pageSize"
+      [pageIndex]="pageIndex"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="onPageChange($event)"
+      showFirstLastButtons
+      class="paginator">
+    </mat-paginator>
+  } @else if (!isLoading) {
     <!-- Mensagem quando não há cursos -->
-    <p>Você não possui cursos cadastrados.</p>
+    <div class="empty-state">
+      <mat-icon class="empty-icon">school</mat-icon>
+      <p>Você não possui cursos cadastrados.</p>
+      <button mat-raised-button color="primary" (click)="addCourse()">
+        <mat-icon>add</mat-icon>
+        Adicionar Primeiro Curso
+      </button>
+    </div>
   }
 </div>

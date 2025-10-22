@@ -67,7 +67,11 @@
           <mat-icon matListItemIcon>person</mat-icon>
           <div matListItemTitle class="user-title-row">
             <span class="user-name">{{ p.usuarioNome }}</span>
-            <mat-chip [color]="getRoleColor(p.permissao)" selected class="role-chip">
+            <mat-chip
+              class="role-chip"
+              [class.role-admin]="getRoleColor(p.permissao) === 'warn'"
+              [class.role-gerente]="getRoleColor(p.permissao) === 'primary'"
+              [class.role-secretario]="getRoleColor(p.permissao) === 'accent'">
               <mat-icon class="role-icon">{{ getRoleIcon(p.permissao) }}</mat-icon>
               {{ p.permissao }}
             </mat-chip>

@@ -19,7 +19,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-
 // Services
 import { AtividadesService } from '../../services/atividades.service';
 import { CursosService } from '../../../cursos/services/cursos.service';
@@ -216,6 +215,19 @@ export class ListaAtividadesComponent implements OnInit {
     // Navegar para o formulário de criação
     this.router.navigate(['/atividades/nova', this.cursoId], {
       state: {
+        cursoId: this.cursoId,
+        cursoNome: this.cursoNome
+      }
+    });
+  }
+
+  visualizarAtividade(atividade: AtividadeDTO): void {
+    console.log('👁️ Visualizando atividade:', atividade);
+
+    // Navegar para a página de visualização
+    this.router.navigate(['/atividades/visualizar', atividade.id], {
+      state: {
+        atividade: atividade,
         cursoId: this.cursoId,
         cursoNome: this.cursoNome
       }

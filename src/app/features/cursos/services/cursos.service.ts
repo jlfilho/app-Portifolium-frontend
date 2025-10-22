@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap, map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment.development';
 import { Page, PageRequest } from '../../../shared/models/page.model';
 
@@ -12,14 +13,169 @@ export class CursosService {
 
   constructor(private http: HttpClient) {}
 
-  // Método para buscar a lista de cursos do usuário autenticado
-  // O token será adicionado automaticamente pelo interceptor
+  /**
+   * GET /cursos/usuarios (sem paginação)
+   * Buscar cursos do usuário autenticado
+   * @deprecated Use getUserCoursesPaginado() para melhor performance e filtros
+   */
   getUserCourses(): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/cursos/usuarios`);
   }
 
-  getAllCourses(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/cursos`);
+  /**
+   * GET /cursos/usuarios (com paginação e filtros)
+   * Buscar cursos do usuário autenticado com paginação e filtros
+   * @param pageRequest - Parâmetros de paginação (page, size, sortBy, direction)
+   * @param ativo - Filtro por status ativo/inativo (opcional)
+   * @param nome - Filtro por nome do curso (opcional)
+   * @returns Page<CursoDTO>
+   *
+   * Backend:
+   * @GetMapping("/usuarios")
+   * @PreAuthorize("hasRole('ADMINISTRADOR') or hasRole('GERENTE') or hasRole('SECRETARIO')")
+   * public ResponseEntity<Page<CursoDTO>> getCursosByUsuarioId(
+   *   @AuthenticationPrincipal Usuario userDetails,
+   *   @RequestParam(required = false) Boolean ativo,
+   *   @RequestParam(required = false) String nome,
+   *   @PageableDefault(size = 10, sort = "nome") Pageable pageable
+   * )
+   */
+  getUserCoursesPaginado(
+    pageRequest: PageRequest,
+    ativo?: boolean | null,
+    nome?: string
+  ): Observable<Page<any>> {
+    let params = new HttpParams()
+      .set('page', pageRequest.page.toString())
+      .set('size', pageRequest.size.toString())
+      .set('sort', `${pageRequest.sortBy},${pageRequest.direction.toLowerCase()}`);
+
+    // Adicionar filtros opcionais
+    if (ativo !== null && ativo !== undefined) {
+      params = params.set('ativo', ativo.toString());
+    }
+
+    if (nome && nome.trim()) {
+      params = params.set('nome', nome.trim());
+    }
+
+    console.log('📡 Buscando cursos do usuário (paginado):', {
+      page: pageRequest.page,
+      size: pageRequest.size,
+      sort: `${pageRequest.sortBy},${pageRequest.direction}`,
+      ativo: ativo !== null && ativo !== undefined ? ativo : 'todos',
+      nome: nome || 'sem filtro'
+    });
+
+    return this.http.get<Page<any>>(`${this.baseUrl}/cursos/usuarios`, {
+      params,
+      observe: 'response' // Observar resposta completa para capturar 204
+    }).pipe(
+      tap((response: any) => {
+        // Se 204 No Content, response.body será null
+        if (response.status === 204) {
+          console.log('📭 Backend retornou 204 No Content (sem cursos)');
+        }
+      }),
+      // Extrair apenas o body da resposta
+      map((response: any) => {
+        // Se 204, retornar página vazia
+        if (response.status === 204 || !response.body) {
+          return {
+            content: [],
+            totalElements: 0,
+            totalPages: 0,
+            size: pageRequest.size,
+            number: pageRequest.page,
+            first: true,
+            last: true,
+            empty: true
+          };
+        }
+        return response.body;
+      })
+    );
+  }
+
+  /**
+   * GET /cursos (com paginação e filtros)
+   * Buscar todos os cursos com paginação e filtros
+   * @param pageRequest - Parâmetros de paginação (page, size, sortBy, direction)
+   * @param ativo - Filtro por status ativo/inativo (opcional)
+   * @param nome - Filtro por nome do curso (opcional)
+   * @returns Page<CursoDTO>
+   *
+   * Backend:
+   * @GetMapping
+   * public ResponseEntity<Page<CursoDTO>> buscarTodosCursos(
+   *   @RequestParam(required = false) Boolean ativo,
+   *   @RequestParam(required = false) String nome,
+   *   @PageableDefault(size = 10, sort = "nome") Pageable pageable
+   * )
+   */
+  getAllCoursesPaginado(
+    pageRequest: PageRequest,
+    ativo?: boolean | null,
+    nome?: string
+  ): Observable<Page<any>> {
+    let params = new HttpParams()
+      .set('page', pageRequest.page.toString())
+      .set('size', pageRequest.size.toString())
+      .set('sort', `${pageRequest.sortBy},${pageRequest.direction.toLowerCase()}`);
+
+    // Adicionar filtros opcionais
+    if (ativo !== null && ativo !== undefined) {
+      params = params.set('ativo', ativo.toString());
+    }
+
+    if (nome && nome.trim()) {
+      params = params.set('nome', nome.trim());
+    }
+
+    console.log('📡 Buscando todos os cursos (paginado):', {
+      page: pageRequest.page,
+      size: pageRequest.size,
+      sort: `${pageRequest.sortBy},${pageRequest.direction}`,
+      ativo: ativo !== null && ativo !== undefined ? ativo : 'todos',
+      nome: nome || 'sem filtro'
+    });
+
+    return this.http.get<Page<any>>(`${this.baseUrl}/cursos`, { params }).pipe(
+      tap((response: any) => {
+        console.log('✅ Cursos carregados:', response?.content?.length || 0);
+      }),
+      map((response: any) => {
+        // Garantir que sempre retorna uma estrutura válida
+        if (!response) {
+          return {
+            content: [],
+            totalElements: 0,
+            totalPages: 0,
+            size: pageRequest.size,
+            number: pageRequest.page,
+            first: true,
+            last: true,
+            empty: true
+          };
+        }
+        return response;
+      })
+    );
+  }
+
+  /**
+   * GET /cursos/{id}
+   * Buscar um curso específico por ID
+   * @param id - ID do curso
+   * @returns Observable<CursoDTO>
+   */
+  getCourseById(id: number): Observable<any> {
+    console.log('📡 Buscando curso ID:', id);
+    return this.http.get<any>(`${this.baseUrl}/cursos/${id}`).pipe(
+      tap(curso => {
+        console.log('✅ Curso encontrado:', curso);
+      })
+    );
   }
 
   createCourse(courseData: any): Observable<any> {

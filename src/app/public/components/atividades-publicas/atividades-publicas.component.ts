@@ -116,6 +116,14 @@ export class AtividadesPublicasComponent implements OnInit, OnDestroy {
       this.searchTerm
     ).subscribe({
       next: (page: any) => {
+        if (!page) {
+          this.atividades = [];
+          this.totalElements = 0;
+          this.isLoading = false;
+          console.log('📭 Nenhuma atividade pública encontrada para este curso');
+          return;
+        }
+
         this.atividades = page.content || [];
         this.totalElements = page.totalElements || 0;
         this.isLoading = false;

@@ -110,11 +110,11 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     console.log('📸 Carregando evidências da atividade:', this.atividadeId);
 
     this.publicApiService.getEvidenciasPorAtividade(this.atividadeId).subscribe({
-      next: (evidencias: EvidenciaDTO[]) => {
-        this.evidencias = evidencias;
+      next: (evidencias: EvidenciaDTO[] | null) => {
+        this.evidencias = Array.isArray(evidencias) ? evidencias : [];
         this.calcularPaginasEvidencias();
         this.isLoadingEvidencias = false;
-        console.log('✅ Evidências carregadas:', evidencias.length);
+        console.log('✅ Evidências carregadas:', this.evidencias.length);
       },
       error: (error: any) => {
         console.error('❌ Erro ao carregar evidências:', error);
@@ -129,6 +129,13 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
 
   // Métodos do carrossel de evidências
   calcularPaginasEvidencias(): void {
+    if (!Array.isArray(this.evidencias) || this.evidencias.length === 0) {
+      this.evidenciasPaginas = [];
+      this.totalPaginasEvidencias = 0;
+      this.paginaAtualEvidencias = 0;
+      return;
+    }
+
     this.evidenciasPaginas = [];
     this.totalPaginasEvidencias = Math.ceil(this.evidencias.length / this.evidenciasPorPagina);
 

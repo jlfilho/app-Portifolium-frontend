@@ -126,6 +126,21 @@
   z-index: 10;
 }
 
+.nav-row {
+  max-width: 1400px;
+  margin: 24px auto 0;
+  padding: 0 24px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.nav-row .btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
 .search-field {
   width: 100%;
   background: white;

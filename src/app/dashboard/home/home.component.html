@@ -116,9 +116,22 @@
         routerLink="/categorias"
         routerLinkActive="active-link"
         matRipple
-        class="nav-item">
+        class="nav-item"
+        *ngIf="isAdmin()">
         <mat-icon class="nav-icon">category</mat-icon>
         <span class="nav-text" *ngIf="!isCollapsed">Tipos de Atividades</span>
+        <div class="active-indicator" *ngIf="!isCollapsed"></div>
+      </a>
+
+      <a
+        mat-list-item
+        routerLink="/tipos-curso"
+        routerLinkActive="active-link"
+        matRipple
+        class="nav-item"
+        *ngIf="isAdmin()">
+        <mat-icon class="nav-icon">style</mat-icon>
+        <span class="nav-text" *ngIf="!isCollapsed">Tipos de Cursos</span>
         <div class="active-indicator" *ngIf="!isCollapsed"></div>
       </a>
 

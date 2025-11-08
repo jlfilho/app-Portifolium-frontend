@@ -5,6 +5,8 @@ import { ListaCategoriasComponent } from './components/lista-categorias/lista-ca
 import { FormCategoriaComponent } from './components/form-categoria/form-categoria.component';
 import { adminGuard } from '../../shared/guards/admin.guard';
 import { PermissoesCursoFormComponent } from './components/permissoes-curso-form/permissoes-curso-form.component';
+import { ListaTiposCursoComponent } from './components/lista-tipos-curso/lista-tipos-curso.component';
+import { FormTipoCursoComponent } from './components/form-tipo-curso/form-tipo-curso.component';
 
 export const CURSOS_ROUTES: Routes = [
   {
@@ -25,7 +27,8 @@ export const CURSOS_ROUTES: Routes = [
   },
   {
     path: 'categorias',
-    component: ListaCategoriasComponent
+    component: ListaCategoriasComponent,
+    canActivate: [adminGuard]
   },
   {
     path: 'categorias/novo',
@@ -36,6 +39,22 @@ export const CURSOS_ROUTES: Routes = [
     path: 'categorias/editar/:id',
     component: FormCategoriaComponent,
     canActivate: [adminGuard] // Apenas ADMINISTRADOR pode editar categorias
+  }
+  ,
+  {
+    path: 'tipos-curso',
+    component: ListaTiposCursoComponent,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'tipos-curso/novo',
+    component: FormTipoCursoComponent,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'tipos-curso/editar/:id',
+    component: FormTipoCursoComponent,
+    canActivate: [adminGuard]
   }
 ];
 

@@ -46,6 +46,40 @@
         </div>
 
         <div class="form-row">
+          <!-- Tipo de Curso -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Tipo de Curso</mat-label>
+            <mat-icon matPrefix>category</mat-icon>
+            <mat-select formControlName="tipoId" [disabled]="isLoadingTipos" placeholder="Selecione o tipo">
+              <mat-option *ngIf="isLoadingTipos" [value]="null" disabled>Carregando tipos...</mat-option>
+              <mat-option *ngFor="let tc of tiposCurso" [value]="tc.id">
+                {{ tc.nome }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="tipoId?.hasError('required')">Tipo é obrigatório</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <!-- Descrição do Curso -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Descrição do Curso</mat-label>
+            <mat-icon matPrefix>description</mat-icon>
+            <textarea
+              matInput
+              formControlName="descricao"
+              maxlength="500"
+              rows="4"
+              placeholder="Descreva o objetivo e conteúdo do curso...">
+            </textarea>
+            <mat-hint align="end">{{ descricao?.value?.length || 0 }}/500</mat-hint>
+            <mat-error *ngIf="descricao?.hasError('maxlength')">
+              Descrição deve ter no máximo 500 caracteres
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
           <!-- Status Ativo -->
           <div class="toggle-container">
             <mat-slide-toggle
@@ -61,6 +95,98 @@
             <mat-hint class="toggle-hint">
               {{ cursoForm.get('ativo')?.value ? 'Visível para o público' : 'Oculto para o público' }}
             </mat-hint>
+          </div>
+        </div>
+
+        <!-- Upload de Foto de Capa -->
+        <div class="form-row" *ngIf="isEditMode">
+          <div class="cover-section">
+            <h3>
+              <mat-icon>image</mat-icon>
+              Foto de Capa do Curso
+            </h3>
+
+            <div
+              class="cover-dropzone"
+              [class.drag-over]="isDragOver"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onDrop($event)"
+              (click)="fileInput.click()">
+
+              <div class="cover-preview" *ngIf="(previewUrl || currentCoverUrl); else placeholder">
+                <img [src]="previewUrl || currentCoverUrl" alt="Preview da capa do curso">
+              </div>
+
+              <ng-template #placeholder>
+                <div class="cover-placeholder">
+                  <mat-icon>add_photo_alternate</mat-icon>
+                  <p>Clique ou arraste uma imagem aqui</p>
+                  <span>Formatos: JPG, PNG, GIF ou WEBP. Máx: 5MB.</span>
+                </div>
+              </ng-template>
+
+              <input
+                type="file"
+                #fileInput
+                accept="image/png, image/jpeg, image/gif, image/webp"
+                (change)="onFileSelected($event)"
+                hidden>
+            </div>
+
+            <div class="cover-actions" *ngIf="selectedFile">
+              <div class="file-info">
+                <mat-icon>insert_photo</mat-icon>
+                <div>
+                  <span class="file-name">{{ selectedFile.name }}</span>
+                  <small>{{ (selectedFile.size / 1024 | number: '1.0-0') }} KB</small>
+                </div>
+              </div>
+
+              <div class="cover-buttons">
+                <button
+                  mat-stroked-button
+                  type="button"
+                  color="primary"
+                  (click)="removeSelectedFile()"
+                  [disabled]="isUploadingCover">
+                  <mat-icon>close</mat-icon>
+                  Cancelar
+                </button>
+
+                <button
+                  mat-raised-button
+                  color="primary"
+                  type="button"
+                  (click)="uploadCover()"
+                  [disabled]="isUploadingCover || !cursoId">
+                  <mat-icon *ngIf="!isUploadingCover">cloud_upload</mat-icon>
+                  <mat-progress-spinner
+                    *ngIf="isUploadingCover"
+                    diameter="18"
+                    mode="indeterminate">
+                  </mat-progress-spinner>
+                  {{ isUploadingCover ? 'Enviando...' : 'Enviar Capa' }}
+                </button>
+              </div>
+            </div>
+
+            <div class="cover-hint" *ngIf="!selectedFile && currentCoverUrl">
+              <mat-icon>info</mat-icon>
+              <span>Atual imagem em uso. Clique na área acima para selecionar uma nova capa.</span>
+            </div>
+
+          <div class="cover-actions" *ngIf="currentCoverUrl">
+            <button
+              mat-stroked-button
+              type="button"
+              color="warn"
+              (click)="confirmDeleteCover()"
+              [disabled]="isUploadingCover">
+              <mat-icon>delete</mat-icon>
+              Remover capa atual
+            </button>
+          </div>
           </div>
         </div>
 

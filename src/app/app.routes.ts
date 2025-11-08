@@ -6,15 +6,21 @@ export const routes: Routes = [
     path: 'login',
     loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent)
   },
+  // Rotas públicas
   {
     path: 'cursos-publicos',
-    loadComponent: () => import('./features/cursos/components/lista-cursos-publica/lista-cursos-publica.component').then(m => m.ListaCursosPublicaComponent),
+    loadComponent: () => import('./public/components/cursos-publicos/cursos-publicos.component').then(m => m.CursosPublicosComponent),
     title: 'Cursos Disponíveis'
   },
   {
     path: 'atividades-publicas/curso/:cursoId',
-    loadComponent: () => import('./features/atividades/components/lista-atividades-publica/lista-atividades-publica.component').then(m => m.ListaAtividadesPublicaComponent),
+    loadComponent: () => import('./public/components/atividades-publicas/atividades-publicas.component').then(m => m.AtividadesPublicasComponent),
     title: 'Atividades do Curso'
+  },
+  {
+    path: 'atividade-publica/:atividadeId',
+    loadComponent: () => import('./public/components/visualizar-atividade/visualizar-atividade.component').then(m => m.VisualizarAtividadeComponent),
+    title: 'Visualizar Atividade'
   },
   {
     path: '',

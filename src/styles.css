@@ -14,26 +14,34 @@ html, body {
 }
 
 body {
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
   background-color: var(--bg-dark);
   color: var(--text-dark);
+  letter-spacing: 0.02rem;
 }
+
+h1, .mat-h1 { font-size: var(--font-size-h1); line-height: var(--line-height-h1); font-weight: var(--font-weight-bold); margin: 0; }
+h2, .mat-h2 { font-size: var(--font-size-h2); line-height: var(--line-height-h2); font-weight: var(--font-weight-semibold); margin: 0; }
+h3, .mat-h3 { font-size: var(--font-size-h3); line-height: var(--line-height-h3); font-weight: var(--font-weight-semibold); margin: 0; }
+p { font-size: var(--font-size-body); line-height: var(--line-height-body); margin: 0 0 var(--spacing-md); }
+.text-small { font-size: var(--font-size-small); line-height: var(--line-height-small); }
 
 /* ============================================
    VARIÁVEIS DO TEMA MATERIAL
    ============================================ */
-
 :root {
   /* Cores do tema */
-  --mdc-theme-primary: #3B82F6 !important;
-  --mdc-theme-secondary: #8B5CF6 !important;
-  --mdc-theme-surface: #FFFFFF !important;
-  --mdc-theme-background: #F8FAFC !important;
+  --mdc-theme-primary: var(--primary-color) !important;
+  --mdc-theme-secondary: var(--secondary-color) !important;
+  --mdc-theme-surface: var(--bg-card) !important;
+  --mdc-theme-background: var(--bg-dark) !important;
   --mdc-theme-on-primary: #FFFFFF !important;
   --mdc-theme-on-secondary: #FFFFFF !important;
-  --mdc-theme-on-surface: #0F172A !important;
-  --mdc-theme-on-background: #0F172A !important;
-  --mdc-theme-error: #EF4444 !important;
+  --mdc-theme-on-surface: var(--text-dark) !important;
+  --mdc-theme-on-background: var(--text-dark) !important;
+  --mdc-theme-error: var(--error-color) !important;
   --mdc-theme-on-error: #FFFFFF !important;
 }
 
@@ -93,13 +101,14 @@ body {
 
 /* Botões com Gradiente */
 ::ng-deep .mat-mdc-raised-button.mat-primary {
-  background: var(--gradient-primary) !important;
-  color: white !important;
+  background: var(--primary-button-gradient) !important;
+  color: #FFFFFF !important;
+  box-shadow: var(--shadow-primary);
 }
 
 ::ng-deep .mat-mdc-raised-button.mat-primary:hover {
   background: var(--gradient-accent) !important;
-  box-shadow: var(--shadow-primary);
+  box-shadow: var(--shadow-accent);
 }
 
 /* Tooltips */
@@ -118,18 +127,18 @@ body {
 
 /* Chips */
 ::ng-deep .mat-mdc-chip.mat-primary {
-  --mdc-chip-elevated-container-color: var(--primary-color) !important;
-  --mdc-chip-label-text-color: white !important;
+  --mdc-chip-elevated-container-color: var(--chip-gradient) !important;
+  --mdc-chip-label-text-color: #FFFFFF !important;
 }
 
 ::ng-deep .mat-mdc-chip.mat-accent {
-  --mdc-chip-elevated-container-color: var(--secondary-color) !important;
-  --mdc-chip-label-text-color: white !important;
+  --mdc-chip-elevated-container-color: var(--chip-background) !important;
+  --mdc-chip-label-text-color: var(--chip-text-color) !important;
 }
 
 ::ng-deep .mat-mdc-chip.mat-warn {
   --mdc-chip-elevated-container-color: var(--error-color) !important;
-  --mdc-chip-label-text-color: white !important;
+  --mdc-chip-label-text-color: #FFFFFF !important;
 }
 
 /* Menu */

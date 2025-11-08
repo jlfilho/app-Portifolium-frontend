@@ -1,5 +1,5 @@
-import { Component, HostListener } from '@angular/core';
-import { CommonModule, NgOptimizedImage  } from '@angular/common';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -24,7 +24,12 @@ import { CursosService } from '../../services/cursos.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { SimpleConfirmDialogComponent } from '../../../../shared/components/simple-confirm-dialog/simple-confirm-dialog.component';
 import { PermissoesCursoFormComponent } from '../permissoes-curso-form/permissoes-curso-form.component';
-import { PageRequest } from '../../../../shared/models/page.model';
+import { TiposCursoService } from '../../services/tipos-curso.service';
+import { TipoCurso } from '../../models/tipo-curso.model';
+import { extractApiMessage } from '../../../../shared/utils/message.utils';
+import { Curso } from '../../models/curso.model';
+import { CursoFilter } from '../../models/curso-filter.model';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'acadmanage-cards-cursos',
@@ -34,7 +39,6 @@ import { PageRequest } from '../../../../shared/models/page.model';
     MatCardModule,
     MatButtonModule,
     MatGridListModule,
-    NgOptimizedImage,
     MatDividerModule,
     MatIconModule,
     MatTooltipModule,
@@ -49,8 +53,8 @@ import { PageRequest } from '../../../../shared/models/page.model';
   templateUrl: './cards-cursos.component.html',
   styleUrl: './cards-cursos.component.css'
 })
-export class CardsCursosComponent  {
-  cursos: any[] = []; // Armazena a lista de cursos
+export class CardsCursosComponent  implements OnInit {
+  cursos: Curso[] = []; // Armazena a lista de cursos
   errorMessage: string = ''; // Mensagem de erro (caso ocorra)
   columns: number = 3; // Número de colunas padrão
 
@@ -64,6 +68,7 @@ export class CardsCursosComponent  {
   // Filtros
   filtroNome = '';
   filtroStatus: boolean | null = null;
+  filtroTipo: number | null = null;
   private searchSubject = new Subject<string>();
 
   // Opções de status
@@ -73,8 +78,11 @@ export class CardsCursosComponent  {
     { value: false, label: 'Inativos' }
   ];
 
+  private readonly filesBaseUrl = `${environment.apiUrl}/files`;
+
   constructor(
     private cursosService: CursosService,
+    private tiposCursoService: TiposCursoService,
     private router: Router,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
@@ -82,6 +90,13 @@ export class CardsCursosComponent  {
     this.updateColumns(window.innerWidth);
     this.setupSearchDebounce();
     this.loadCourses();
+  }
+
+  tiposCurso: TipoCurso[] = [];
+  isLoadingTipos = false;
+
+  ngOnInit(): void {
+    this.loadTiposCurso();
   }
 
   // Configurar debounce para busca dinâmica
@@ -125,38 +140,39 @@ export class CardsCursosComponent  {
     this.isLoading = true;
     this.errorMessage = '';
 
-    const pageRequest: PageRequest = {
+    const filter: CursoFilter = {
       page: this.pageIndex,
       size: this.pageSize,
       sortBy: 'nome',
-      direction: 'ASC' as 'ASC'
+      direction: 'ASC',
+      ativo: this.filtroStatus,
+      nome: this.filtroNome || undefined,
+      tipoId: this.filtroTipo ?? undefined
     };
 
     console.log('📡 Carregando cursos do usuário (página ' + (this.pageIndex + 1) + ')');
     console.log('🔍 Filtros aplicados:', {
       nome: this.filtroNome || 'sem filtro',
-      status: this.filtroStatus !== null ? (this.filtroStatus ? 'Ativos' : 'Inativos') : 'Todos'
+      status: this.filtroStatus !== null ? (this.filtroStatus ? 'Ativos' : 'Inativos') : 'Todos',
+      tipoId: this.filtroTipo ?? 'todos'
     });
 
-    // Buscar cursos do usuário autenticado com filtros
-    this.cursosService.getUserCoursesPaginado(
-      pageRequest,
-      this.filtroStatus,
-      this.filtroNome || undefined
-    ).subscribe({
+    this.cursosService.getUserCoursesPaginado(filter).subscribe({
       next: (page) => {
-        // Tratar resposta null (204 No Content) do backend
         if (!page || page === null) {
           console.log('📭 Nenhum curso encontrado (204 No Content)');
-          this.cursos = [];
-          this.totalElements = 0;
-          this.isLoading = false;
+          this.handleEmptyCourses();
           return;
         }
 
         this.cursos = page.content || [];
         this.totalElements = page.totalElements || 0;
         this.isLoading = false;
+
+        if (this.cursos.length === 0) {
+          this.handleEmptyCourses();
+          return;
+        }
 
         console.log('✅ Cursos do usuário carregados:', {
           exibindo: this.cursos.length,
@@ -166,21 +182,32 @@ export class CardsCursosComponent  {
         });
       },
       error: (error) => {
-        console.error('❌ Erro ao carregar cursos:', error);
-
-        // Se for 204 No Content (alguns clientes HTTP tratam como erro)
-        if (error.status === 204) {
-          console.log('📭 Nenhum curso encontrado (204 tratado como erro)');
-          this.cursos = [];
-          this.totalElements = 0;
-          this.errorMessage = '';
-        } else {
-          this.errorMessage = 'Erro ao carregar os cursos. Tente novamente.';
-        }
-
+        console.error('❌ Erro ao carregar cursos do usuário:', error);
+        const apiMessage = extractApiMessage(error);
+        this.errorMessage = apiMessage || 'Erro ao carregar os cursos. Tente novamente.';
         this.isLoading = false;
-      },
+        this.showMessage(this.errorMessage, 'error');
+        this.cursos = [];
+        this.totalElements = 0;
+      }
     });
+  }
+
+  getCursoImageUrl(curso: Curso): string {
+    const foto = curso?.fotoCapa;
+    if (foto) {
+      if (foto.startsWith('http')) {
+        return foto;
+      }
+      const normalized = foto.startsWith('/') ? foto : `/${foto}`;
+      return `${this.filesBaseUrl}${normalized}`;
+    }
+    return '/imagens/curso-header.png';
+  }
+
+  onImageError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    target.src = '/imagens/curso-header.png';
   }
 
   // Chamado quando usuário digita no campo de busca
@@ -196,11 +223,18 @@ export class CardsCursosComponent  {
     this.loadCourses();
   }
 
+  onTipoChange(): void {
+    console.log('🏷️ Filtro de tipo alterado:', this.filtroTipo);
+    this.pageIndex = 0;
+    this.loadCourses();
+  }
+
   // Limpar filtros
   limparFiltros(): void {
     console.log('🧹 Limpando filtros');
     this.filtroNome = '';
     this.filtroStatus = null;
+    this.filtroTipo = null;
     this.pageIndex = 0;
     this.loadCourses();
   }
@@ -219,25 +253,43 @@ export class CardsCursosComponent  {
   }
 
   // Navegar para editar curso
-  editCourse(cursoId: number): void {
+  editCourse(cursoId?: number): void {
+    if (cursoId == null) {
+      this.showMessage('Curso inválido selecionado. Tente novamente.', 'error');
+      return;
+    }
     this.router.navigate(['/cursos/editar', cursoId]);
   }
 
   // Navegar para a tela de gerenciar permissões (formulário)
-  managePermissions(curso: any): void {
+  managePermissions(curso: Curso): void {
     console.log('👥 Gerenciar permissões para curso:', curso);
-    this.router.navigate(['/cursos', curso.id, 'permissoes'], { state: { cursoNome: curso.nome } });
+    if (curso?.id == null) {
+      this.showMessage('Curso inválido selecionado. Tente novamente.', 'error');
+      return;
+    }
+    const cursoId = curso.id;
+    this.router.navigate(['/cursos', cursoId, 'permissoes'], { state: { cursoNome: curso.nome } });
   }
 
   // Navegar para a tela de atividades do curso
-  manageAtividades(curso: any): void {
+  manageAtividades(curso: Curso): void {
     console.log('📚 Gerenciar atividades para curso:', curso);
-    this.router.navigate(['/atividades/curso', curso.id], { state: { cursoNome: curso.nome } });
+    if (curso?.id == null) {
+      this.showMessage('Curso inválido selecionado. Tente novamente.', 'error');
+      return;
+    }
+    const cursoId = curso.id;
+    this.router.navigate(['/atividades/curso', cursoId], { state: { cursoNome: curso.nome } });
   }
 
   // Deletar curso com diálogo de confirmação
-  deleteCourse(curso: any): void {
+  deleteCourse(curso: Curso): void {
     console.log('🗑️ Excluir curso chamado para:', curso);
+    if (curso?.id == null) {
+      this.showMessage('Curso inválido selecionado. Tente novamente.', 'error');
+      return;
+    }
 
     const dialogRef = this.dialog.open(SimpleConfirmDialogComponent, {
       width: '500px',
@@ -254,7 +306,8 @@ export class CardsCursosComponent  {
       console.log('💬 Resultado do diálogo de exclusão:', result);
       if (result === true) {
         console.log('✅ Confirmado! Executando exclusão...');
-        this.performDelete(curso.id, curso.nome);
+        const cursoId = curso.id!;
+        this.performDelete(cursoId, curso.nome);
       } else {
         console.log('❌ Exclusão cancelada pelo usuário');
       }
@@ -277,21 +330,7 @@ export class CardsCursosComponent  {
         console.error('📊 Detalhes do erro:', error.error);
         console.error('🔢 Status HTTP:', error.status);
 
-        // Extrair mensagem de erro do servidor
-        let errorMessage = 'Erro ao excluir curso. Tente novamente.';
-
-        if (error.error) {
-          // Se o backend retornou uma mensagem
-          if (typeof error.error === 'string') {
-            errorMessage = error.error;
-          } else if (error.error.message) {
-            errorMessage = error.error.message;
-          } else if (error.error.error) {
-            errorMessage = error.error.error;
-          }
-        } else if (error.message) {
-          errorMessage = error.message;
-        }
+        const errorMessage = extractApiMessage(error) || 'Erro ao excluir curso. Tente novamente.';
 
         console.log('📢 Mensagem de erro extraída:', errorMessage);
         this.showMessage(errorMessage, 'error');
@@ -300,9 +339,14 @@ export class CardsCursosComponent  {
   }
 
   // Toggle status do curso (ativar/desativar) com confirmação
-  toggleCourseStatus(curso: any): void {
+  toggleCourseStatus(curso: Curso): void {
     console.log('🔄 Toggle status chamado para curso:', curso);
     console.log('📊 Status atual:', curso.ativo);
+
+    if (curso?.id == null) {
+      this.showMessage('Curso inválido selecionado. Tente novamente.', 'error');
+      return;
+    }
 
     const novoStatus = !curso.ativo;
     const acao = novoStatus ? 'ativar' : 'desativar';
@@ -325,7 +369,8 @@ export class CardsCursosComponent  {
       console.log('💬 Resultado do diálogo:', result);
       if (result === true) {
         console.log('✅ Confirmado! Executando atualização...');
-        this.performStatusUpdate(curso.id, curso.nome, novoStatus);
+        const cursoId = curso.id!;
+        this.performStatusUpdate(cursoId, curso.nome, novoStatus);
       } else {
         console.log('❌ Cancelado pelo usuário');
       }
@@ -350,21 +395,7 @@ export class CardsCursosComponent  {
         console.error('📊 Detalhes do erro:', error.error);
         console.error('🔢 Status HTTP:', error.status);
 
-        // Extrair mensagem de erro do servidor
-        let errorMessage = 'Erro ao atualizar status do curso. Tente novamente.';
-
-        if (error.error) {
-          // Se o backend retornou uma mensagem
-          if (typeof error.error === 'string') {
-            errorMessage = error.error;
-          } else if (error.error.message) {
-            errorMessage = error.error.message;
-          } else if (error.error.error) {
-            errorMessage = error.error.error;
-          }
-        } else if (error.message) {
-          errorMessage = error.message;
-        }
+        const errorMessage = extractApiMessage(error) || 'Erro ao atualizar status do curso. Tente novamente.';
 
         console.log('📢 Mensagem de erro extraída:', errorMessage);
         this.showMessage(errorMessage, 'error');
@@ -384,4 +415,50 @@ export class CardsCursosComponent  {
     });
   }
 
+  private loadTiposCurso(): void {
+    this.isLoadingTipos = true;
+    this.tiposCursoService.getFirstPageAsList(100, undefined, 'nome', 'ASC').subscribe({
+      next: (list: TipoCurso[]) => {
+        this.tiposCurso = Array.isArray(list) ? list : [];
+        this.isLoadingTipos = false;
+      },
+      error: () => {
+        this.tiposCurso = [];
+        this.isLoadingTipos = false;
+      }
+    });
+  }
+
+  getTipoNomeById(id: number | null | undefined): string {
+    if (id == null) return '';
+    const found = this.tiposCurso.find(t => t.id === id);
+    return found?.nome || '';
+  }
+
+  getTipoNomeFromCurso(curso: any): string {
+    return curso?.tipo?.nome || this.getTipoNomeById(curso?.tipoId) || curso?.tipoNome || '';
+  }
+
+  private hasActiveFilters(): boolean {
+    return Boolean(
+      (this.filtroNome && this.filtroNome.trim()) ||
+      this.filtroStatus !== null ||
+      this.filtroTipo !== null
+    );
+  }
+
+  private handleEmptyCourses(): void {
+    this.cursos = [];
+    this.totalElements = 0;
+    this.isLoading = false;
+    if (this.hasActiveFilters()) {
+      this.errorMessage = 'Nenhum curso encontrado com os filtros aplicados.';
+    } else {
+      this.errorMessage = 'Você ainda não possui cursos cadastrados.';
+    }
+  }
+
+  trackCurso(index: number, curso: Curso): string | number {
+    return curso.id ?? curso.nome ?? index;
+  }
 }

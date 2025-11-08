@@ -803,8 +803,23 @@ mat-divider {
 .caption-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   margin-bottom: 12px;
+}
+
+.caption-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.caption-header button[mat-icon-button] {
+  align-self: flex-start;
+}
+
+.caption-header button[mat-icon-button] mat-progress-spinner {
+  margin: 0;
 }
 
 .caption-avatar {

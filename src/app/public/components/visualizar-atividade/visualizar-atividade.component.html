@@ -1,0 +1,296 @@
+<!-- Loading State -->
+<div *ngIf="isLoading" class="loading-container">
+  <mat-spinner diameter="50"></mat-spinner>
+  <p>Carregando atividade...</p>
+</div>
+
+<!-- Error State -->
+<div *ngIf="errorMessage && !isLoading" class="error-container">
+  <mat-icon class="error-icon">error</mat-icon>
+  <h2>Erro ao carregar atividade</h2>
+  <p>{{ errorMessage }}</p>
+  <button mat-raised-button color="primary" (click)="loadAtividade()">
+    <mat-icon>refresh</mat-icon>
+    Tentar Novamente
+  </button>
+</div>
+
+<!-- Atividade Content -->
+<div *ngIf="atividade && !isLoading" class="atividade-container">
+  <!-- Header com navegação -->
+  <div class="header-section">
+    <div class="breadcrumb">
+      <button mat-button (click)="voltarParaCursos()" class="breadcrumb-link">
+        <mat-icon>home</mat-icon>
+        Cursos Públicos
+      </button>
+      <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
+      <button mat-button (click)="voltarParaAtividades()" class="breadcrumb-link">
+        <mat-icon>school</mat-icon>
+        {{ cursoNome }}
+      </button>
+      <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
+      <span class="breadcrumb-current">{{ atividade.nome }}</span>
+    </div>
+  </div>
+
+  <!-- Card principal da atividade -->
+  <mat-card class="atividade-card">
+    <!-- Imagem de capa -->
+    <div class="capa-container" *ngIf="atividade.fotoCapa">
+      <img
+        [src]="getImageUrl(atividade.fotoCapa)"
+        [alt]="atividade.nome"
+        class="capa-image"
+        (error)="onImageError($event)">
+    </div>
+
+    <!-- Conteúdo da atividade -->
+    <mat-card-content class="atividade-content">
+      <!-- Título -->
+      <div class="atividade-header">
+        <h1 class="atividade-titulo">{{ atividade.nome }}</h1>
+      </div>
+
+      <!-- Informações básicas -->
+      <div class="info-grid">
+        <div class="info-item">
+          <mat-icon class="info-icon">school</mat-icon>
+          <div class="info-content">
+            <span class="info-label">Curso</span>
+            <span class="info-value">{{ atividade.curso.nome }}</span>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <mat-icon class="info-icon">category</mat-icon>
+          <div class="info-content">
+            <span class="info-label">Categoria</span>
+            <span class="info-value">{{ atividade.categoria.nome }}</span>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <mat-icon class="info-icon">event</mat-icon>
+          <div class="info-content">
+            <span class="info-label">Data de Realização</span>
+            <span class="info-value">{{ formatarData(atividade.dataRealizacao) }}</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Objetivo -->
+      <div class="objetivos-section" *ngIf="atividade.objetivo">
+        <h3>
+          <mat-icon>flag</mat-icon>
+          Objetivo
+        </h3>
+        <p class="objetivos-texto">{{ atividade.objetivo }}</p>
+      </div>
+
+      <!-- Coordenador -->
+      <div class="coordenador-section" *ngIf="atividade.coordenador">
+        <h3>
+          <mat-icon>person</mat-icon>
+          Coordenador
+        </h3>
+        <div class="pessoa-card">
+          <div class="pessoa-info">
+            <span class="pessoa-nome">{{ atividade.coordenador }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Integrantes -->
+      <div class="integrantes-section" *ngIf="atividade.integrantes && atividade.integrantes.length > 0">
+        <h3>
+          <mat-icon>group</mat-icon>
+          Integrantes ({{ atividade.integrantes.length }})
+        </h3>
+        <div class="integrantes-grid">
+          <div
+            *ngFor="let integrante of atividade.integrantes"
+            class="integrante-card">
+            <mat-chip
+              class="papel-chip">
+              <mat-icon>person</mat-icon>
+              {{ integrante.papel }}
+            </mat-chip>
+            <div class="integrante-info">
+              <span class="integrante-nome">{{ integrante.nome }}</span>
+              <span class="integrante-cpf" *ngIf="integrante.cpf">CPF: {{ integrante.cpf }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fontes Financiadoras -->
+      <div class="fontes-section" *ngIf="atividade.fontesFinanciadora && atividade.fontesFinanciadora.length > 0">
+        <h3>
+          <mat-icon>account_balance</mat-icon>
+          Fontes Financiadoras ({{ atividade.fontesFinanciadora.length }})
+        </h3>
+        <div class="fontes-grid">
+          <mat-chip
+            *ngFor="let fonte of atividade.fontesFinanciadora"
+            class="fonte-chip">
+            <mat-icon>account_balance</mat-icon>
+            {{ fonte.nome }}
+          </mat-chip>
+        </div>
+      </div>
+
+      <!-- Evidências Fotográficas -->
+      <div class="evidencias-section" *ngIf="evidencias.length > 0">
+        <div class="evidencias-header">
+          <h3>
+            <mat-icon>photo_library</mat-icon>
+            Evidências Fotográficas
+          </h3>
+          <div class="evidencias-counter">
+            <span>{{ evidencias.length }} evidência(s)</span>
+          </div>
+        </div>
+
+        <!-- Loading das evidências -->
+        <div class="evidencias-loading" *ngIf="isLoadingEvidencias">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Carregando evidências...</p>
+        </div>
+
+        <!-- Carrossel de evidências -->
+        <div class="evidencias-carousel" *ngIf="!isLoadingEvidencias && evidencias.length > 0">
+          <!-- Controles de navegação -->
+          <div class="carousel-controls">
+            <button
+              mat-icon-button
+              class="carousel-btn prev-btn"
+              (click)="paginaAnteriorEvidencias()"
+              [disabled]="paginaAtualEvidencias === 0"
+              matTooltip="Página anterior">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+
+            <button
+              mat-icon-button
+              class="carousel-btn next-btn"
+              (click)="proximaPaginaEvidencias()"
+              [disabled]="paginaAtualEvidencias === totalPaginasEvidencias - 1"
+              matTooltip="Próxima página">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </div>
+
+          <!-- Container do carrossel -->
+          <div class="carousel-container">
+            <div class="carousel-track" [style.transform]="'translateX(-' + (paginaAtualEvidencias * 100) + '%)'">
+              <div
+                *ngFor="let pagina of evidenciasPaginas; let i = index"
+                class="carousel-slide">
+                <div class="evidencias-grid">
+                  <div
+                    *ngFor="let evidencia of pagina"
+                    class="evidencia-card"
+                    (click)="openLightbox(evidencia)">
+                    <div class="evidencia-image-container">
+                      <img
+                        [src]="getEvidenciaImageUrl(evidencia.foto)"
+                        [alt]="evidencia.legenda"
+                        class="evidencia-image"
+                        (error)="onImageError($event)">
+                      <div class="evidencia-overlay">
+                        <mat-icon class="zoom-icon">zoom_in</mat-icon>
+                      </div>
+                    </div>
+                    <div class="evidencia-info">
+                      <p class="evidencia-legenda">{{ evidencia.legenda }}</p>
+                      <span class="evidencia-criador" *ngIf="evidencia.criadoPor">
+                        <mat-icon>person</mat-icon>
+                        {{ evidencia.criadoPor }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Indicadores de página -->
+          <div class="carousel-indicators" *ngIf="totalPaginasEvidencias > 1">
+            <button
+              *ngFor="let pagina of evidenciasPaginas; let i = index"
+              class="indicator-btn"
+              [class.active]="i === paginaAtualEvidencias"
+              (click)="irParaPaginaEvidencias(i)"
+              [attr.aria-label]="'Ir para página ' + (i + 1)">
+              <span class="indicator-dot"></span>
+            </button>
+          </div>
+
+          <!-- Informações da página atual -->
+          <div class="carousel-info">
+            <span class="page-info">
+              Página {{ paginaAtualEvidencias + 1 }} de {{ totalPaginasEvidencias }}
+            </span>
+            <span class="items-info">
+              {{ getEvidenciasPaginaAtual().length }} de {{ evidencias.length }} evidência(s)
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty state para evidências -->
+      <div class="evidencias-empty" *ngIf="!isLoadingEvidencias && evidencias.length === 0">
+        <mat-icon class="empty-icon">photo_library</mat-icon>
+        <p>Nenhuma evidência fotográfica disponível</p>
+      </div>
+
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<!-- Lightbox Modal -->
+<div class="lightbox-backdrop" *ngIf="lightboxOpen" (click)="closeLightbox()">
+  <div class="lightbox-content" (click)="$event.stopPropagation()">
+    <button mat-icon-button class="lightbox-close" (click)="closeLightbox()" aria-label="Fechar lightbox">
+      <mat-icon>close</mat-icon>
+    </button>
+
+    <button mat-icon-button class="lightbox-nav lightbox-prev" (click)="prevLightbox()" aria-label="Evidência anterior">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+
+    <div class="lightbox-image-wrapper">
+      <img [src]="getLightboxImageUrl()" [alt]="lightboxEvidencia?.legenda" class="lightbox-image">
+    </div>
+
+    <button mat-icon-button class="lightbox-nav lightbox-next" (click)="nextLightbox()" aria-label="Próxima evidência">
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+
+    <div class="lightbox-caption" *ngIf="lightboxEvidencia">
+      <div class="caption-text">
+        <mat-icon>photo_camera</mat-icon>
+        <p>{{ lightboxEvidencia.legenda }}</p>
+      </div>
+      <div class="caption-meta">
+        <span *ngIf="lightboxEvidencia.criadoPor">
+          <mat-icon>person</mat-icon>
+          {{ lightboxEvidencia.criadoPor }}
+        </span>
+        <span class="caption-index">{{ lightboxIndex + 1 }} / {{ evidencias.length }}</span>
+      </div>
+    </div>
+
+    <div class="lightbox-thumbs" *ngIf="evidencias.length > 1">
+      <button
+        *ngFor="let evidencia of evidencias; let i = index"
+        class="thumb-button"
+        [class.active]="i === lightboxIndex"
+        (click)="goToLightbox(i)">
+        <img [src]="getEvidenciaImageUrl(evidencia.foto)" [alt]="evidencia.legenda">
+      </button>
+    </div>
+  </div>
+</div>

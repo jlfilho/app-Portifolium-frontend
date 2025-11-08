@@ -166,39 +166,42 @@ export class AtividadesService {
     console.log('📡 Request URL:', url);
     console.log('📋 Params:', params.toString());
 
-    return this.http.get<Page<AtividadeDTO>>(url, { params, observe: 'response' }).pipe(
+    return this.http.get<Page<AtividadeDTO>>(url, { params }).pipe(
       timeout(30000), // 30 segundos de timeout
       tap(response => {
-        console.log('🌐 Response completa:', response);
-        console.log('📊 Status:', response.status);
-        console.log('📦 Body:', response.body);
+        console.log('🌐 Response recebida:', response);
+        if (!response) {
+          console.log('⚠️ Resposta nula do servidor (possível 204 No Content)');
+          return;
+        }
+        console.log('📦 Content length:', response?.content?.length || 0);
+        console.log('📊 Total elements:', response?.totalElements ?? 0);
       }),
       map(response => {
-        // Se for 204 No Content, retornar página vazia
-        if (response.status === 204 || !response.body) {
-          console.log('⚠️ Resposta 204 ou sem body, retornando página vazia');
-          return {
-            content: [],
-            totalElements: 0,
-            totalPages: 0,
-            size: size,
-            number: page,
-            first: true,
-            last: true,
-            empty: true
-          } as Page<AtividadeDTO>;
+        if (!response || !Array.isArray(response.content)) {
+          console.log('⚠️ Resposta vazia ou sem conteúdo válido, retornando página vazia');
+          return this.buildEmptyPage(page, size);
         }
 
         // Validar estrutura da resposta
-        const body = response.body as Page<AtividadeDTO>;
         console.log('✅ Body validado:', {
-          contentLength: body.content?.length || 0,
-          totalElements: body.totalElements,
-          totalPages: body.totalPages,
-          pageNumber: body.number
+          contentLength: response.content?.length || 0,
+          totalElements: response.totalElements,
+          totalPages: response.totalPages,
+          pageNumber: response.number
         });
 
-        return body;
+        return {
+          ...response,
+          content: response.content ?? [],
+          totalElements: response.totalElements ?? response.content.length,
+          totalPages: response.totalPages ?? 1,
+          size: response.size ?? size,
+          number: response.number ?? page,
+          first: response.first ?? page === 0,
+          last: response.last ?? true,
+          empty: response.content.length === 0
+        };
       }),
       catchError((error: any) => {
         console.error('🚨 Erro HTTP capturado no serviço:', error);
@@ -218,6 +221,19 @@ export class AtividadesService {
         console.log('🏁 Requisição finalizada (sucesso ou erro)');
       })
     );
+  }
+
+  private buildEmptyPage(page: number, size: number): Page<AtividadeDTO> {
+    return {
+      content: [],
+      totalElements: 0,
+      totalPages: 0,
+      size,
+      number: page,
+      first: true,
+      last: true,
+      empty: true
+    };
   }
 
   /**

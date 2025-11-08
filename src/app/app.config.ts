@@ -8,6 +8,8 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { authInterceptor } from './shared/interceptors/auth.interceptor';
 import { errorInterceptor } from './shared/interceptors/error.interceptor';
 import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
+import { MatPaginatorIntl } from '@angular/material/paginator';
+import { PtBrMatPaginatorIntl } from './shared/paginator-intl';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -22,6 +24,10 @@ export const appConfig: ApplicationConfig = {
         errorInterceptor  // Detecta token expirado (401/403)
       ])
     ),
+    {
+      provide: MatPaginatorIntl,
+      useClass: PtBrMatPaginatorIntl
+    },
     {
       provide: MAT_DIALOG_DEFAULT_OPTIONS,
       useValue: {

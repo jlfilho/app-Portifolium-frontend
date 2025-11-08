@@ -8,12 +8,13 @@
     <span class="space"></span>
     <button
       *ngIf="isAdmin()"
-      mat-icon-button
-      class="add-button"
+      mat-raised-button
+      class="btn-primary add-button"
       matTooltip="Adicionar novo tipo de atividade"
       matTooltipPosition="below"
       (click)="addCategoria()">
       <mat-icon>add</mat-icon>
+      Novo Tipo
     </button>
   </div>
 

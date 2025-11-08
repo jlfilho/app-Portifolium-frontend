@@ -18,8 +18,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatRippleModule } from '@angular/material/core';
 
 // Services
-import { CursosService } from '../../services/cursos.service';
-import { PageRequest } from '../../../../shared/models/page.model';
+import { PublicApiService } from '../../services/public-api.service';
+import { PublicNavigationService } from '../../services/public-navigation.service';
 
 @Component({
   selector: 'acadmanage-lista-cursos-publica',
@@ -38,10 +38,10 @@ import { PageRequest } from '../../../../shared/models/page.model';
     MatDividerModule,
     MatRippleModule
   ],
-  templateUrl: './lista-cursos-publica.component.html',
-  styleUrl: './lista-cursos-publica.component.css'
+  templateUrl: './cursos-publicos.component.html',
+  styleUrl: './cursos-publicos.component.css'
 })
-export class ListaCursosPublicaComponent implements OnInit, OnDestroy {
+export class CursosPublicosComponent implements OnInit, OnDestroy {
   cursos: any[] = [];
   isLoading = false;
 
@@ -56,7 +56,8 @@ export class ListaCursosPublicaComponent implements OnInit, OnDestroy {
   private searchSubject = new Subject<string>();
 
   constructor(
-    private cursosService: CursosService,
+    private publicApiService: PublicApiService,
+    private publicNavigationService: PublicNavigationService,
     private router: Router
   ) {}
 
@@ -85,26 +86,24 @@ export class ListaCursosPublicaComponent implements OnInit, OnDestroy {
   loadCursos(): void {
     this.isLoading = true;
 
-    const pageRequest: PageRequest = {
-      page: this.pageIndex,
-      size: this.pageSize,
-      sortBy: 'nome',
-      direction: 'ASC' as 'ASC'
-    };
-
-    // Sempre buscar apenas cursos ATIVOS (filtro oculto)
-    const ativo = true;
-    const nome = this.searchTerm || undefined;
-
     console.log('📚 Carregando cursos públicos:', {
       pagina: this.pageIndex + 1,
       tamanho: this.pageSize,
-      busca: nome || 'todos',
+      busca: this.searchTerm || 'todos',
       apenasAtivos: true
     });
 
-    this.cursosService.getAllCoursesPaginado(pageRequest, ativo, nome).subscribe({
+    this.publicApiService.getCursosPublicos(this.pageIndex, this.pageSize, this.searchTerm).subscribe({
       next: (page) => {
+        // Tratar resposta vazia (204 No Content)
+        if (!page) {
+          this.cursos = [];
+          this.totalElements = 0;
+          this.isLoading = false;
+          console.log('📭 Nenhum curso encontrado');
+          return;
+        }
+
         this.cursos = page.content || [];
         this.totalElements = page.totalElements || 0;
         this.isLoading = false;
@@ -119,6 +118,13 @@ export class ListaCursosPublicaComponent implements OnInit, OnDestroy {
         this.cursos = [];
         this.totalElements = 0;
         this.isLoading = false;
+
+        // Mostrar mensagem de erro mais específica
+        if (error.status === 403) {
+          console.warn('⚠️ Acesso negado - verificar permissões da API');
+        } else if (error.status === 500) {
+          console.warn('⚠️ Erro interno do servidor');
+        }
       }
     });
   }
@@ -149,23 +155,12 @@ export class ListaCursosPublicaComponent implements OnInit, OnDestroy {
   // Navegar para atividades públicas do curso
   viewCurso(curso: any): void {
     console.log('👁️ Visualizando atividades do curso:', curso);
-    // Navegar para página pública de atividades
-    this.router.navigate(['/atividades-publicas/curso', curso.id], {
-      state: { cursoNome: curso.nome }
-    });
+    this.publicNavigationService.navigateToAtividadesPublicas(curso.id, curso.nome);
   }
 
   // Obter URL completa da imagem
   getImageUrl(fotoCapa: string): string {
-    if (!fotoCapa) return '';
-
-    // Se já é uma URL completa, retorna como está
-    if (fotoCapa.startsWith('http')) {
-      return fotoCapa;
-    }
-
-    // Senão, monta a URL completa
-    return `http://localhost:8080/api/files${fotoCapa}`;
+    return this.publicApiService.getCursoImageUrl(fotoCapa);
   }
 
   // Tratamento de erro de imagem
@@ -173,6 +168,10 @@ export class ListaCursosPublicaComponent implements OnInit, OnDestroy {
     console.log('⚠️ Erro ao carregar imagem do curso, usando gradiente padrão');
     // Remove o elemento img para mostrar o gradiente de fundo
     event.target.style.display = 'none';
+  }
+
+  getTipoNome(curso: any): string {
+    return curso?.tipo?.nome || curso?.tipoNome || '';
   }
 }
 

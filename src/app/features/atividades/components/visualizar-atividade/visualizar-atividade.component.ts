@@ -13,12 +13,15 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AtividadeDTO } from '../../models/atividade.model';
 import { AtividadesService } from '../../services/atividades.service';
 import { Papel, PapelUtils } from '../../models/papel.enum';
 import { EvidenciasService } from '../../../evidencias/services/evidencias.service';
 import { EvidenciaDTO } from '../../../evidencias/models/evidencia.model';
 import { ImageCompressionService, CompressionResult } from '../../../../shared/services/image-compression.service';
+import { firstValueFrom } from 'rxjs';
+import { extractApiMessage } from '../../../../shared/utils/message.utils';
 
 @Component({
   selector: 'acadmanage-visualizar-atividade',
@@ -36,7 +39,8 @@ import { ImageCompressionService, CompressionResult } from '../../../../shared/s
     MatSnackBarModule,
     MatBadgeModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    MatDialogModule
   ],
   templateUrl: './visualizar-atividade.component.html',
   styleUrl: './visualizar-atividade.component.css'
@@ -67,6 +71,7 @@ export class VisualizarAtividadeComponent implements OnInit {
   dragOver = false;
   isCompressing = false;
   compressionInfo: CompressionResult | null = null;
+  deletingEvidenceId: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -74,7 +79,8 @@ export class VisualizarAtividadeComponent implements OnInit {
     private atividadesService: AtividadesService,
     private evidenciasService: EvidenciasService,
     private imageCompressionService: ImageCompressionService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -391,6 +397,35 @@ export class VisualizarAtividadeComponent implements OnInit {
       });
   }
 
+  async confirmarExclusaoEvidencia(evidencia: EvidenciaDTO): Promise<void> {
+    const confirmado = await this.openConfirmDialog({
+      title: 'Excluir Evidência',
+      message: `Tem certeza que deseja excluir a evidência "${evidencia.legenda}"? Esta ação não pode ser desfeita.`,
+      confirmText: 'Excluir',
+      cancelText: 'Cancelar'
+    });
+
+    if (confirmado === true && evidencia.id) {
+      this.excluirEvidencia(evidencia.id);
+    }
+  }
+
+  private excluirEvidencia(evidenciaId: number): void {
+    this.deletingEvidenceId = evidenciaId;
+    this.evidenciasService.excluirEvidencia(evidenciaId).subscribe({
+      next: () => {
+        this.showMessage('Evidência excluída com sucesso!', 'success');
+        this.deletingEvidenceId = null;
+        this.carregarEvidencias();
+      },
+      error: (error) => {
+        const apiMessage = extractApiMessage(error);
+        this.showMessage(apiMessage || error.message || 'Erro ao excluir evidência.', 'error');
+        this.deletingEvidenceId = null;
+      }
+    });
+  }
+
   private resetUploadForm(): void {
     this.selectedFile = null;
     this.previewUrl = null;
@@ -406,6 +441,15 @@ export class VisualizarAtividadeComponent implements OnInit {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  }
+
+  private async openConfirmDialog(data: { title: string; message: string; confirmText: string; cancelText: string }): Promise<boolean> {
+    const { SimpleConfirmDialogComponent } = await import('../../../../shared/components/simple-confirm-dialog/simple-confirm-dialog.component');
+    const dialogRef = this.dialog.open(SimpleConfirmDialogComponent, {
+      width: '420px',
+      data
+    });
+    return firstValueFrom(dialogRef.afterClosed());
   }
 }
 

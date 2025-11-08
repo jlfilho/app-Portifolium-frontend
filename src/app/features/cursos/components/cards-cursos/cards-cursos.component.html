@@ -1,16 +1,23 @@
-<div class="courses-container">
+<div class="courses-container page-container">
   <!-- Header com título e botão adicionar -->
-  <div class="courses-header">
-    <h2>Meus Cursos</h2>
-    <span class="space"></span>
-    <button
-      mat-icon-button
-      class="add-button"
-      matTooltip="Adicionar novo curso"
-      matTooltipPosition="below"
-      (click)="addCourse()">
-      <mat-icon>add</mat-icon>
-    </button>
+  <div class="app-section-header courses-header">
+    <div class="app-section-header__title">
+      <mat-icon>school</mat-icon>
+      <div>
+        <span>Meus Cursos</span>
+      </div>
+    </div>
+    <div class="app-section-header__actions">
+      <button
+        mat-raised-button
+        class="btn-primary add-button"
+        matTooltip="Adicionar novo curso"
+        matTooltipPosition="below"
+        (click)="addCourse()">
+        <mat-icon>add</mat-icon>
+        Novo Curso
+      </button>
+    </div>
   </div>
 
   <mat-divider></mat-divider>
@@ -55,32 +62,52 @@
         <mat-icon matPrefix>toggle_on</mat-icon>
       </mat-form-field>
 
+      <!-- Filtro por Tipo -->
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Tipo de Curso</mat-label>
+        <mat-select
+          [(ngModel)]="filtroTipo"
+          (ngModelChange)="onTipoChange()"
+          [disabled]="isLoadingTipos">
+          <mat-option [value]="null">Todos</mat-option>
+          <mat-option *ngFor="let tc of tiposCurso" [value]="tc.id">{{ tc.nome }}</mat-option>
+        </mat-select>
+        <mat-icon matPrefix>category</mat-icon>
+      </mat-form-field>
+
       <!-- Botão Limpar Filtros -->
       <button
         mat-stroked-button
+        class="btn-cancel btn-clear-filters"
         (click)="limparFiltros()"
-        [disabled]="isLoading || (!filtroNome && filtroStatus === null)"
-        class="btn-clear-filters">
+        [disabled]="isLoading || (!filtroNome && filtroStatus === null && !filtroTipo)">
         <mat-icon>clear_all</mat-icon>
         Limpar Filtros
       </button>
     </div>
 
     <!-- Filtros ativos -->
-    <div class="active-filters" *ngIf="filtroNome || filtroStatus !== null">
+    <div class="active-filters" *ngIf="filtroNome || filtroStatus !== null || filtroTipo">
       <span class="filters-label">Filtros ativos:</span>
       <mat-chip-set>
-        <mat-chip *ngIf="filtroNome" class="filter-chip">
+        <mat-chip *ngIf="filtroNome" class="chip-default">
           <mat-icon matChipAvatar>search</mat-icon>
           Nome: "{{ filtroNome }}"
           <button matChipRemove (click)="filtroNome = ''; onSearchChange('')">
             <mat-icon>cancel</mat-icon>
           </button>
         </mat-chip>
-        <mat-chip *ngIf="filtroStatus !== null" class="filter-chip">
+        <mat-chip *ngIf="filtroStatus !== null" class="chip-default">
           <mat-icon matChipAvatar>toggle_on</mat-icon>
           {{ filtroStatus ? 'Ativos' : 'Inativos' }}
           <button matChipRemove (click)="filtroStatus = null; onStatusChange()">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip>
+        <mat-chip *ngIf="filtroTipo !== null" class="chip-default">
+          <mat-icon matChipAvatar>category</mat-icon>
+          Tipo: {{ getTipoNomeById(filtroTipo) || 'Todos' }}
+          <button matChipRemove (click)="filtroTipo = null; onTipoChange()">
             <mat-icon>cancel</mat-icon>
           </button>
         </mat-chip>
@@ -102,7 +129,7 @@
   </div>
 
   <!-- Loading -->
-  <div class="loading" *ngIf="isLoading">
+  <div class="app-loading" *ngIf="isLoading">
     <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
     <span>Carregando cursos...</span>
   </div>
@@ -115,19 +142,24 @@
       gutterSize="24px"
       class="grid-list"
       [cols]="getColumns()">
-      @for (curso of cursos; track curso.id) {
+      @for (curso of cursos; track trackCurso($index, curso)) {
         <mat-grid-tile>
           <mat-card class="card" appearance="outlined" [class.card-inactive]="!curso.ativo">
             <!-- Header do Card -->
             <mat-card-header class="card-header">
               <div mat-card-avatar class="header-image"></div>
-              <mat-card-title>{{ curso.nome }}</mat-card-title>
+              <div class="header-text">
+                <mat-card-title>{{ curso.nome }}</mat-card-title>
+                <mat-chip-set class="tipo-chip-set" *ngIf="getTipoNomeFromCurso(curso)">
+                  <mat-chip class="chip-highlight">{{ getTipoNomeFromCurso(curso) }}</mat-chip>
+                </mat-chip-set>
+              </div>
               <button
                 mat-icon-button
                 class="edit-button"
                 matTooltip="Editar curso"
                 matTooltipPosition="left"
-                (click)="editCourse(curso.id); $event.stopPropagation()">
+                (click)="curso.id && editCourse(curso.id); $event.stopPropagation()">
                 <mat-icon>edit</mat-icon>
               </button>
             </mat-card-header>
@@ -136,11 +168,12 @@
             <img
               class="card-image"
               mat-card-image
-              ngSrc="/imagens/curso-header.png"
+              [src]="getCursoImageUrl(curso)"
               alt="Imagem do curso {{ curso.nome }}"
               width="398"
               height="318"
-              priority
+              loading="lazy"
+              (error)="onImageError($event)"
             />
 
             <!-- Ações do Card -->
@@ -196,10 +229,11 @@
     </mat-paginator>
   } @else if (!isLoading) {
     <!-- Mensagem quando não há cursos -->
-    <div class="empty-state">
-      <mat-icon class="empty-icon">school</mat-icon>
-      <p>Você não possui cursos cadastrados.</p>
-      <button mat-raised-button color="primary" (click)="addCourse()">
+    <div class="app-empty-state">
+      <mat-icon class="app-empty-state__icon">school</mat-icon>
+      <p class="app-empty-state__title">Você não possui cursos cadastrados.</p>
+      <p class="app-empty-state__subtitle">Crie seu primeiro curso para começar a gerenciar conteúdos.</p>
+      <button mat-raised-button class="btn-primary add-button" (click)="addCourse()">
         <mat-icon>add</mat-icon>
         Adicionar Primeiro Curso
       </button>

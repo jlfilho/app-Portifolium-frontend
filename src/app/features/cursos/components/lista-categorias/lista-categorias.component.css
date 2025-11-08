@@ -57,45 +57,6 @@
   flex: 1;
 }
 
-/* Botão Adicionar - Mesmo estilo da listagem de usuários */
-.add-button {
-  background: var(--gradient-primary) !important;
-  color: white !important;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  box-shadow: 0 4px 12px rgba(91, 91, 234, 0.4);
-  transition: all 0.3s ease;
-  flex-shrink: 0;
-}
-
-.add-button:hover {
-  transform: scale(1.1) translateY(-2px);
-  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6);
-}
-
-.add-button:active {
-  transform: scale(1.05) translateY(-1px);
-}
-
-.add-button:focus {
-  outline: 2px solid var(--accent-color);
-  outline-offset: 2px;
-}
-
-.add-button mat-icon {
-  font-size: 28px;
-  width: 28px;
-  height: 28px;
-  color: white !important;
-}
-
-::ng-deep .add-button .mat-mdc-button-persistent-ripple,
-::ng-deep .add-button .mat-mdc-button-ripple {
-  display: none;
-}
-
-/* Divider */
 mat-divider {
   margin-bottom: 24px;
 }
@@ -485,18 +446,6 @@ mat-divider {
     min-width: 600px;
   }
 
-  .add-button {
-    width: 44px;
-    height: 44px;
-    flex-shrink: 0;
-  }
-
-  .add-button mat-icon {
-    font-size: 26px;
-    width: 26px;
-    height: 26px;
-  }
-
   .table-card {
     padding: 20px;
   }
@@ -518,18 +467,6 @@ mat-divider {
   .categorias-header h2 {
     font-size: 22px;
     flex: 1;
-  }
-
-  .add-button {
-    width: 42px;
-    height: 42px;
-    flex-shrink: 0;
-  }
-
-  .add-button mat-icon {
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
   }
 
   .filter-field {
@@ -619,18 +556,6 @@ mat-divider {
   .categorias-header h2 {
     font-size: 18px;
     flex: 1;
-  }
-
-  .add-button {
-    width: 40px;
-    height: 40px;
-    flex-shrink: 0;
-  }
-
-  .add-button mat-icon {
-    font-size: 22px;
-    width: 22px;
-    height: 22px;
   }
 
   .table-card {
@@ -732,18 +657,6 @@ mat-divider {
     flex: 1;
   }
 
-  .add-button {
-    width: 36px;
-    height: 36px;
-    flex-shrink: 0;
-  }
-
-  .add-button mat-icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-  }
-
   .categoria-card {
     padding: 10px;
   }
@@ -786,10 +699,8 @@ mat-divider {
     align-items: center;
   }
 
-  .add-button {
-    width: 42px;
-    height: 42px;
-    flex-shrink: 0;
+  .cards-container {
+    gap: 12px;
   }
 
   .categoria-card {

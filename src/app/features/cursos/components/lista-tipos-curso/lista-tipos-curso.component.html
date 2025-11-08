@@ -1,0 +1,95 @@
+<div class="lista-tipos-container page-container">
+  <!-- Header -->
+  <div class="app-section-header header">
+    <div class="app-section-header__title">
+      <mat-icon>category</mat-icon>
+      <div>
+        <span>Tipos de Cursos</span>
+        <p class="app-section-header__subtitle">Gerencie os tipos disponíveis para classificação dos cursos.</p>
+      </div>
+    </div>
+    <div class="app-section-header__actions" *ngIf="isAdmin()">
+      <button
+        mat-raised-button
+        class="btn-primary add-button"
+        matTooltip="Adicionar novo tipo de curso"
+        matTooltipPosition="below"
+        (click)="addTipo()">
+        <mat-icon>add</mat-icon>
+        Novo Tipo
+      </button>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <mat-card class="table-card">
+    <!-- Busca -->
+    <mat-form-field class="filter-field" appearance="outline">
+      <mat-label>Buscar tipos de curso</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput (keyup)="applyFilter(input.value)" placeholder="Nome do tipo..." #input>
+      <button mat-icon-button matSuffix *ngIf="input.value" (click)="input.value=''; applyFilter('')" matTooltip="Limpar busca">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <!-- Mensagem de erro -->
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Tabela -->
+    <div class="table-container">
+      <div *ngIf="isLoading" class="app-loading app-loading--inline">
+        <mat-spinner diameter="36"></mat-spinner>
+        <span>Carregando tipos de curso...</span>
+      </div>
+      <table *ngIf="!isLoading && tipos.length > 0" mat-table [dataSource]="tipos" class="mat-elevation-z1 full-width-table tipos-table">
+        <!-- ID -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>#</th>
+          <td mat-cell *matCellDef="let row">{{ row.id }}</td>
+        </ng-container>
+
+        <!-- Nome -->
+        <ng-container matColumnDef="nome">
+          <th mat-header-cell *matHeaderCellDef>Nome</th>
+          <td mat-cell *matCellDef="let row">{{ row.nome }}</td>
+        </ng-container>
+
+        <!-- Ações -->
+        <ng-container matColumnDef="acao">
+          <th mat-header-cell *matHeaderCellDef class="actions-header">Ações</th>
+          <td mat-cell *matCellDef="let row" class="actions-cell">
+            <button mat-icon-button matTooltip="Editar" (click)="editTipo(row)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button matTooltip="Excluir" (click)="deleteTipo(row)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+      <div class="app-empty-state" *ngIf="!isLoading && tipos.length === 0">
+        <mat-icon class="app-empty-state__icon">category</mat-icon>
+        <p class="app-empty-state__title">Nenhum tipo cadastrado.</p>
+        <p class="app-empty-state__subtitle">Crie um novo tipo de curso para começar a utilizá-lo nos cadastros.</p>
+      </div>
+    </div>
+    <mat-paginator
+      class="tipos-paginator"
+      [length]="totalElements"
+      [pageSize]="pageSize"
+      [pageIndex]="pageIndex"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="onPageChange($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+  </mat-card>
+</div>
+
+

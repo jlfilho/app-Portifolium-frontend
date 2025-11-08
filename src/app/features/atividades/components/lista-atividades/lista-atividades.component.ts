@@ -19,11 +19,14 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { firstValueFrom } from 'rxjs';
 // Services
 import { AtividadesService } from '../../services/atividades.service';
 import { CursosService } from '../../../cursos/services/cursos.service';
 import { AtividadeDTO, AtividadeFiltroDTO, Page } from '../../models/atividade.model';
 import { PageRequest } from '../../../../shared/models/page.model';
+import { extractApiMessage } from '../../../../shared/utils/message.utils';
 
 @Component({
   selector: 'acadmanage-lista-atividades',
@@ -45,7 +48,8 @@ import { PageRequest } from '../../../../shared/models/page.model';
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatDialogModule
   ],
   templateUrl: './lista-atividades.component.html',
   styleUrl: './lista-atividades.component.css'
@@ -57,6 +61,7 @@ export class ListaAtividadesComponent implements OnInit {
   categorias: any[] = [];
   isLoading = true;
   errorMessage = '';
+  emptyMessage = 'Sem atividade cadastrada!';
 
   // Filtros
   filtros: AtividadeFiltroDTO = {};
@@ -84,7 +89,8 @@ export class ListaAtividadesComponent implements OnInit {
     private router: Router,
     public atividadesService: AtividadesService,
     private cursosService: CursosService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -144,27 +150,35 @@ export class ListaAtividadesComponent implements OnInit {
     console.log('🔍 Carregando atividades com filtros:', filtros);
     console.log('📄 Página:', this.pageIndex, 'Tamanho:', this.pageSize);
 
-           this.atividadesService.getAtividadesPorFiltros(filtros, this.pageIndex, this.pageSize).subscribe({
-             next: (page: Page<AtividadeDTO>) => {
-               console.log('✅ Atividades carregadas:', page);
-               this.atividades = page?.content || [];
-               this.totalElements = page?.totalElements || 0;
-               this.isLoading = false;
+    this.atividadesService.getAtividadesPorFiltros(filtros, this.pageIndex, this.pageSize).subscribe({
+      next: (page: Page<AtividadeDTO> | null | undefined) => {
+        console.log('✅ Atividades carregadas:', page);
 
-               // Log detalhado das atividades para debug das fotos
-               console.log('📸 URLs das fotos de capa das atividades:');
-               this.atividades.forEach((atividade, index) => {
-                 if (atividade.fotoCapa) {
-                   console.log(`  ${index + 1}. ${atividade.nome}: ${this.getImageUrl(atividade.fotoCapa)}`);
-                 } else {
-                   console.log(`  ${index + 1}. ${atividade.nome}: Sem foto de capa`);
-                 }
-               });
+        if (!page) {
+          this.handleEmptyAtividades();
+          return;
+        }
 
-               if (this.atividades.length === 0) {
-                 console.log('ℹ️ Nenhuma atividade encontrada para os filtros aplicados');
-               }
-             },
+        this.atividades = page.content || [];
+        this.totalElements = page.totalElements || 0;
+        this.isLoading = false;
+
+        // Log detalhado das atividades para debug das fotos
+        console.log('📸 URLs das fotos de capa das atividades:');
+        this.atividades.forEach((atividade, index) => {
+          if (atividade.fotoCapa) {
+            console.log(`  ${index + 1}. ${atividade.nome}: ${this.getImageUrl(atividade.fotoCapa)}`);
+          } else {
+            console.log(`  ${index + 1}. ${atividade.nome}: Sem foto de capa`);
+          }
+        });
+
+        if (this.atividades.length === 0) {
+          this.handleEmptyAtividades();
+        } else {
+          this.errorMessage = '';
+        }
+      },
       error: (error) => {
         console.error('❌ Erro ao carregar atividades:', error);
         console.error('❌ Status:', error?.status);
@@ -235,15 +249,48 @@ export class ListaAtividadesComponent implements OnInit {
   }
 
   editarAtividade(atividade: AtividadeDTO): void {
-    console.log('✏️ Editando atividade:', atividade);
-    // Navegar para o formulário de edição
-    this.router.navigate(['/atividades/editar', atividade.id], {
-      state: {
-        atividade: atividade,
-        cursoId: this.cursoId,
-        cursoNome: this.cursoNome
+    if (!atividade || !atividade.id) {
+      console.warn('⚠️ Atividade inválida ao tentar editar:', atividade);
+      return;
+    }
+    this.router.navigate(['/atividades/editar', atividade.id], { state: { atividade, cursoNome: this.cursoNome } });
+  }
+
+  async confirmarExclusao(atividade: AtividadeDTO): Promise<void> {
+    const confirmado = await this.openConfirmDialog({
+      title: 'Excluir Atividade',
+      message: `Tem certeza que deseja excluir a atividade "${atividade?.nome}"? Essa ação não pode ser desfeita.`,
+      confirmText: 'Excluir',
+      cancelText: 'Cancelar'
+    });
+
+    if (confirmado === true && atividade?.id) {
+      this.excluirAtividade(atividade.id);
+    }
+  }
+
+  private excluirAtividade(atividadeId: number): void {
+    this.isLoading = true;
+    this.atividadesService.excluirAtividade(atividadeId).subscribe({
+      next: () => {
+        this.showMessage('Atividade excluída com sucesso!', 'success');
+        this.loadAtividades();
+      },
+      error: (error) => {
+        const apiMessage = extractApiMessage(error);
+        this.showMessage(apiMessage || 'Erro ao excluir atividade. Tente novamente.', 'error');
+        this.isLoading = false;
       }
     });
+  }
+
+  private async openConfirmDialog(data: { title: string; message: string; confirmText: string; cancelText: string }): Promise<boolean> {
+    const { SimpleConfirmDialogComponent } = await import('../../../../shared/components/simple-confirm-dialog/simple-confirm-dialog.component');
+    const dialogRef = this.dialog.open(SimpleConfirmDialogComponent, {
+      width: '460px',
+      data
+    });
+    return firstValueFrom(dialogRef.afterClosed());
   }
 
   getImageUrl(fotoCapa: string): string {
@@ -297,5 +344,24 @@ export class ListaAtividadesComponent implements OnInit {
 
   trackByAtividadeId(index: number, atividade: AtividadeDTO): number {
     return atividade.id || index;
+  }
+
+  private hasActiveFilters(): boolean {
+    return Boolean(
+      (this.filtroNome && this.filtroNome.trim()) ||
+      this.filtroCategoriaId !== null ||
+      this.filtroStatusPublicacao !== null ||
+      this.filtroDataInicio ||
+      this.filtroDataFim
+    );
+  }
+
+  private handleEmptyAtividades(): void {
+    this.atividades = [];
+    this.totalElements = 0;
+    this.isLoading = false;
+    this.emptyMessage = this.hasActiveFilters()
+      ? 'Nenhuma atividade encontrada com os filtros aplicados.'
+      : 'Sem atividade cadastrada!';
   }
 }

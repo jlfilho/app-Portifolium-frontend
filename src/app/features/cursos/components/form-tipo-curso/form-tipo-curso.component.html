@@ -1,0 +1,66 @@
+<div class="form-container">
+  <mat-card class="form-card">
+    <mat-card-header>
+      <div class="header-content">
+        <div class="header-icon">
+          <mat-icon>{{ isEditMode ? 'edit' : 'add_circle_outline' }}</mat-icon>
+        </div>
+        <div>
+          <mat-card-title>
+            {{ isEditMode ? 'Editar Tipo de Curso' : 'Cadastrar Tipo de Curso' }}
+          </mat-card-title>
+          <mat-card-subtitle>
+            {{ isEditMode ? 'Atualize as informações do tipo' : 'Defina o nome do tipo' }}
+          </mat-card-subtitle>
+        </div>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Loading -->
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Carregando...</p>
+      </div>
+
+      <!-- Formulário -->
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nome</mat-label>
+            <mat-icon matPrefix>text_fields</mat-icon>
+            <input matInput formControlName="nome" maxlength="100">
+            <mat-hint align="end">{{ form.get('nome')?.value?.length || 0 }}/100</mat-hint>
+            <mat-error *ngIf="form.get('nome')?.hasError('required')">Nome é obrigatório</mat-error>
+            <mat-error *ngIf="form.get('nome')?.hasError('minlength')">Mínimo de 3 caracteres</mat-error>
+          </mat-form-field>
+        </div>
+      </form>
+    </mat-card-content>
+
+    <div class="form-actions" *ngIf="!isLoading">
+      <button
+        mat-stroked-button
+        type="button"
+        class="cancel-button"
+        (click)="onCancel()"
+        [disabled]="isSaving">
+        <mat-icon>close</mat-icon>
+        Cancelar
+      </button>
+
+      <button
+        mat-raised-button
+        color="primary"
+        type="button"
+        class="submit-button"
+        (click)="onSubmit()"
+        [disabled]="isSaving || form.invalid">
+        <mat-icon>{{ isSaving ? 'hourglass_empty' : 'save' }}</mat-icon>
+        {{ isSaving ? 'Salvando...' : (isEditMode ? 'Atualizar' : 'Cadastrar') }}
+      </button>
+    </div>
+  </mat-card>
+</div>
+
+

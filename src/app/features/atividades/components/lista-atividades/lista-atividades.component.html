@@ -98,7 +98,7 @@
     <div class="atividades-list" *ngIf="!isLoading; else loadingTpl">
       <div class="empty" *ngIf="atividades.length === 0">
         <mat-icon class="empty-icon">event_busy</mat-icon>
-        <p>Nenhuma atividade cadastrada para este curso.</p>
+        <p>{{ emptyMessage }}</p>
       </div>
 
       <!-- Grid de Cards de Atividades -->
@@ -169,7 +169,8 @@
               mat-raised-button
               color="primary"
               (click)="visualizarAtividade(atividade)"
-              class="btn-visualizar">
+              class="btn-visualizar"
+              [disabled]="isLoading">
               <mat-icon>visibility</mat-icon>
               Visualizar
             </button>
@@ -177,9 +178,19 @@
               mat-stroked-button
               color="primary"
               (click)="editarAtividade(atividade)"
-              class="btn-editar">
+              class="btn-editar"
+              [disabled]="isLoading">
               <mat-icon>edit</mat-icon>
               Editar
+            </button>
+            <button
+              mat-stroked-button
+              color="warn"
+              (click)="confirmarExclusao(atividade)"
+              class="btn-excluir"
+              [disabled]="isLoading">
+              <mat-icon>delete</mat-icon>
+              Excluir
             </button>
           </mat-card-actions>
         </mat-card>

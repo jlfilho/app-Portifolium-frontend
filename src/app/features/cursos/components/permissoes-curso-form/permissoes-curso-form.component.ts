@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -22,6 +23,9 @@ import { CursosService } from '../../services/cursos.service';
 import { UsuariosService } from '../../../usuarios/services/usuarios.service';
 import { SimpleConfirmDialogComponent } from '../../../../shared/components/simple-confirm-dialog/simple-confirm-dialog.component';
 import { PageRequest } from '../../../../shared/models/page.model';
+import { extractApiMessage } from '../../../../shared/utils/message.utils';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 export interface PermissaoCurso {
   cursoId: number;
@@ -39,6 +43,7 @@ export interface PermissaoCurso {
     MatCardModule,
     MatFormFieldModule,
     MatSelectModule,
+    MatInputModule,
     MatButtonModule,
     MatIconModule,
     MatListModule,
@@ -51,17 +56,19 @@ export interface PermissaoCurso {
   templateUrl: './permissoes-curso-form.component.html',
   styleUrl: './permissoes-curso-form.component.css'
 })
-export class PermissoesCursoFormComponent implements OnInit {
+export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
   cursoId!: number;
   cursoNome = '';
 
   permissoes: PermissaoCurso[] = [];
   usuarios: any[] = [];
   usuarioSelecionado: number | null = null;
+  usuarioFiltro = '';
   isLoading = true;
   isLoadingUsers = false;
   isAdding = false;
   errorMessage = '';
+  private userSearchSubject = new Subject<string>();
 
   constructor(
     private route: ActivatedRoute,
@@ -73,12 +80,27 @@ export class PermissoesCursoFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.setupSearchDebounce();
     this.cursoId = Number(this.route.snapshot.paramMap.get('id'));
     // Tentar recuperar nome do curso via state (enviado pela navegação) ou via query
     this.cursoNome = (history.state && history.state.cursoNome) || this.route.snapshot.queryParamMap.get('nome') || '';
 
     this.loadPermissions();
     this.loadUsers();
+  }
+
+  ngOnDestroy(): void {
+    this.userSearchSubject.complete();
+  }
+
+  private setupSearchDebounce(): void {
+    this.userSearchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(term => {
+      this.usuarioFiltro = term;
+      this.loadUsers(term);
+    });
   }
 
   loadPermissions(): void {
@@ -91,13 +113,13 @@ export class PermissoesCursoFormComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        this.errorMessage = this.extractErrorMessage(error);
+        this.errorMessage = extractApiMessage(error) || 'Erro ao carregar permissões do curso. Tente novamente.';
         this.isLoading = false;
       }
     });
   }
 
-  loadUsers(): void {
+  loadUsers(term?: string): void {
     this.isLoadingUsers = true;
 
     // Usar getAllUsersPaginado() em vez do método deprecated getAllUsers()
@@ -108,7 +130,7 @@ export class PermissoesCursoFormComponent implements OnInit {
       direction: 'ASC'
     };
 
-    this.usuariosService.getAllUsersPaginado(pageRequest).subscribe({
+    this.usuariosService.getAllUsersPaginado(pageRequest, term).subscribe({
       next: (page) => {
         console.log('📦 Resposta recebida:', page);
         console.log('📦 Conteúdo (page.content):', page.content);
@@ -197,11 +219,15 @@ export class PermissoesCursoFormComponent implements OnInit {
         console.error('❌ Error message:', error.message);
         console.error('❌ Error body:', error.error);
 
-        const errorMessage = this.extractErrorMessage(error);
+        const errorMessage = extractApiMessage(error) || 'Erro ao adicionar usuário ao curso. Tente novamente.';
         this.showMessage(errorMessage, 'error');
         this.isAdding = false;
       }
     });
+  }
+
+  onUserSearchChange(term: string): void {
+    this.userSearchSubject.next(term);
   }
 
   confirmRemove(permissao: PermissaoCurso): void {
@@ -229,8 +255,47 @@ export class PermissoesCursoFormComponent implements OnInit {
         this.showMessage(`Usuário "${usuarioNome}" removido do curso com sucesso!`, 'success');
       },
       error: (error) => {
-        const errorMessage = this.extractErrorMessage(error);
-        this.showMessage(errorMessage, 'error');
+        const handleMessage = (apiMessage: string | null) => {
+          if (apiMessage) {
+            this.showMessage(apiMessage, 'error');
+            return;
+          }
+
+          if (error?.status === 409) {
+            this.showMessage('Não é possível remover administradores enquanto houver outros usuários dependentes.', 'error');
+            return;
+          }
+
+          if (error?.status === 403) {
+            this.showMessage('Você não tem permissão para remover este usuário.', 'error');
+            return;
+          }
+
+          if (error?.status === 404) {
+            this.showMessage('Usuário não encontrado no curso.', 'error');
+            return;
+          }
+
+          this.showMessage('Erro ao remover usuário do curso. Tente novamente.', 'error');
+        };
+
+        if (error?.error instanceof Blob) {
+          const blob = error.error as Blob;
+          blob.text().then(text => {
+            let parsed: any = text;
+            try {
+              parsed = JSON.parse(text);
+            } catch {
+              // keep as text
+            }
+            const apiMessage = extractApiMessage(parsed);
+            handleMessage(apiMessage);
+          }).catch(() => handleMessage(null));
+          return;
+        }
+
+        const apiMessage = extractApiMessage(error);
+        handleMessage(apiMessage);
       }
     });
   }
@@ -252,16 +317,6 @@ export class PermissoesCursoFormComponent implements OnInit {
     });
   }
 
-  private extractErrorMessage(error: any): string {
-    if (error?.error) {
-      if (typeof error.error === 'string') return error.error;
-      if (error.error.message) return error.error.message;
-      if (error.error.error) return error.error.error;
-    }
-    if (error?.message) return error.message;
-    return 'Erro ao processar solicitação.';
-  }
-
   trackByUsuarioId(index: number, p: PermissaoCurso): number {
     return p.usuarioId;
   }
@@ -269,11 +324,11 @@ export class PermissoesCursoFormComponent implements OnInit {
   getRoleColor(role: string): string {
     const roleUpper = role.toUpperCase();
     if (roleUpper.includes('ADMINISTRADOR')) {
-      return 'warn';
+      return 'error';
     } else if (roleUpper.includes('GERENTE')) {
-      return 'primary';
+      return 'success';
     } else if (roleUpper.includes('SECRETARIO')) {
-      return 'accent';
+      return 'warn';
     }
     return '';
   }

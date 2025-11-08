@@ -121,9 +121,10 @@ export class ListaCategoriasComponent implements OnInit {
       },
       error: (error) => {
         console.error('❌ Erro ao carregar tipos de atividades:', error);
-        this.errorMessage = 'Erro ao carregar os tipos de atividades. Tente novamente.';
+        const apiMessage = this.extractApiMessage(error);
+        this.errorMessage = apiMessage || 'Erro ao carregar os tipos de atividades. Tente novamente.';
         this.isLoading = false;
-        this.showMessage('Erro ao carregar tipos de atividades.', 'error');
+        this.showMessage(this.errorMessage, 'error');
       },
     });
   }
@@ -186,7 +187,10 @@ export class ListaCategoriasComponent implements OnInit {
       error: (error) => {
         console.error('❌ Erro ao excluir tipo de atividade:', error);
 
-        if (error.status === 403) {
+        const apiMessage = this.extractApiMessage(error);
+        if (apiMessage) {
+          this.showMessage(apiMessage, 'error');
+        } else if (error.status === 403) {
           this.showMessage('Você não tem permissão para excluir tipos de atividades.', 'error');
         } else if (error.status === 404) {
           this.showMessage('Tipo de atividade não encontrado.', 'error');
@@ -200,8 +204,8 @@ export class ListaCategoriasComponent implements OnInit {
   }
 
   showMessage(message: string, type: 'success' | 'error' | 'info' = 'success'): void {
-    const panelClass = type === 'success' ? 'success-snackbar' :
-                       type === 'error' ? 'error-snackbar' :
+    const panelClass = type === 'success' ? 'snackbar-success' :
+                       type === 'error' ? 'snackbar-error' :
                        'info-snackbar';
 
     this.snackBar.open(message, 'Fechar', {
@@ -210,6 +214,13 @@ export class ListaCategoriasComponent implements OnInit {
       verticalPosition: 'top',
       panelClass: [panelClass]
     });
+  }
+
+  private extractApiMessage(error: any): string | null {
+    if (!error) return null;
+    if (typeof error.error === 'string' && error.error.trim()) return error.error;
+    if (error.error && typeof error.error.message === 'string' && error.error.message.trim()) return error.error.message;
+    return null;
   }
 
   trackByCategoria(index: number, categoria: Categoria): number {

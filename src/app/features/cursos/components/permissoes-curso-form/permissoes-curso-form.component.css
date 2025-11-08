@@ -15,68 +15,51 @@
   --border-color: #CBD5E1;
 }
 
+.permissoes-container {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .form-card {
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 0;
   overflow: hidden;
+  width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
-mat-card-header {
-  background: var(--gradient-primary);
-  color: #fff;
+mat-card-content {
   padding: 24px;
-  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.12);
+  background: #fff;
 }
-
-.title-icon { color: white; }
-
-mat-card-title { color: white !important; font-size: 24px; font-weight: 600; margin-bottom: 4px; }
-mat-card-subtitle { color: rgba(255,255,255,0.9) !important; font-size: 14px; }
-
-mat-card-content { padding: 24px; background: #fff; }
 
 .add-user-row {
   display: flex;
   gap: 12px;
-  align-items: center;
+  align-items: stretch;
   margin-bottom: 12px;
 }
 
-.add-user-row mat-form-field {
-  align-self: center;
-}
+.add-user-row mat-form-field { flex: 1; }
 
 .add-user-row button {
-  align-self: center;
-  height: 56px; /* Altura padrão do mat-form-field */
+  align-self: stretch;
+  height: 56px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--spacing-md);
+}
+
+::ng-deep .add-user-row .mat-mdc-form-field-flex {
+  height: 56px;
 }
 
 .full-width { flex: 1; }
 
-.space { flex: 1; }
-
 .permissions-list .empty {
   color: var(--text-medium);
-}
-
-.loading {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--text-medium);
-}
-
-/* Botões como no formulário de curso */
-::ng-deep .mat-mdc-raised-button.mat-primary {
-  --mdc-protected-button-container-color: var(--primary-color) !important;
-  --mdc-protected-button-label-text-color: #fff !important;
-}
-
-::ng-deep .mat-mdc-stroked-button.mat-primary,
-::ng-deep .mat-mdc-outlined-button.mat-primary {
-  --mdc-outlined-button-label-text-color: var(--primary-color) !important;
-  --mdc-outlined-button-outline-color: var(--primary-color) !important;
 }
 
 /* Botão de remoção seguindo padrão do formulário de usuários */
@@ -97,16 +80,8 @@ mat-card-content { padding: 24px; background: #fff; }
 /* List styles */
 ::ng-deep .mat-mdc-list-item:hover { background-color: var(--bg-hover) !important; }
 
-/* Estilos específicos para o layout da lista */
 .permissions-list {
   margin-top: 16px;
-}
-
-.permissions-list .empty {
-  text-align: center;
-  padding: 24px;
-  color: var(--text-medium);
-  font-style: italic;
 }
 
 /* Layout do título com role ao lado */
@@ -123,44 +98,32 @@ mat-card-content { padding: 24px; background: #fff; }
   font-size: 16px;
 }
 
-.role-chip {
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  height: auto;
-  color: white !important;
-  font-size: 12px;
+.badge-status {
+  font-weight: var(--font-weight-medium) !important;
+  font-size: 12px !important;
+  gap: var(--spacing-xs) !important;
 }
 
-/* Cores por tipo de role */
-.role-chip.role-admin {
-  background-color: #EF4444 !important; /* Vermelho para Administrador */
+.badge-status .role-icon,
+.badge-status mat-icon {
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
 }
 
-.role-chip.role-gerente {
-  background-color: #3B82F6 !important; /* Azul para Gerente */
+.badge-status.error {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: var(--error-color) !important;
 }
 
-.role-chip.role-secretario {
-  background-color: #8B5CF6 !important; /* Roxo para Secretário */
+.badge-status.success {
+  background: rgba(16, 185, 129, 0.12) !important;
+  color: var(--success-color) !important;
 }
 
-.role-icon {
-  font-size: 16px;
-  width: 16px;
-  height: 16px;
-  color: white !important;
-}
-
-::ng-deep .role-chip span,
-::ng-deep .role-chip .mat-mdc-chip-action-label {
-  color: white !important;
-}
-
-::ng-deep .role-chip mat-icon {
-  color: white !important;
+.badge-status.warn {
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: var(--warning-color) !important;
 }
 
 .user-id {

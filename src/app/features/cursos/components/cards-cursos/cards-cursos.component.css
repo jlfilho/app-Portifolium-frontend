@@ -15,21 +15,13 @@
 
 /* Container Principal */
 .courses-container {
-  padding: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
-  min-height: calc(100vh - 100px);
+  width: 100%;
   overflow-y: auto;
 }
 
 /* Header */
 .courses-header {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  padding: 16px 0;
+  margin-bottom: var(--spacing-lg);
 }
 
 .courses-header h2 {
@@ -49,28 +41,6 @@
 
 .space {
   flex: 1;
-}
-
-/* Botão Adicionar - Nova Paleta */
-.add-button {
-  background: var(--accent-color) !important;
-  color: white !important;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
-  transition: all 0.3s ease;
-}
-
-.add-button:hover {
-  transform: scale(1.1) translateY(-2px);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
-}
-
-.add-button mat-icon {
-  font-size: 28px;
-  width: 28px;
-  height: 28px;
 }
 
 /* Divider */
@@ -192,6 +162,13 @@ mat-divider {
   display: block;
 }
 
+/* Chip de tipo do curso nos cards internos */
+.tipo-chip-set {
+  padding: 8px 16px 0 16px;
+}
+
+/* remove custom tipo-chip; using global chip-highlight */
+
 /* Card Actions */
 mat-card-actions {
   display: flex;
@@ -303,7 +280,7 @@ mat-card-actions button mat-icon {
 
 .filters-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: 1fr 1fr 1fr auto;
   gap: 16px;
   align-items: start;
 }
@@ -473,10 +450,6 @@ mat-card-actions button mat-icon {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
-  }
-
-  .add-button {
-    align-self: flex-end;
   }
 
   /* Filtros responsivo */
@@ -656,4 +629,19 @@ mat-card-actions button mat-icon {
 
 .card-inactive mat-card-actions button:not(.status-inactive):hover {
   opacity: 0.9;
+}
+
+/* ===== Header text layout to place chip under title within header ===== */
+.header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-left: 8px;
+  flex: 1;
+}
+
+/* Remove extra padding in header and add small spacing below title */
+.card-header .tipo-chip-set {
+  padding: 0;
+  margin-top: 4px;
 }

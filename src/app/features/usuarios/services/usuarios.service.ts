@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap, map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment.development';
 import { Usuario, ChangePasswordRequest, ChangePasswordResponse, AuthoritiesResponse } from '../models/usuario.model';
 import { Page, PageRequest } from '../../../shared/models/page.model';
@@ -13,30 +14,70 @@ export class UsuariosService {
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * GET /api/usuarios
-   * Buscar todos os usuários (apenas ADMINISTRADOR) - SEM paginação
-   * @PreAuthorize("hasRole('ADMINISTRADOR')")
-   * @deprecated Use getAllUsersPaginado() para melhor performance
-   */
-  getAllUsers(): Observable<Usuario[]> {
-    return this.http.get<Usuario[]>(`${this.baseUrl}/usuarios`);
-  }
 
   /**
-   * GET /api/usuarios (com paginação)
-   * Buscar usuários paginados (apenas ADMINISTRADOR)
+   * GET /api/usuarios (com paginação e filtro por nome)
+   * Buscar usuários paginados (ADMINISTRADOR, GERENTE, SECRETARIO)
    * @param pageRequest - Parâmetros de paginação
-   * @PreAuthorize("hasRole('ADMINISTRADOR')")
+   * @param nome - Filtro por nome (opcional, case insensitive)
+   * @PreAuthorize("hasRole('ADMINISTRADOR') or hasRole('GERENTE') or hasRole('SECRETARIO')")
    */
-  getAllUsersPaginado(pageRequest: PageRequest): Observable<Page<Usuario>> {
+  getAllUsersPaginado(pageRequest: PageRequest, nome?: string): Observable<Page<Usuario>> {
     let params = new HttpParams()
       .set('page', pageRequest.page.toString())
       .set('size', pageRequest.size.toString())
       .set('sortBy', pageRequest.sortBy)
       .set('direction', pageRequest.direction);
 
-    return this.http.get<Page<Usuario>>(`${this.baseUrl}/usuarios`, { params });
+    // Adicionar filtro por nome se fornecido
+    if (nome && nome.trim()) {
+      params = params.set('nome', nome.trim());
+    }
+
+    console.log('📡 UsuariosService - Fazendo requisição para:', `${this.baseUrl}/usuarios`);
+    console.log('📡 UsuariosService - Parâmetros:', params.toString());
+
+    return this.http.get<Page<Usuario>>(`${this.baseUrl}/usuarios`, {
+      params
+    }).pipe(
+      tap((response: Page<Usuario>) => {
+        console.log('📡 UsuariosService - Resposta recebida:', response);
+      }),
+      map((response: Page<Usuario>) => {
+        // Se a resposta está vazia, retornar página vazia estruturada
+        if (!response || !response.content || response.content.length === 0) {
+          return {
+            content: [],
+            totalElements: 0,
+            totalPages: 0,
+            size: pageRequest.size,
+            number: pageRequest.page,
+            first: true,
+            last: true,
+            empty: true,
+            pageable: {
+              pageNumber: pageRequest.page,
+              pageSize: pageRequest.size,
+              sort: {
+                sorted: false,
+                unsorted: true,
+                empty: true
+              },
+              offset: pageRequest.page * pageRequest.size,
+              paged: true,
+              unpaged: false
+            },
+            sort: {
+              sorted: false,
+              unsorted: true,
+              empty: true
+            },
+            numberOfElements: 0
+          } as Page<Usuario>;
+        }
+        return response;
+      })
+    );
   }
 
   /**

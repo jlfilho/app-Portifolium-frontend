@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subject, Observable, firstValueFrom } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs/operators';
 
 // Angular Material
 import { MatCardModule } from '@angular/material/card';
@@ -10,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, MAT_DATE_LOCALE, DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { MatChipsModule } from '@angular/material/chips';
@@ -19,6 +22,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 // Services
 import { AtividadesService } from '../../services/atividades.service';
@@ -28,7 +32,8 @@ import { UsuariosService } from '../../../usuarios/services/usuarios.service';
 import { ImageCompressionService, CompressionResult } from '../../../../shared/services/image-compression.service';
 import { AtividadeDTO, AtividadeUpdateDTO, AtividadeCreateDTO, PessoaPapelDTO } from '../../models/atividade.model';
 import { Papel, PapeisDisponiveis, PapelUtils } from '../../models/papel.enum';
-import { PageRequest } from '../../../../shared/models/page.model';
+import { CursoFilter } from '../../../cursos/models/curso-filter.model';
+import { extractApiMessage } from '../../../../shared/utils/message.utils';
 
 @Component({
   selector: 'acadmanage-form-atividade',
@@ -43,6 +48,7 @@ import { PageRequest } from '../../../../shared/models/page.model';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    MatAutocompleteModule,
     MatDatepickerModule,
     MatNativeDateModule,
     MatChipsModule,
@@ -51,7 +57,8 @@ import { PageRequest } from '../../../../shared/models/page.model';
     MatSnackBarModule,
     MatTooltipModule,
     MatCheckboxModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatDialogModule
   ],
   templateUrl: './form-atividade.component.html',
   styleUrl: './form-atividade.component.css',
@@ -71,14 +78,32 @@ export class FormAtividadeComponent implements OnInit {
   fontesFinanciadoras: any[] = [];
   fontesFinanciadorasSelecionadas: any[] = [];
   fonteFinanciadoraSelecionada: number | null = null;
+  fonteFinanciadoraSelecionadaCompleta: any = null; // Armazenar fonte completa
+  fonteFinanciadoraFiltro = '';
+  fontesFinanciadorasFiltradas: any[] = [];
 
   // Gerenciamento de Integrantes
   pessoas: any[] = [];
   integrantesSelecionados: PessoaPapelDTO[] = [];
   pessoaSelecionada: number | null = null;
+  pessoaSelecionadaCompleta: any = null; // Armazenar pessoa completa
   papelSelecionado: Papel = Papel.PARTICIPANTE;
   papeisDisponiveis = PapeisDisponiveis;
   coordenadorId: number | null = null;
+
+  // Filtros para busca de usuários
+  filtroCoordenador = '';
+  filtroIntegrante = '';
+  pessoasFiltradas: any[] = [];
+  coordenadoresFiltrados: any[] = [];
+
+  // Controle de filtro para mat-select
+  coordenadorFiltro = '';
+  integranteFiltro = '';
+
+  // Subjects para debounce dos filtros
+  private coordenadorSearchSubject = new Subject<string>();
+  private integranteSearchSubject = new Subject<string>();
 
   isLoading = true;
   isSaving = false;
@@ -90,6 +115,7 @@ export class FormAtividadeComponent implements OnInit {
   isUploading = false;
   uploadProgress = 0;
   dragOver = false;
+  isDeletingFoto = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -101,11 +127,15 @@ export class FormAtividadeComponent implements OnInit {
     private usuariosService: UsuariosService,
     private imageCompressionService: ImageCompressionService,
     private snackBar: MatSnackBar,
-    private dateAdapter: DateAdapter<Date>
+    private dateAdapter: DateAdapter<Date>,
+    private dialog: MatDialog
   ) {
     this.initForm();
     // Configurar locale pt-BR para o DatePicker
     this.dateAdapter.setLocale('pt-BR');
+
+    // Configurar debounce para filtros
+    this.setupDebounceFilters();
   }
 
   ngOnInit(): void {
@@ -187,15 +217,16 @@ export class FormAtividadeComponent implements OnInit {
   loadCursos(): Promise<void> {
     return new Promise((resolve) => {
       // Buscar todos os cursos sem paginação (para dropdown)
-      const pageRequest: PageRequest = {
+      const filter: CursoFilter = {
         page: 0,
-        size: 1000, // Buscar muitos cursos para ter todos disponíveis
+        size: 1000,
         sortBy: 'nome',
-        direction: 'ASC' as 'ASC'
+        direction: 'ASC',
+        ativo: true
       };
 
-      this.cursosService.getAllCoursesPaginado(pageRequest).subscribe({
-        next: (page: any) => {
+      this.cursosService.getAllCourses(filter).subscribe({
+        next: (page) => {
           this.cursos = page.content || [];
           console.log('📚 Cursos carregados:', this.cursos.length);
 
@@ -241,12 +272,15 @@ export class FormAtividadeComponent implements OnInit {
       this.fontesFinanciadorasService.listarTodas().subscribe({
         next: (fontes: any[]) => {
           this.fontesFinanciadoras = fontes || [];
+          // Inicializar lista filtrada com todas as fontes
+          this.fontesFinanciadorasFiltradas = [...this.fontesFinanciadoras];
           console.log('💰 Fontes financiadoras carregadas:', this.fontesFinanciadoras);
           resolve();
         },
         error: (error: any) => {
           console.error('❌ Erro ao carregar fontes financiadoras:', error);
           this.fontesFinanciadoras = [];
+          this.fontesFinanciadorasFiltradas = [];
           resolve();
         }
       });
@@ -255,18 +289,19 @@ export class FormAtividadeComponent implements OnInit {
 
   loadPessoas(): Promise<void> {
     return new Promise((resolve) => {
-      this.usuariosService.getAllUsersPaginado({ page: 0, size: 1000, sortBy: 'id', direction: 'ASC' }).subscribe({
-        next: (page: any) => {
-          this.pessoas = Array.isArray(page) ? page : (page?.content || []);
-          console.log('👥 Pessoas carregadas:', this.pessoas);
-          resolve();
-        },
-        error: (error: any) => {
-          console.error('❌ Erro ao carregar pessoas:', error);
-          this.pessoas = [];
-          resolve();
-        }
-      });
+      console.log('📡 Inicializando busca de pessoas...');
+
+      // Inicializar listas vazias
+      this.pessoas = [];
+      this.pessoasFiltradas = [];
+      this.coordenadoresFiltrados = [];
+
+      // Disparar busca inicial vazia para carregar alguns usuários
+      this.coordenadorSearchSubject.next('');
+      this.integranteSearchSubject.next('');
+
+      console.log('👥 Sistema de busca de pessoas inicializado');
+      resolve();
     });
   }
 
@@ -312,6 +347,9 @@ export class FormAtividadeComponent implements OnInit {
     if (this.atividade.fotoCapa) {
       this.previewUrl = this.getImageUrl(this.atividade.fotoCapa);
     }
+
+    // Configurar campo de coordenador para autocomplete
+    this.coordenadorFiltro = this.atividade.coordenador || '';
 
     // Carregar fontes financiadoras da atividade
     if (this.atividade.fontesFinanciadora && this.atividade.fontesFinanciadora.length > 0) {
@@ -420,8 +458,29 @@ export class FormAtividadeComponent implements OnInit {
   }
 
   uploadImage(): void {
-    if (!this.selectedFile || !this.atividadeId) {
+    if (!this.selectedFile) {
       this.showMessage('Nenhum arquivo selecionado', 'error');
+      return;
+    }
+
+    // Se estamos em modo de edição e temos atividadeId, fazer upload imediatamente
+    if (this.isEditMode && this.atividadeId) {
+      this.performImageUpload();
+      return;
+    }
+
+    // Se estamos criando nova atividade, mostrar mensagem explicativa
+    if (!this.isEditMode) {
+      this.showMessage('A imagem será enviada automaticamente ao salvar a atividade', 'warning');
+      return;
+    }
+
+    // Se estamos em modo de edição mas não temos atividadeId, mostrar erro
+    this.showMessage('Erro: ID da atividade não encontrado', 'error');
+  }
+
+  private performImageUpload(): void {
+    if (!this.selectedFile || !this.atividadeId) {
       return;
     }
 
@@ -459,6 +518,56 @@ export class FormAtividadeComponent implements OnInit {
     this.previewUrl = this.atividade?.fotoCapa ? this.getImageUrl(this.atividade.fotoCapa) : null;
   }
 
+  async confirmarExclusaoFotoCapa(): Promise<void> {
+    if (!this.isEditMode || !this.atividadeId || !this.atividade?.fotoCapa) {
+      return;
+    }
+
+    const confirmado = await this.openConfirmDialog({
+      title: 'Excluir Foto de Capa',
+      message: 'Tem certeza que deseja excluir a foto de capa desta atividade? Esta ação não pode ser desfeita.',
+      confirmText: 'Excluir',
+      cancelText: 'Cancelar'
+    });
+
+    if (confirmado) {
+      this.excluirFotoCapa();
+    }
+  }
+
+  private excluirFotoCapa(): void {
+    if (!this.atividadeId) {
+      return;
+    }
+
+    this.isDeletingFoto = true;
+    this.atividadesService.excluirFotoCapa(this.atividadeId).subscribe({
+      next: () => {
+        this.showMessage('Foto de capa excluída com sucesso!', 'success');
+        if (this.atividade) {
+          this.atividade.fotoCapa = undefined as any;
+        }
+        this.previewUrl = null;
+        this.selectedFile = null;
+        this.isDeletingFoto = false;
+      },
+      error: (error) => {
+        const apiMessage = extractApiMessage(error);
+        this.showMessage(apiMessage || 'Erro ao excluir foto de capa. Tente novamente.', 'error');
+        this.isDeletingFoto = false;
+      }
+    });
+  }
+
+  private async openConfirmDialog(data: { title: string; message: string; confirmText: string; cancelText: string }): Promise<boolean> {
+    const { SimpleConfirmDialogComponent } = await import('../../../../shared/components/simple-confirm-dialog/simple-confirm-dialog.component');
+    const dialogRef = this.dialog.open(SimpleConfirmDialogComponent, {
+      width: '420px',
+      data
+    });
+    return firstValueFrom(dialogRef.afterClosed());
+  }
+
   getImageUrl(fotoCapa: string): string {
     if (fotoCapa.startsWith('http')) {
       return fotoCapa;
@@ -487,19 +596,22 @@ export class FormAtividadeComponent implements OnInit {
       return;
     }
 
-    // Encontrar a fonte selecionada na lista completa
-    const fonte = this.fontesFinanciadoras.find(
-      f => f.id === this.fonteFinanciadoraSelecionada
-    );
+    // Usar a fonte completa armazenada
+    const fonte = this.fonteFinanciadoraSelecionadaCompleta;
 
-    console.log('🔍 Fonte encontrada na lista completa:', fonte);
+    console.log('🔍 Fonte armazenada:', fonte);
 
     if (fonte) {
       this.fontesFinanciadorasSelecionadas.push(fonte);
       this.fonteFinanciadoraSelecionada = null; // Limpar seleção
+      this.fonteFinanciadoraSelecionadaCompleta = null; // Limpar fonte completa
       console.log('✅ Fonte financiadora adicionada à lista:', fonte);
       console.log('📋 Fontes selecionadas DEPOIS:', [...this.fontesFinanciadorasSelecionadas]);
       console.log('📊 Total de fontes:', this.fontesFinanciadorasSelecionadas.length);
+
+      // Atualizar lista filtrada após adicionar
+      this.filtrarFontesFinanciadoras(this.fonteFinanciadoraFiltro);
+
       // Mensagem removida - só mostra ao salvar efetivamente
     } else {
       console.error('❌ Fonte não encontrada na lista completa!');
@@ -519,6 +631,10 @@ export class FormAtividadeComponent implements OnInit {
       console.log('❌ Fonte financiadora removida da lista:', fonte);
       console.log('📋 Fontes restantes:', [...this.fontesFinanciadorasSelecionadas]);
       console.log('📊 Total de fontes:', this.fontesFinanciadorasSelecionadas.length);
+
+      // Atualizar lista filtrada após remover
+      this.filtrarFontesFinanciadoras(this.fonteFinanciadoraFiltro);
+
       // Mensagem removida - só mostra ao salvar efetivamente
     } else {
       console.error('❌ Fonte não encontrada para remoção!');
@@ -534,18 +650,164 @@ export class FormAtividadeComponent implements OnInit {
     );
   }
 
+  // Método para filtrar fontes financiadoras no lado cliente
+  filtrarFontesFinanciadoras(termo: string): void {
+    this.fonteFinanciadoraFiltro = termo;
+
+    const fontesDisponiveis = this.getFontesFinanciadorasDisponiveis();
+
+    if (!termo || termo.trim() === '') {
+      this.fontesFinanciadorasFiltradas = [...fontesDisponiveis];
+    } else {
+      this.fontesFinanciadorasFiltradas = fontesDisponiveis.filter(fonte =>
+        fonte.nome?.toLowerCase().includes(termo.toLowerCase())
+      );
+    }
+
+    // Ordenar por nome
+    this.fontesFinanciadorasFiltradas.sort((a: any, b: any) => {
+      const nomeA = (a.nome || '').toLowerCase();
+      const nomeB = (b.nome || '').toLowerCase();
+      return nomeA.localeCompare(nomeB);
+    });
+
+    console.log('🔍 Fontes financiadoras filtradas:', this.fontesFinanciadorasFiltradas.length);
+  }
+
+  onFonteFinanciadoraSelected(nomeFonte: string): void {
+    console.log('💰 Fonte financiadora selecionada:', nomeFonte);
+
+    if (!nomeFonte) return;
+
+    // Encontrar a fonte selecionada pelo nome
+    const fonte = this.fontesFinanciadorasFiltradas.find(f => f.nome === nomeFonte);
+
+    if (!fonte) {
+      console.error('❌ Fonte não encontrada!');
+      return;
+    }
+
+    // Armazenar fonte completa e ID
+    this.fonteFinanciadoraSelecionadaCompleta = fonte;
+    this.fonteFinanciadoraSelecionada = fonte.id;
+
+    // Limpar o campo de busca
+    this.fonteFinanciadoraFiltro = '';
+
+    console.log('✅ Fonte selecionada para adicionar:', fonte);
+  }
+
+  // Configurar debounce para filtros de usuários
+  private setupDebounceFilters(): void {
+    // Debounce para filtro de coordenadores
+    this.coordenadorSearchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(termo => this.searchCoordenadores(termo))
+    ).subscribe(usuarios => {
+      this.coordenadoresFiltrados = usuarios;
+    });
+
+    // Debounce para filtro de integrantes
+    this.integranteSearchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(termo => this.searchIntegrantes(termo))
+    ).subscribe(usuarios => {
+      this.pessoasFiltradas = usuarios;
+    });
+  }
+
+  // Métodos para buscar usuários na API
+  private searchCoordenadores(termo: string): Observable<any[]> {
+    const pageRequest = {
+      page: 0,
+      size: 50,
+      sortBy: 'id',
+      direction: 'ASC' as 'ASC'
+    };
+
+    return this.usuariosService.getAllUsersPaginado(pageRequest, termo).pipe(
+      map((page: any) => page.content || []),
+      map((usuarios: any[]) => {
+        // Filtrar coordenadores já selecionados
+        const usuariosFiltrados = usuarios.filter((pessoa: any) => {
+          const jaEhCoordenador = this.integrantesSelecionados.some(
+            integrante => integrante.id === pessoa.id && integrante.papel === Papel.COORDENADOR
+          );
+          return !jaEhCoordenador;
+        });
+
+        // Ordenar por nome
+        return usuariosFiltrados.sort((a: any, b: any) => {
+          const nomeA = (a.nome || a.name || '').toLowerCase();
+          const nomeB = (b.nome || b.name || '').toLowerCase();
+          return nomeA.localeCompare(nomeB);
+        });
+      })
+    );
+  }
+
+  private searchIntegrantes(termo: string): Observable<any[]> {
+    const pageRequest = {
+      page: 0,
+      size: 50,
+      sortBy: 'id',
+      direction: 'ASC' as 'ASC'
+    };
+
+    return this.usuariosService.getAllUsersPaginado(pageRequest, termo).pipe(
+      map((page: any) => page.content || []),
+      map((usuarios: any[]) => {
+        // Filtrar integrantes já selecionados
+        const usuariosFiltrados = usuarios.filter((pessoa: any) =>
+          !this.integrantesSelecionados.some(integrante => integrante.id === pessoa.id)
+        );
+
+        // Ordenar por nome
+        return usuariosFiltrados.sort((a: any, b: any) => {
+          const nomeA = (a.nome || a.name || '').toLowerCase();
+          const nomeB = (b.nome || b.name || '').toLowerCase();
+          return nomeA.localeCompare(nomeB);
+        });
+      })
+    );
+  }
+
+  // Métodos para filtrar usuários no mat-autocomplete
+  filtrarCoordenadores(termo: string): void {
+    this.coordenadorFiltro = termo;
+    this.coordenadorSearchSubject.next(termo);
+  }
+
+  filtrarIntegrantes(termo: string): void {
+    this.integranteFiltro = termo;
+    this.integranteSearchSubject.next(termo);
+  }
+
+  // Método para exibir nome do coordenador selecionado
+  getCoordenadorNome(): string {
+    if (!this.coordenadorId) return '';
+    const pessoa = this.pessoas.find(p => p.id === this.coordenadorId);
+    return pessoa ? (pessoa.nome || pessoa.name) : '';
+  }
+
   // Métodos para gerenciar integrantes
-  onCoordenadorChange(pessoaId: number): void {
-    console.log('👤 Coordenador alterado para pessoa ID:', pessoaId);
+  onCoordenadorChange(nomePessoa: string): void {
+    console.log('👤 Coordenador alterado para:', nomePessoa);
 
-    if (!pessoaId) return;
+    if (!nomePessoa) return;
 
-    // Encontrar a pessoa selecionada
-    const pessoa = this.pessoas.find(p => p.id === pessoaId);
+    // Encontrar a pessoa selecionada pelo nome
+    const pessoa = this.coordenadoresFiltrados.find(p => (p.nome || p.name) === nomePessoa);
+
     if (!pessoa) {
       console.error('❌ Pessoa não encontrada!');
       return;
     }
+
+    // Atualizar o campo de texto com o nome da pessoa selecionada
+    this.coordenadorFiltro = pessoa.nome || pessoa.name;
 
     // Remover coordenador anterior (se existir)
     const coordenadorAnteriorIndex = this.integrantesSelecionados.findIndex(i => i.papel === Papel.COORDENADOR);
@@ -556,7 +818,7 @@ export class FormAtividadeComponent implements OnInit {
     }
 
     // Verificar se a pessoa já está nos integrantes com outro papel
-    const integranteExistenteIndex = this.integrantesSelecionados.findIndex(i => i.id === pessoaId);
+    const integranteExistenteIndex = this.integrantesSelecionados.findIndex(i => i.id === pessoa.id);
     if (integranteExistenteIndex > -1) {
       // Atualizar papel para COORDENADOR
       console.log('🔄 Pessoa já era integrante, atualizando para COORDENADOR');
@@ -579,6 +841,33 @@ export class FormAtividadeComponent implements OnInit {
     });
 
     console.log('📋 Integrantes após mudança de coordenador:', this.integrantesSelecionados);
+
+    // Atualizar listas filtradas após mudança
+    this.filtrarCoordenadores(this.coordenadorFiltro);
+    this.filtrarIntegrantes(this.integranteFiltro);
+  }
+
+  onIntegranteSelected(nomePessoa: string): void {
+    console.log('👤 Integrante selecionado:', nomePessoa);
+
+    if (!nomePessoa) return;
+
+    // Encontrar a pessoa selecionada pelo nome
+    const pessoa = this.pessoasFiltradas.find(p => (p.nome || p.name) === nomePessoa);
+
+    if (!pessoa) {
+      console.error('❌ Pessoa não encontrada!');
+      return;
+    }
+
+    // Armazenar pessoa completa e ID
+    this.pessoaSelecionadaCompleta = pessoa;
+    this.pessoaSelecionada = pessoa.id;
+
+    // Limpar o campo de busca
+    this.integranteFiltro = '';
+
+    console.log('✅ Pessoa selecionada para adicionar:', pessoa);
   }
 
   adicionarIntegrante(): void {
@@ -608,12 +897,10 @@ export class FormAtividadeComponent implements OnInit {
       return;
     }
 
-    // Encontrar a pessoa selecionada na lista completa
-    const pessoa = this.pessoas.find(
-      p => p.id === this.pessoaSelecionada
-    );
+    // Usar a pessoa completa armazenada
+    const pessoa = this.pessoaSelecionadaCompleta;
 
-    console.log('🔍 Pessoa encontrada na lista completa:', pessoa);
+    console.log('🔍 Pessoa armazenada:', pessoa);
 
     if (pessoa) {
       // Criar objeto PessoaPapelDTO
@@ -626,11 +913,15 @@ export class FormAtividadeComponent implements OnInit {
 
       this.integrantesSelecionados.push(integrante);
       this.pessoaSelecionada = null; // Limpar seleção
+      this.pessoaSelecionadaCompleta = null; // Limpar pessoa completa
       this.papelSelecionado = Papel.PARTICIPANTE; // Resetar para padrão
 
       console.log('✅ Integrante adicionado à lista:', integrante);
       console.log('📋 Integrantes selecionados DEPOIS:', [...this.integrantesSelecionados]);
       console.log('📊 Total de integrantes:', this.integrantesSelecionados.length);
+
+      // Atualizar listas filtradas após adição
+      this.filtrarIntegrantes(this.integranteFiltro);
       // Sem mensagem - só mostra ao salvar
     } else {
       console.error('❌ Pessoa não encontrada na lista completa!');
@@ -690,10 +981,19 @@ export class FormAtividadeComponent implements OnInit {
   }
 
   getPessoasDisponiveis(): any[] {
-    // Retornar apenas pessoas que ainda não foram selecionadas
-    return this.pessoas.filter(
+    // Retornar apenas pessoas filtradas que ainda não foram selecionadas
+    return this.pessoasFiltradas.filter(
       pessoa => !this.integrantesSelecionados.some(
         selecionado => selecionado.id === pessoa.id
+      )
+    );
+  }
+
+  getCoordenadoresDisponiveis(): any[] {
+    // Retornar apenas coordenadores filtrados que ainda não foram selecionados
+    return this.coordenadoresFiltrados.filter(
+      pessoa => !this.integrantesSelecionados.some(
+        selecionado => selecionado.id === pessoa.id && selecionado.papel === Papel.COORDENADOR
       )
     );
   }

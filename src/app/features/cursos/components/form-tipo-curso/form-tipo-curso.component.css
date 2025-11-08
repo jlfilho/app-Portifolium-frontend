@@ -1,0 +1,137 @@
+.form-container {
+  padding: 24px;
+  max-width: 600px;
+  margin: 0 auto;
+  min-height: calc(100vh - 100px);
+}
+
+.form-card {
+  max-width: 560px;
+  width: 100%;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== Paleta de cores (alinhada aos demais formulários) ===== */
+:host {
+  --gradient-primary: linear-gradient(90deg, #3B82F6, #8B5CF6);
+  --gradient-accent: linear-gradient(90deg, #6366F1, #8B5CF6);
+  --primary-color: #3B82F6;
+  --secondary-color: #8B5CF6;
+  --accent-color: #6366F1;
+  --success-color: #10B981;
+  --error-color: #EF4444;
+  --warning-color: #F59E0B;
+  --text-dark: #0F172A;
+  --text-medium: #475569;
+  --text-light: #64748B;
+  --bg-actions: #F8FAFC;
+  --border-color: #CBD5E1;
+}
+
+/* Cabeçalho do card com gradiente igual ao formulário de curso */
+mat-card-header {
+  background: var(--gradient-primary);
+  color: #fff;
+  padding: 24px;
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.12);
+}
+
+mat-card-content {
+  padding: 24px;
+  background: #fff;
+  display: block;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-icon mat-icon {
+  font-size: 28px;
+}
+
+.form-row {
+  margin-bottom: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 0;
+}
+
+/* Prefix icon cores */
+::ng-deep .form-card .mat-mdc-form-field-icon-prefix {
+  color: var(--primary-color);
+}
+
+::ng-deep .form-card .mat-mdc-form-field.mat-focused .mat-mdc-form-field-icon-prefix {
+  color: var(--accent-color);
+}
+
+/* Botão primário com gradiente */
+button[color="primary"] {
+  background: var(--gradient-primary) !important;
+  color: #fff !important;
+}
+
+button[color="primary"]:hover:not(:disabled) {
+  background: var(--gradient-accent) !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+/* Ações do formulário (padrão do form de atividades) */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-actions);
+}
+
+.cancel-button,
+.submit-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 24px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  min-width: 120px;
+  justify-content: center;
+}
+
+.cancel-button {
+  color: var(--text-medium) !important;
+  border-color: var(--border-color) !important;
+}
+
+.cancel-button:hover:not([disabled]) {
+  background-color: var(--bg-hover) !important;
+  border-color: var(--text-medium) !important;
+  color: var(--text-dark) !important;
+}
+
+.submit-button {
+  box-shadow: 0 2px 8px rgba(91, 91, 234, 0.3);
+}
+
+.submit-button:hover:not([disabled]) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(91, 91, 234, 0.5);
+}
+
+

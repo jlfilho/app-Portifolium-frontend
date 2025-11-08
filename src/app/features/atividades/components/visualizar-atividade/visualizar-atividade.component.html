@@ -189,8 +189,8 @@
         <span>Nenhum integrante cadastrado</span>
       </div>
 
-      <!-- Carrossel de Evidências (só aparece se houver evidências OU formulário aberto) -->
-      <div *ngIf="evidencias.length > 0 || showUploadForm || isLoadingEvidencias">
+      <!-- Carrossel de Evidências -->
+      <div>
         <mat-divider></mat-divider>
 
         <div class="info-section">
@@ -370,13 +370,28 @@
             <!-- Legenda estilo rede social -->
             <div class="carousel-caption">
               <div class="caption-header">
-                <div class="caption-avatar">
-                  <mat-icon>account_circle</mat-icon>
+                <div class="caption-info">
+                  <div class="caption-avatar">
+                    <mat-icon>account_circle</mat-icon>
+                  </div>
+                  <div class="caption-user-info">
+                    <span class="caption-username">{{ currentEvidencia!.criadoPor || 'Usuário' }}</span>
+                    <span class="caption-location">{{ atividade.nome }}</span>
+                  </div>
                 </div>
-                <div class="caption-user-info">
-                  <span class="caption-username">{{ currentEvidencia!.criadoPor || 'Usuário' }}</span>
-                  <span class="caption-location">{{ atividade.nome }}</span>
-                </div>
+                <button
+                  mat-icon-button
+                  color="warn"
+                  matTooltip="Excluir evidência"
+                  (click)="confirmarExclusaoEvidencia(currentEvidencia!)"
+                  [disabled]="deletingEvidenceId === currentEvidencia!.id">
+                  <mat-icon *ngIf="deletingEvidenceId !== currentEvidencia!.id">delete</mat-icon>
+                  <mat-progress-spinner
+                    *ngIf="deletingEvidenceId === currentEvidencia!.id"
+                    mode="indeterminate"
+                    diameter="20">
+                  </mat-progress-spinner>
+                </button>
               </div>
 
               <div class="caption-text">

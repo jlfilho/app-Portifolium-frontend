@@ -50,13 +50,20 @@
         <!-- Coordenador -->
         <mat-form-field appearance="outline" class="form-field">
           <mat-label>Coordenador *</mat-label>
-          <mat-select [(ngModel)]="coordenadorId" [ngModelOptions]="{standalone: true}" (selectionChange)="onCoordenadorChange($event.value)">
-            <mat-option *ngFor="let pessoa of pessoas" [value]="pessoa.id">
-              {{ pessoa.nome || pessoa.name }}
-            </mat-option>
-          </mat-select>
+          <input matInput
+                 [(ngModel)]="coordenadorFiltro"
+                 [ngModelOptions]="{standalone: true}"
+                 [matAutocomplete]="coordenadorAuto"
+                 (input)="filtrarCoordenadores($any($event.target).value)"
+                 placeholder="Digite para buscar coordenador...">
           <mat-icon matPrefix>person</mat-icon>
           <mat-hint>O coordenador será automaticamente adicionado aos integrantes</mat-hint>
+          <mat-autocomplete #coordenadorAuto="matAutocomplete"
+                           (optionSelected)="onCoordenadorChange($event.option.value)">
+            <mat-option *ngFor="let pessoa of coordenadoresFiltrados" [value]="pessoa.nome || pessoa.name">
+              {{ pessoa.nome || pessoa.name }}
+            </mat-option>
+          </mat-autocomplete>
         </mat-form-field>
 
         <!-- Data de Realização -->
@@ -117,15 +124,25 @@
         <div class="add-fonte-row">
           <mat-form-field appearance="outline" class="fonte-select">
             <mat-label>Adicionar Fonte Financiadora</mat-label>
-            <mat-select [(ngModel)]="fonteFinanciadoraSelecionada" [ngModelOptions]="{standalone: true}">
-              <mat-option *ngFor="let fonte of getFontesFinanciadorasDisponiveis()" [value]="fonte.id">
-                {{ fonte.nome }}
-              </mat-option>
-            </mat-select>
+            <input matInput
+                   [(ngModel)]="fonteFinanciadoraFiltro"
+                   [ngModelOptions]="{standalone: true}"
+                   [matAutocomplete]="fonteAuto"
+                   (input)="filtrarFontesFinanciadoras($any($event.target).value)"
+                   placeholder="Digite para buscar fonte financiadora...">
             <mat-icon matPrefix>search</mat-icon>
-            <mat-hint *ngIf="getFontesFinanciadorasDisponiveis().length === 0">
+            <mat-hint *ngIf="fontesFinanciadorasFiltradas.length === 0">
               Todas as fontes disponíveis já foram adicionadas
             </mat-hint>
+            <mat-hint *ngIf="fontesFinanciadorasFiltradas.length > 0">
+              Digite para filtrar a lista
+            </mat-hint>
+            <mat-autocomplete #fonteAuto="matAutocomplete"
+                             (optionSelected)="onFonteFinanciadoraSelected($event.option.value)">
+              <mat-option *ngFor="let fonte of fontesFinanciadorasFiltradas" [value]="fonte.nome">
+                {{ fonte.nome }}
+              </mat-option>
+            </mat-autocomplete>
           </mat-form-field>
 
           <button
@@ -184,15 +201,25 @@
         <div class="add-integrante-row">
           <mat-form-field appearance="outline" class="pessoa-select">
             <mat-label>Selecionar Pessoa</mat-label>
-            <mat-select [(ngModel)]="pessoaSelecionada" [ngModelOptions]="{standalone: true}">
-              <mat-option *ngFor="let pessoa of getPessoasDisponiveis()" [value]="pessoa.id">
-                {{ pessoa.nome || pessoa.name }} ({{ pessoa.cpf }})
-              </mat-option>
-            </mat-select>
+            <input matInput
+                   [(ngModel)]="integranteFiltro"
+                   [ngModelOptions]="{standalone: true}"
+                   [matAutocomplete]="integranteAuto"
+                   (input)="filtrarIntegrantes($any($event.target).value)"
+                   placeholder="Digite para buscar pessoa...">
             <mat-icon matPrefix>person_search</mat-icon>
             <mat-hint *ngIf="getPessoasDisponiveis().length === 0">
               Todas as pessoas disponíveis já foram adicionadas
             </mat-hint>
+            <mat-hint *ngIf="getPessoasDisponiveis().length > 0">
+              Digite para filtrar a lista
+            </mat-hint>
+            <mat-autocomplete #integranteAuto="matAutocomplete"
+                             (optionSelected)="onIntegranteSelected($event.option.value)">
+              <mat-option *ngFor="let pessoa of pessoasFiltradas" [value]="pessoa.nome || pessoa.name">
+                {{ pessoa.nome || pessoa.name }} ({{ pessoa.cpf }})
+              </mat-option>
+            </mat-autocomplete>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="papel-select">
@@ -346,7 +373,7 @@
                 (click)="uploadImage()"
                 [disabled]="isUploading">
                 <mat-icon>cloud_upload</mat-icon>
-                {{ isUploading ? 'Enviando...' : 'Enviar Imagem' }}
+                {{ isUploading ? 'Enviando...' : (isEditMode ? 'Enviar Imagem' : 'Confirmar Imagem') }}
               </button>
 
               <button
@@ -358,7 +385,33 @@
                 Cancelar
               </button>
             </div>
+
+            <!-- Mensagem explicativa para modo de criação -->
+            <div class="upload-hint" *ngIf="!isEditMode">
+              <mat-icon>info</mat-icon>
+              <span>A imagem será enviada automaticamente ao salvar a atividade</span>
+            </div>
           </div>
+
+        <div
+          class="existing-photo-actions"
+          *ngIf="!selectedFile && isEditMode && atividade?.fotoCapa && previewUrl">
+          <button
+            type="button"
+            mat-stroked-button
+            color="warn"
+            (click)="confirmarExclusaoFotoCapa()"
+            [disabled]="isDeletingFoto">
+            <mat-icon *ngIf="!isDeletingFoto">delete</mat-icon>
+            <mat-progress-spinner
+              *ngIf="isDeletingFoto"
+              mode="indeterminate"
+              diameter="20"
+              class="delete-spinner">
+            </mat-progress-spinner>
+            {{ isDeletingFoto ? 'Excluindo...' : 'Excluir Foto de Capa' }}
+          </button>
+        </div>
 
           <!-- Botão para selecionar arquivo -->
           <button

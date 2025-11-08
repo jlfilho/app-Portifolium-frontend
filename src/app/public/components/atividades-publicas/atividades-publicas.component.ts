@@ -19,9 +19,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatRippleModule } from '@angular/material/core';
 
 // Services
-import { AtividadesService } from '../../services/atividades.service';
-import { AtividadeDTO } from '../../models/atividade.model';
-import { PageRequest } from '../../../../shared/models/page.model';
+import { PublicApiService } from '../../services/public-api.service';
+import { PublicNavigationService } from '../../services/public-navigation.service';
+import { AtividadeDTO } from '../../models/public.models';
 
 @Component({
   selector: 'acadmanage-lista-atividades-publica',
@@ -41,10 +41,10 @@ import { PageRequest } from '../../../../shared/models/page.model';
     MatTooltipModule,
     MatRippleModule
   ],
-  templateUrl: './lista-atividades-publica.component.html',
-  styleUrl: './lista-atividades-publica.component.css'
+  templateUrl: './atividades-publicas.component.html',
+  styleUrl: './atividades-publicas.component.css'
 })
-export class ListaAtividadesPublicaComponent implements OnInit, OnDestroy {
+export class AtividadesPublicasComponent implements OnInit, OnDestroy {
   cursoId!: number;
   cursoNome = '';
   atividades: AtividadeDTO[] = [];
@@ -63,7 +63,8 @@ export class ListaAtividadesPublicaComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private atividadesService: AtividadesService
+    private publicApiService: PublicApiService,
+    private publicNavigationService: PublicNavigationService
   ) {}
 
   ngOnInit(): void {
@@ -101,20 +102,18 @@ export class ListaAtividadesPublicaComponent implements OnInit, OnDestroy {
 
     const filtro = {
       cursoId: this.cursoId,
-      nome: this.searchTerm || undefined
-      // NOTA: statusPublicacao removido temporariamente devido a erro no backend
-      // O campo não existe na entidade Atividade ou na query JPA
-      // Reativar quando backend for corrigido: statusPublicacao: true
+      nome: this.searchTerm || undefined,
+      statusPublicacao: true // Filtrar apenas atividades ativas/publicadas
     };
 
     console.log('📚 Carregando atividades públicas do curso:', this.cursoId);
+    console.log('🔍 Filtros aplicados:', filtro);
 
-    this.atividadesService.getAtividadesPorFiltros(
-      filtro,
+    this.publicApiService.getAtividadesPublicasPorCurso(
+      this.cursoId,
       this.pageIndex,
       this.pageSize,
-      'dataInicio',
-      'DESC'
+      this.searchTerm
     ).subscribe({
       next: (page: any) => {
         this.atividades = page.content || [];
@@ -123,7 +122,14 @@ export class ListaAtividadesPublicaComponent implements OnInit, OnDestroy {
 
         console.log('✅ Atividades carregadas:', {
           exibindo: this.atividades.length,
-          total: this.totalElements
+          total: this.totalElements,
+          filtro: filtro,
+          atividades: this.atividades.map(a => ({
+            id: a.id,
+            nome: a.nome,
+            statusPublicacao: a.statusPublicacao,
+            cursoId: a.curso?.id
+          }))
         });
       },
       error: (error: any) => {
@@ -159,18 +165,14 @@ export class ListaAtividadesPublicaComponent implements OnInit, OnDestroy {
   // Visualizar atividade
   viewAtividade(atividade: AtividadeDTO): void {
     console.log('👁️ Visualizando atividade:', atividade);
-    this.router.navigate(['/atividades/visualizar', atividade.id], {
-      state: {
-        atividade: atividade,
-        cursoId: this.cursoId,
-        cursoNome: this.cursoNome
-      }
-    });
+    if (atividade.id) {
+      this.publicNavigationService.navigateToVisualizarAtividade(atividade.id, this.cursoId, this.cursoNome);
+    }
   }
 
   // Voltar para cursos públicos
   voltarParaCursos(): void {
-    this.router.navigate(['/cursos-publicos']);
+    this.publicNavigationService.navigateBackToCursos();
   }
 
   // Formatar data
@@ -182,11 +184,7 @@ export class ListaAtividadesPublicaComponent implements OnInit, OnDestroy {
 
   // Obter URL da imagem
   getImageUrl(fotoCapa: string): string {
-    if (!fotoCapa) return '';
-    if (fotoCapa.startsWith('http')) {
-      return fotoCapa;
-    }
-    return `http://localhost:8080/api/files${fotoCapa}`;
+    return this.publicApiService.getAtividadeImageUrl(fotoCapa);
   }
 
   // Erro ao carregar imagem

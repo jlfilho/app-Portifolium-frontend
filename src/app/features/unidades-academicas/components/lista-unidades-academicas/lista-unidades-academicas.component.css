@@ -1,0 +1,250 @@
+:host {
+  --primary-color: #3B82F6;
+  --secondary-color: #8B5CF6;
+  --accent-color: #6366F1;
+  --error-color: #EF4444;
+  --text-dark: #0F172A;
+  --text-medium: #475569;
+  --text-light: #64748B;
+  --bg-hover: rgba(59, 130, 246, 0.08);
+  --border-color: #CBD5E1;
+  --card-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+  --surface: #ffffff;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 60px;
+  min-height: calc(100vh - 100px);
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header h1 mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: var(--primary-color);
+}
+
+.header p {
+  margin: 4px 0 0 0;
+  font-size: 15px;
+  color: var(--text-medium);
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.add-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  padding: 0 20px;
+}
+
+.table-card {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: var(--card-shadow);
+  position: relative;
+}
+
+.filter-row {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 18px;
+}
+
+.filter-field {
+  width: 100%;
+  max-width: 480px;
+}
+
+::ng-deep .filter-field .mat-mdc-form-field-icon-prefix {
+  color: var(--primary-color);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.unidades-table {
+  width: 100%;
+  background: #ffffff;
+}
+
+::ng-deep .unidades-table .mat-mdc-header-cell {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%) !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.6px;
+  padding: 16px 12px;
+  border: none;
+}
+
+::ng-deep .unidades-table .mat-mdc-header-cell .mat-sort-header-content,
+::ng-deep .unidades-table .mat-mdc-header-cell .mat-sort-header-arrow,
+::ng-deep .unidades-table thead tr th,
+::ng-deep .unidades-table thead tr th * {
+  color: #ffffff !important;
+}
+
+::ng-deep .unidades-table .mat-mdc-cell {
+  padding: 16px 12px;
+  font-size: 14px;
+  color: var(--text-dark);
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.table-row {
+  transition: background-color 0.2s ease;
+}
+
+.table-row:hover {
+  background: var(--bg-hover);
+}
+
+.descricao {
+  display: inline-block;
+  max-width: 520px;
+  color: var(--text-medium);
+}
+
+.descricao.sem-descricao {
+  font-style: italic;
+  color: var(--text-light);
+}
+
+.actions-header {
+  text-align: right;
+}
+
+.actions-cell {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.actions-cell button {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.actions-cell button:hover {
+  transform: scale(1.08);
+}
+
+.actions-cell button:first-child {
+  color: var(--secondary-color);
+}
+
+.actions-cell button:last-child {
+  color: var(--error-color);
+}
+
+.empty-state {
+  padding: 48px 0;
+  text-align: center;
+  color: var(--text-medium);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.empty-state mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: var(--accent-color);
+}
+
+.loading-inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 0;
+  color: var(--text-medium);
+}
+
+.paginator {
+  margin-top: 24px;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+@media (max-width: 1024px) {
+  .container {
+    padding: 24px 20px 48px;
+  }
+
+  .table-card {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .add-button {
+    align-self: flex-start;
+  }
+
+  .table-card {
+    padding: 18px;
+  }
+
+  .filter-field {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 20px 16px 40px;
+  }
+
+  .table-card {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  ::ng-deep .unidades-table .mat-mdc-header-cell,
+  ::ng-deep .unidades-table .mat-mdc-cell {
+    padding: 12px 10px;
+    font-size: 13px;
+  }
+}
+
+

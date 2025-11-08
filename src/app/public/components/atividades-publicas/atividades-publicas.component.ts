@@ -47,6 +47,9 @@ import { AtividadeDTO } from '../../models/public.models';
 export class AtividadesPublicasComponent implements OnInit, OnDestroy {
   cursoId!: number;
   cursoNome = '';
+  cursoDescricao = '';
+  cursoTipoNome = '';
+  cursoImagemCapa = '';
   atividades: AtividadeDTO[] = [];
   isLoading = false;
 
@@ -76,12 +79,39 @@ export class AtividadesPublicasComponent implements OnInit, OnDestroy {
     const state = navigation?.extras?.state || this.router.lastSuccessfulNavigation?.extras?.state;
     this.cursoNome = (state && state['cursoNome']) || 'Curso';
 
+    this.loadCursoDetalhes();
     this.setupSearchDebounce();
     this.loadAtividades();
   }
 
   ngOnDestroy(): void {
     this.searchSubject.complete();
+  }
+
+  private loadCursoDetalhes(): void {
+    if (!this.cursoId) {
+      return;
+    }
+
+    this.publicApiService.getCursoById(this.cursoId).subscribe({
+      next: (curso) => {
+        if (curso?.nome) {
+          this.cursoNome = curso.nome;
+        }
+
+        this.cursoDescricao = curso?.descricao || '';
+        this.cursoTipoNome = curso?.tipo?.nome || (curso as any)?.tipoNome || '';
+
+        const foto = (curso as any)?.fotoCapa || (curso as any)?.imagemCapa;
+        this.cursoImagemCapa = foto ? this.publicApiService.getCursoImageUrl(foto) : '';
+      },
+      error: (error) => {
+        console.error('❌ Erro ao carregar detalhes do curso público:', error);
+        this.cursoDescricao = '';
+        this.cursoTipoNome = '';
+        this.cursoImagemCapa = '';
+      }
+    });
   }
 
   // Configurar debounce para busca
@@ -181,6 +211,10 @@ export class AtividadesPublicasComponent implements OnInit, OnDestroy {
   // Voltar para cursos públicos
   voltarParaCursos(): void {
     this.publicNavigationService.navigateBackToCursos();
+  }
+
+  onCursoImageError(): void {
+    this.cursoImagemCapa = '';
   }
 
   // Formatar data

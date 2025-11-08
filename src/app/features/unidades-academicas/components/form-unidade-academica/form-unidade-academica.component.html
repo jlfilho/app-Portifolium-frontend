@@ -1,0 +1,55 @@
+<div class="form-container">
+  <mat-card class="form-card">
+    <mat-card-header>
+      <div mat-card-avatar class="form-avatar">
+        <mat-icon>domain</mat-icon>
+      </div>
+      <mat-card-title>{{ isEditMode ? 'Editar Unidade Acadêmica' : 'Cadastrar Unidade Acadêmica' }}</mat-card-title>
+      <mat-card-subtitle>Informe os dados da unidade que ficará associada aos cursos.</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Nome da Unidade</mat-label>
+            <mat-icon matPrefix>school</mat-icon>
+            <input matInput formControlName="nome" maxlength="120" placeholder="Ex.: Instituto de Ciências Exatas">
+            <mat-hint align="end">{{ form.get('nome')?.value?.length || 0 }}/120</mat-hint>
+            <mat-error *ngIf="form.get('nome')?.hasError('required')">Informe o nome da unidade.</mat-error>
+            <mat-error *ngIf="form.get('nome')?.hasError('minlength')">O nome deve ter pelo menos 3 caracteres.</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Descrição</mat-label>
+            <mat-icon matPrefix>text_snippet</mat-icon>
+            <textarea matInput formControlName="descricao" rows="4" maxlength="500" placeholder="Descreva a unidade, áreas de atuação, cursos associados..."></textarea>
+            <mat-hint align="end">{{ form.get('descricao')?.value?.length || 0 }}/500</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-stroked-button type="button" class="cancel-button" (click)="onCancel()">
+            <mat-icon>arrow_back</mat-icon>
+            Voltar
+          </button>
+
+          <button mat-raised-button color="primary" class="submit-button" type="submit" [disabled]="isSaving">
+            <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+            {{ isEditMode ? 'Salvar Alterações' : 'Cadastrar Unidade' }}
+            <mat-progress-spinner
+              *ngIf="isSaving"
+              diameter="20"
+              mode="indeterminate"
+              class="loading-spinner">
+            </mat-progress-spinner>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+

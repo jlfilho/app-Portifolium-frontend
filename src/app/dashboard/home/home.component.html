@@ -137,6 +137,18 @@
 
       <a
         mat-list-item
+        routerLink="/unidades-academicas"
+        routerLinkActive="active-link"
+        matRipple
+        class="nav-item"
+        *ngIf="isAdmin()">
+        <mat-icon class="nav-icon">apartment</mat-icon>
+        <span class="nav-text" *ngIf="!isCollapsed">Unidades Acadêmicas</span>
+        <div class="active-indicator" *ngIf="!isCollapsed"></div>
+      </a>
+
+      <a
+        mat-list-item
         routerLink="/usuarios"
         routerLinkActive="active-link"
         matRipple

@@ -21,6 +21,37 @@
     </div>
   </div>
 
+  <!-- Course Summary -->
+  <div class="course-summary" *ngIf="cursoDescricao || cursoTipoNome || cursoImagemCapa">
+    <div class="summary-card" [class.with-image]="cursoImagemCapa">
+      <div class="summary-content">
+        <div class="summary-header">
+          <div class="summary-icon"><mat-icon>menu_book</mat-icon></div>
+          <div class="summary-title">
+            <span class="subtitle">Sobre o curso</span>
+            <h2>{{ cursoNome }}</h2>
+          </div>
+        </div>
+
+        <mat-chip-set *ngIf="cursoTipoNome" class="summary-chip-set">
+          <mat-chip class="summary-chip" color="primary">{{ cursoTipoNome }}</mat-chip>
+        </mat-chip-set>
+
+        <p class="summary-description" *ngIf="cursoDescricao">
+          {{ cursoDescricao }}
+        </p>
+      </div>
+
+      <div class="summary-media" *ngIf="cursoImagemCapa">
+        <img
+          [src]="cursoImagemCapa"
+          [alt]="'Foto do curso ' + cursoNome"
+          (error)="onCursoImageError()"
+        >
+      </div>
+    </div>
+  </div>
+
   <!-- Search Section -->
   <div class="search-section">
     <mat-form-field appearance="outline" class="search-field">

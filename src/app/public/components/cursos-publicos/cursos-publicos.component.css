@@ -105,26 +105,82 @@
 .unidade-field {
   width: 100%;
   background: rgba(248, 249, 253, 0.9);
-  border-radius: 16px;
+  border-radius: 14px;
   box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.2);
-  padding: 0;
-  overflow: hidden;
 }
 
 ::ng-deep .search-field .mat-mdc-form-field-flex,
 ::ng-deep .unidade-field .mat-mdc-form-field-flex {
   background: transparent;
   border-radius: 12px;
-  padding: 0 16px;
-  min-height: 46px;
+  padding: 0 14px;
+  min-height: 44px;
+  align-items: center;
+}
+
+::ng-deep .search-field .mat-mdc-form-field-infix,
+::ng-deep .unidade-field .mat-mdc-form-field-infix {
+  padding: 0;
+  margin: 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+::ng-deep .search-field .mat-mdc-form-field-outline-start,
+::ng-deep .search-field .mat-mdc-form-field-outline-end,
+::ng-deep .unidade-field .mat-mdc-form-field-outline-start,
+::ng-deep .unidade-field .mat-mdc-form-field-outline-end {
+  border-radius: 14px;
+}
+
+::ng-deep .search-field input[matInput] {
+  padding: 0;
+  margin: 0;
+  height: 44px;
+  line-height: 44px;
+}
+
+::ng-deep .unidade-field .mat-mdc-select-trigger {
+  height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+::ng-deep .unidade-field .mat-mdc-select-value {
+  display: flex;
+  align-items: center;
+}
+
+::ng-deep .unidade-field .mat-mdc-select-value-text {
+  line-height: 44px;
+}
+
+::ng-deep .search-field .mat-mdc-form-field-flex .mdc-floating-label,
+::ng-deep .unidade-field .mat-mdc-form-field-flex .mdc-floating-label {
+  transform: translateY(18px) scale(1);
+}
+
+::ng-deep .search-field .mat-mdc-form-field-flex.mdc-text-field--focused .mdc-floating-label,
+::ng-deep .unidade-field .mat-mdc-form-field-flex.mdc-text-field--focused .mdc-floating-label {
+  transform: translateY(-12px) scale(0.75);
+}
+
+::ng-deep .search-field .mat-mdc-form-field-flex.mdc-text-field--label-floating .mdc-floating-label,
+::ng-deep .unidade-field .mat-mdc-form-field-flex.mdc-text-field--label-floating .mdc-floating-label {
+  transform: translateY(-12px) scale(0.75);
 }
 
 ::ng-deep .search-field .mat-mdc-text-field-wrapper {
   padding-bottom: 0;
 }
 
-::ng-deep .search-field .mat-mdc-form-field-subscript-wrapper {
-  display: none;
+::ng-deep .search-field .mat-mdc-form-field-subscript-wrapper,
+::ng-deep .unidade-field .mat-mdc-form-field-subscript-wrapper,
+::ng-deep .search-field .mat-mdc-form-field-bottom-align,
+::ng-deep .unidade-field .mat-mdc-form-field-bottom-align {
+  display: none !important;
+  height: 0 !important;
 }
 
 ::ng-deep .search-field input {

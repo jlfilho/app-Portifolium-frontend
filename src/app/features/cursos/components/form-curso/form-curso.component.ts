@@ -1,8 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 // Angular Material
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -16,6 +17,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
 // Services e Models
 import { CursosService } from '../../services/cursos.service';
@@ -24,6 +26,8 @@ import { TiposCursoService } from '../../services/tipos-curso.service';
 import { TipoCurso } from '../../models/tipo-curso.model';
 import { extractApiMessage } from '../../../../shared/utils/message.utils';
 import { environment } from '../../../../../environments/environment';
+import { UnidadesAcademicasService } from '../../../unidades-academicas/services/unidades-academicas.service';
+import { UnidadeAcademica } from '../../../unidades-academicas/models/unidade-academica.model';
 
 @Component({
   selector: 'acadmanage-form-curso',
@@ -41,7 +45,8 @@ import { environment } from '../../../../../environments/environment';
     MatSnackBarModule,
     MatTooltipModule,
     MatSelectModule,
-    MatDialogModule
+    MatDialogModule,
+    MatAutocompleteModule
   ],
   templateUrl: './form-curso.component.html',
   styleUrl: './form-curso.component.css'
@@ -62,17 +67,24 @@ export class FormCursoComponent implements OnInit, OnDestroy {
   isDragOver = false;
   private fotoCapaPath: string | null = null;
   private readonly filesBaseUrl = `${environment.apiUrl}/files`;
+  unidadeAcademicaSearchCtrl: FormControl = new FormControl('');
+  unidadesAcademicas: UnidadeAcademica[] = [];
+  isLoadingUnidades = false;
+  selectedUnidadeAcademica: UnidadeAcademica | null = null;
+  private unidadeSearchSub?: Subscription;
 
   constructor(
     private fb: FormBuilder,
     private cursosService: CursosService,
     private tiposCursoService: TiposCursoService,
+    private unidadesAcademicasService: UnidadesAcademicasService,
     private router: Router,
     private route: ActivatedRoute,
     private snackBar: MatSnackBar,
     private dialog: MatDialog
   ) {
     this.initForm();
+    this.setupUnidadeSearch();
   }
 
   ngOnInit(): void {
@@ -89,6 +101,7 @@ export class FormCursoComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.revokePreviewUrl();
+    this.unidadeSearchSub?.unsubscribe();
   }
 
   initForm(): void {
@@ -96,7 +109,8 @@ export class FormCursoComponent implements OnInit, OnDestroy {
       nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
       descricao: ['', [Validators.maxLength(500)]],
       ativo: [true],
-      tipoId: [null, [Validators.required]]
+      tipoId: [null, [Validators.required]],
+      unidadeAcademicaId: [null, [Validators.required]]
     });
   }
 
@@ -113,12 +127,23 @@ export class FormCursoComponent implements OnInit, OnDestroy {
             nome: curso.nome,
             descricao: curso.descricao || '',
             ativo: curso.ativo !== undefined ? curso.ativo : true,
-            tipoId: (curso as any).tipoId ?? curso.tipo?.id ?? null
+            tipoId: (curso as any).tipoId ?? curso.tipo?.id ?? null,
+            unidadeAcademicaId: (curso as any).unidadeAcademicaId ?? curso.unidadeAcademica?.id ?? null
           });
           console.log('📝 Formulário populado:', this.cursoForm.value);
           this.fotoCapaPath = curso.fotoCapa || null;
           this.currentCoverUrl = this.fotoCapaPath ? this.buildImageUrl(this.fotoCapaPath) : null;
           this.setPreviewUrl(this.currentCoverUrl);
+
+          const unidade = (curso as any).unidadeAcademica as UnidadeAcademica | undefined;
+          if (unidade) {
+            this.setSelectedUnidade(unidade);
+          } else {
+            const unidadeId = (curso as any).unidadeAcademicaId;
+            if (unidadeId) {
+              this.fetchUnidadeById(unidadeId);
+            }
+          }
         } else {
           console.warn('⚠️ Curso não encontrado');
           this.showMessage('Curso não encontrado', 'error');
@@ -149,6 +174,9 @@ export class FormCursoComponent implements OnInit, OnDestroy {
         ...this.cursoForm.value,
         fotoCapa: this.fotoCapaPath || undefined
       };
+      if (this.selectedUnidadeAcademica) {
+        cursoData.unidadeAcademicaId = this.selectedUnidadeAcademica.id;
+      }
 
       const operation = this.isEditMode && this.cursoId
         ? this.cursosService.updateCourse(this.cursoId, cursoData)
@@ -294,12 +322,15 @@ export class FormCursoComponent implements OnInit, OnDestroy {
     this.cursoForm.reset({
       descricao: '',
       ativo: true,
-      tipoId: null
+      tipoId: null,
+      unidadeAcademicaId: null
     });
     this.selectedFile = null;
     this.previewUrl = null;
     this.currentCoverUrl = this.fotoCapaPath ? this.buildImageUrl(this.fotoCapaPath) : null;
     this.setPreviewUrl(this.currentCoverUrl);
+    this.selectedUnidadeAcademica = null;
+    this.unidadeAcademicaSearchCtrl.setValue('', { emitEvent: false });
   }
 
   // Helpers
@@ -328,6 +359,7 @@ export class FormCursoComponent implements OnInit, OnDestroy {
   get descricao() { return this.cursoForm.get('descricao'); }
   get ativo() { return this.cursoForm.get('ativo'); }
   get tipoId() { return this.cursoForm.get('tipoId'); }
+  get unidadeAcademicaId() { return this.cursoForm.get('unidadeAcademicaId'); }
 
   private loadTiposCurso(): void {
     this.isLoadingTipos = true;
@@ -390,6 +422,96 @@ export class FormCursoComponent implements OnInit, OnDestroy {
     });
     const result = await firstValueFrom(dialogRef.afterClosed());
     return result === true;
+  }
+
+  private setupUnidadeSearch(): void {
+    this.unidadeSearchSub = this.unidadeAcademicaSearchCtrl.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(value => {
+      if (typeof value === 'string') {
+        const term = value.trim();
+        this.searchUnidades(term);
+        if (!term) {
+          this.clearUnidadeSelection(false, false);
+        }
+      }
+    });
+
+    this.searchUnidades('');
+  }
+
+  private searchUnidades(term: string): void {
+    this.isLoadingUnidades = true;
+    this.unidadesAcademicasService.getFirstPageAsList(50, term || undefined, 'nome', 'ASC').subscribe({
+      next: (list) => {
+        this.unidadesAcademicas = Array.isArray(list) ? list : [];
+        if (this.selectedUnidadeAcademica) {
+          const alreadyExists = this.unidadesAcademicas.some(u => u.id === this.selectedUnidadeAcademica?.id);
+          if (!alreadyExists) {
+            this.unidadesAcademicas = [this.selectedUnidadeAcademica, ...this.unidadesAcademicas];
+          }
+        }
+        this.isLoadingUnidades = false;
+      },
+      error: () => {
+        this.unidadesAcademicas = [];
+        this.isLoadingUnidades = false;
+      }
+    });
+  }
+
+  onUnidadeSelected(event: MatAutocompleteSelectedEvent): void {
+    const unidade = event.option.value as UnidadeAcademica | null;
+    if (!unidade) {
+      this.clearUnidadeSelection();
+      return;
+    }
+    this.setSelectedUnidade(unidade);
+    this.unidadeAcademicaSearchCtrl.setValue(unidade.nome, { emitEvent: false });
+  }
+
+  clearUnidadeSelection(resetInput: boolean = true, markControl: boolean = true): void {
+    this.selectedUnidadeAcademica = null;
+    const control = this.unidadeAcademicaId;
+    control?.setValue(null);
+    if (markControl) {
+      control?.markAsTouched();
+      control?.markAsDirty();
+    }
+    control?.updateValueAndValidity();
+    if (resetInput) {
+      this.unidadeAcademicaSearchCtrl.setValue('', { emitEvent: false });
+    }
+  }
+
+  private setSelectedUnidade(unidade: UnidadeAcademica): void {
+    this.selectedUnidadeAcademica = unidade;
+    const control = this.unidadeAcademicaId;
+    control?.setValue(unidade.id);
+    control?.markAsTouched();
+    control?.markAsDirty();
+    control?.updateValueAndValidity();
+    this.unidadeAcademicaSearchCtrl.setValue(unidade.nome, { emitEvent: false });
+  }
+
+  private fetchUnidadeById(id: number): void {
+    this.isLoadingUnidades = true;
+    this.unidadesAcademicasService.getById(id).subscribe({
+      next: (unidade) => {
+        if (unidade) {
+          this.setSelectedUnidade(unidade);
+          const exists = this.unidadesAcademicas.some(u => u.id === unidade.id);
+          if (!exists) {
+            this.unidadesAcademicas = [unidade, ...this.unidadesAcademicas];
+          }
+        }
+        this.isLoadingUnidades = false;
+      },
+      error: () => {
+        this.isLoadingUnidades = false;
+      }
+    });
   }
 }
 

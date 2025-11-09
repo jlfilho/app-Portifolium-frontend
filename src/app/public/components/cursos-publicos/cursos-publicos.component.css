@@ -76,25 +76,47 @@
 
 /* ===== SEARCH SECTION ===== */
 .search-section {
-  max-width: 800px;
+  max-width: 900px;
   margin: -40px auto 40px;
   padding: 0 24px;
   position: relative;
   z-index: 10;
 }
 
-.search-field {
-  width: 100%;
-  background: white;
-  border-radius: 50px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+.filters-card {
+  background: rgba(255, 255, 255, 0.65);
+  border-radius: 22px;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.15);
+  padding: 18px 22px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  backdrop-filter: blur(12px);
 }
 
-::ng-deep .search-field .mat-mdc-form-field-flex {
-  background: white;
-  border-radius: 50px;
-  padding: 4px 24px;
-  height: 48px;
+.filters-grid {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr;
+  gap: 16px;
+  align-items: center;
+}
+
+.search-field,
+.unidade-field {
+  width: 100%;
+  background: rgba(248, 249, 253, 0.9);
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.2);
+  padding: 0;
+  overflow: hidden;
+}
+
+::ng-deep .search-field .mat-mdc-form-field-flex,
+::ng-deep .unidade-field .mat-mdc-form-field-flex {
+  background: transparent;
+  border-radius: 12px;
+  padding: 0 16px;
+  min-height: 46px;
 }
 
 ::ng-deep .search-field .mat-mdc-text-field-wrapper {
@@ -107,34 +129,79 @@
 
 ::ng-deep .search-field input {
   font-size: 16px;
-  padding: 4px 0;
+  padding: 6px 0;
 }
 
 ::ng-deep .search-field .mat-mdc-form-field-infix {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  min-height: auto;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
-/* Ajuste do ícone de prefixo no campo de busca */
-::ng-deep .search-field .mat-mdc-form-field-icon-prefix {
-  margin-left: -6px; /* desloca o ícone levemente para a esquerda */
-  margin-right: 8px; /* cria espaçamento entre o ícone e o texto */
+::ng-deep .unidade-field .mat-mdc-form-field-icon-prefix {
+  margin-right: 8px;
+  color: rgba(59, 130, 246, 0.65);
 }
 
-/* Results Info */
-.results-info {
+::ng-deep .search-field .mat-mdc-form-field-icon-prefix,
+::ng-deep .unidade-field .mat-mdc-form-field-icon-prefix {
+  margin-left: -4px;
+  margin-right: 8px;
+}
+
+.filters-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filters-illustration {
+  width: 60px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(59, 130, 246, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
+  color: rgba(59, 130, 246, 0.8);
+}
+
+.filters-illustration mat-icon {
+  font-size: 26px;
+  width: 26px;
+  height: 26px;
+}
+
+.clear-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-color: rgba(59, 130, 246, 0.25);
+  color: rgba(59, 130, 246, 0.85);
+  padding: 0 16px;
+}
+
+.clear-button mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.results-info {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
   gap: 8px;
-  margin-top: 16px;
-  padding: 12px 20px;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 24px;
+  padding: 10px 16px;
+  background: rgba(248, 249, 253, 0.7);
+  border-radius: 14px;
   color: var(--text-dark);
   font-size: 15px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
+  flex-wrap: wrap;
+  min-height: 44px;
+  flex: 1;
 }
 
 .results-info mat-icon {
@@ -144,14 +211,14 @@
   height: 20px;
 }
 
-.results-info strong {
+.results-info strong,
+.search-highlight {
   color: var(--primary);
   font-weight: 600;
 }
 
-.search-highlight {
-  color: var(--primary);
-  font-weight: 600;
+.filters-grid mat-progress-spinner {
+  margin-left: 12px;
 }
 
 /* ===== LOADING ===== */
@@ -175,20 +242,20 @@
 .cursos-grid {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 28px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 28px;
+  gap: 32px;
 }
 
 /* ===== CURSO CARD ===== */
 .curso-card {
-  background: white;
-  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 247, 255, 0.96) 100%);
+  border-radius: 18px;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.2);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -196,8 +263,8 @@
 }
 
 .curso-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  transform: translateY(-10px) scale(1.01);
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.25);
 }
 
 .curso-card::before {
@@ -426,6 +493,25 @@
 }
 
 @media (max-width: 768px) {
+  .filters-card {
+    padding: 16px 16px 14px;
+    gap: 12px;
+  }
+
+  .filters-grid {
+    gap: 10px;
+  }
+
+  .filters-illustration {
+    width: 48px;
+    height: 42px;
+  }
+
+  .clear-button {
+    width: 100%;
+    justify-content: center;
+  }
+
   .hero-section {
     padding: 60px 24px 40px;
   }
@@ -447,7 +533,7 @@
   }
 
   .search-section {
-    margin: -30px auto 30px;
+    margin: -28px auto 28px;
   }
 
   .cursos-grid {
@@ -462,6 +548,23 @@
 }
 
 @media (max-width: 480px) {
+  .search-section {
+    padding: 0 16px;
+  }
+
+  .filters-card {
+    padding: 14px;
+  }
+
+  .filters-grid {
+    gap: 10px;
+  }
+
+  .clear-button {
+    width: 100%;
+    justify-content: center;
+  }
+
   .hero-title {
     font-size: 28px;
   }

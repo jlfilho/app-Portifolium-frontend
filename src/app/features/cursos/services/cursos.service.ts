@@ -44,7 +44,8 @@ export class CursosService {
       sort: `${filter.sortBy},${filter.direction}`,
       ativo: filter.ativo !== null && filter.ativo !== undefined ? filter.ativo : 'todos',
       nome: filter.nome || 'sem filtro',
-      tipoId: filter.tipoId ?? 'todos'
+      tipoId: filter.tipoId ?? 'todos',
+      unidadeAcademicaId: filter.unidadeAcademicaId ?? 'todas'
     });
 
     return this.http.get<Page<Curso> | Curso[]>(`${this.baseUrl}/cursos/usuarios`, { params }).pipe(
@@ -65,7 +66,8 @@ export class CursosService {
       sort: `${filter.sortBy},${filter.direction}`,
       ativo: filter.ativo !== null && filter.ativo !== undefined ? filter.ativo : 'todos',
       nome: filter.nome || 'sem filtro',
-      tipoId: filter.tipoId ?? 'todos'
+      tipoId: filter.tipoId ?? 'todos',
+      unidadeAcademicaId: filter.unidadeAcademicaId ?? 'todas'
     });
 
     return this.http.get<Page<Curso> | Curso[]>(`${this.baseUrl}/cursos`, { params }).pipe(
@@ -212,6 +214,10 @@ export class CursosService {
 
     if (filter.tipoId !== null && filter.tipoId !== undefined) {
       params = params.set('tipoId', filter.tipoId.toString());
+    }
+
+    if (filter.unidadeAcademicaId !== null && filter.unidadeAcademicaId !== undefined) {
+      params = params.set('unidadeAcademicaId', filter.unidadeAcademicaId.toString());
     }
 
     return params;

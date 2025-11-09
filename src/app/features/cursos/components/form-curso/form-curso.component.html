@@ -61,6 +61,52 @@
         </div>
 
         <div class="form-row">
+          <!-- Unidade Acadêmica -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Unidade Acadêmica</mat-label>
+            <mat-icon matPrefix>apartment</mat-icon>
+            <input
+              matInput
+              [formControl]="unidadeAcademicaSearchCtrl"
+              [matAutocomplete]="autoUnidades"
+              placeholder="Digite para buscar a unidade acadêmica">
+            <button
+              mat-icon-button
+              matSuffix
+              *ngIf="unidadeAcademicaSearchCtrl.value"
+              (click)="clearUnidadeSelection()"
+              matTooltip="Limpar seleção">
+              <mat-icon>close</mat-icon>
+            </button>
+            <mat-error *ngIf="unidadeAcademicaId?.hasError('required')">
+              Unidade acadêmica é obrigatória
+            </mat-error>
+            <mat-hint *ngIf="selectedUnidadeAcademica">
+              Selecionada: {{ selectedUnidadeAcademica?.nome }}
+            </mat-hint>
+          </mat-form-field>
+
+          <mat-autocomplete
+            #autoUnidades="matAutocomplete"
+            (optionSelected)="onUnidadeSelected($event)">
+            <mat-option *ngIf="isLoadingUnidades" [value]="null" disabled>
+              <mat-icon class="option-loading-icon">sync</mat-icon>
+              Buscando unidades...
+            </mat-option>
+            <ng-container *ngIf="!isLoadingUnidades">
+              <mat-option
+                *ngFor="let unidade of unidadesAcademicas"
+                [value]="unidade">
+                {{ unidade.nome }}
+              </mat-option>
+              <mat-option *ngIf="unidadesAcademicas.length === 0" [value]="null" disabled>
+                Nenhuma unidade encontrada
+              </mat-option>
+            </ng-container>
+          </mat-autocomplete>
+        </div>
+
+        <div class="form-row">
           <!-- Descrição do Curso -->
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Descrição do Curso</mat-label>

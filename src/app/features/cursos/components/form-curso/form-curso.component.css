@@ -150,6 +150,12 @@ form {
   margin-left: 36px;
 }
 
+.option-loading-icon {
+  margin-right: 8px;
+  vertical-align: middle;
+  color: var(--primary-color);
+}
+
 /* Info Box */
 .info-box {
   display: flex;

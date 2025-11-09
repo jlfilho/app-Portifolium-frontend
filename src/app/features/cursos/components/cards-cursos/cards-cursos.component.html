@@ -8,15 +8,15 @@
       </div>
     </div>
     <div class="app-section-header__actions">
-      <button
+    <button
         mat-raised-button
         class="btn-primary add-button"
-        matTooltip="Adicionar novo curso"
-        matTooltipPosition="below"
-        (click)="addCourse()">
-        <mat-icon>add</mat-icon>
+      matTooltip="Adicionar novo curso"
+      matTooltipPosition="below"
+      (click)="addCourse()">
+      <mat-icon>add</mat-icon>
         Novo Curso
-      </button>
+    </button>
     </div>
   </div>
 
@@ -75,19 +75,34 @@
         <mat-icon matPrefix>category</mat-icon>
       </mat-form-field>
 
+      <!-- Filtro por Unidade Acadêmica -->
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Unidade Acadêmica</mat-label>
+        <mat-select
+          [(ngModel)]="filtroUnidade"
+          (ngModelChange)="onUnidadeChange()"
+          [disabled]="isLoadingUnidades">
+          <mat-option [value]="null">Todas as unidades</mat-option>
+          <mat-option *ngFor="let unidade of unidadesAcademicas" [value]="unidade.id">
+            {{ unidade.nome }}
+          </mat-option>
+        </mat-select>
+        <mat-icon matPrefix>apartment</mat-icon>
+      </mat-form-field>
+
       <!-- Botão Limpar Filtros -->
       <button
         mat-stroked-button
         class="btn-cancel btn-clear-filters"
         (click)="limparFiltros()"
-        [disabled]="isLoading || (!filtroNome && filtroStatus === null && !filtroTipo)">
+        [disabled]="isLoading || (!filtroNome && filtroStatus === null && filtroTipo === null && filtroUnidade === null)">
         <mat-icon>clear_all</mat-icon>
         Limpar Filtros
       </button>
     </div>
 
     <!-- Filtros ativos -->
-    <div class="active-filters" *ngIf="filtroNome || filtroStatus !== null || filtroTipo">
+    <div class="active-filters" *ngIf="filtroNome || filtroStatus !== null || filtroTipo !== null || filtroUnidade !== null">
       <span class="filters-label">Filtros ativos:</span>
       <mat-chip-set>
         <mat-chip *ngIf="filtroNome" class="chip-default">
@@ -108,6 +123,13 @@
           <mat-icon matChipAvatar>category</mat-icon>
           Tipo: {{ getTipoNomeById(filtroTipo) || 'Todos' }}
           <button matChipRemove (click)="filtroTipo = null; onTipoChange()">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip>
+        <mat-chip *ngIf="filtroUnidade !== null" class="chip-default">
+          <mat-icon matChipAvatar>apartment</mat-icon>
+          Unidade: {{ getUnidadeNomeById(filtroUnidade) || 'Todas' }}
+          <button matChipRemove (click)="filtroUnidade = null; onUnidadeChange()">
             <mat-icon>cancel</mat-icon>
           </button>
         </mat-chip>
@@ -149,7 +171,7 @@
             <mat-card-header class="card-header">
               <div mat-card-avatar class="header-image"></div>
               <div class="header-text">
-                <mat-card-title>{{ curso.nome }}</mat-card-title>
+              <mat-card-title>{{ curso.nome }}</mat-card-title>
                 <mat-chip-set class="tipo-chip-set" *ngIf="getTipoNomeFromCurso(curso)">
                   <mat-chip class="chip-highlight">{{ getTipoNomeFromCurso(curso) }}</mat-chip>
                 </mat-chip-set>

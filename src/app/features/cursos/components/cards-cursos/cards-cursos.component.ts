@@ -30,6 +30,8 @@ import { extractApiMessage } from '../../../../shared/utils/message.utils';
 import { Curso } from '../../models/curso.model';
 import { CursoFilter } from '../../models/curso-filter.model';
 import { environment } from '../../../../../environments/environment';
+import { UnidadesAcademicasService } from '../../../unidades-academicas/services/unidades-academicas.service';
+import { UnidadeAcademica } from '../../../unidades-academicas/models/unidade-academica.model';
 
 @Component({
   selector: 'acadmanage-cards-cursos',
@@ -69,6 +71,7 @@ export class CardsCursosComponent  implements OnInit {
   filtroNome = '';
   filtroStatus: boolean | null = null;
   filtroTipo: number | null = null;
+  filtroUnidade: number | null = null;
   private searchSubject = new Subject<string>();
 
   // Opções de status
@@ -83,6 +86,7 @@ export class CardsCursosComponent  implements OnInit {
   constructor(
     private cursosService: CursosService,
     private tiposCursoService: TiposCursoService,
+    private unidadesAcademicasService: UnidadesAcademicasService,
     private router: Router,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
@@ -94,9 +98,12 @@ export class CardsCursosComponent  implements OnInit {
 
   tiposCurso: TipoCurso[] = [];
   isLoadingTipos = false;
+  unidadesAcademicas: UnidadeAcademica[] = [];
+  isLoadingUnidades = false;
 
   ngOnInit(): void {
     this.loadTiposCurso();
+    this.loadUnidadesAcademicas();
   }
 
   // Configurar debounce para busca dinâmica
@@ -147,14 +154,16 @@ export class CardsCursosComponent  implements OnInit {
       direction: 'ASC',
       ativo: this.filtroStatus,
       nome: this.filtroNome || undefined,
-      tipoId: this.filtroTipo ?? undefined
+      tipoId: this.filtroTipo ?? undefined,
+      unidadeAcademicaId: this.filtroUnidade ?? undefined
     };
 
     console.log('📡 Carregando cursos do usuário (página ' + (this.pageIndex + 1) + ')');
     console.log('🔍 Filtros aplicados:', {
       nome: this.filtroNome || 'sem filtro',
       status: this.filtroStatus !== null ? (this.filtroStatus ? 'Ativos' : 'Inativos') : 'Todos',
-      tipoId: this.filtroTipo ?? 'todos'
+      tipoId: this.filtroTipo ?? 'todos',
+      unidadeAcademicaId: this.filtroUnidade ?? 'todas'
     });
 
     this.cursosService.getUserCoursesPaginado(filter).subscribe({
@@ -168,6 +177,8 @@ export class CardsCursosComponent  implements OnInit {
         this.cursos = page.content || [];
         this.totalElements = page.totalElements || 0;
         this.isLoading = false;
+
+        this.populateUnidadesFromCursos(this.cursos);
 
         if (this.cursos.length === 0) {
           this.handleEmptyCourses();
@@ -229,12 +240,19 @@ export class CardsCursosComponent  implements OnInit {
     this.loadCourses();
   }
 
+  onUnidadeChange(): void {
+    console.log('🏛️ Filtro de unidade acadêmica alterado:', this.filtroUnidade);
+    this.pageIndex = 0;
+    this.loadCourses();
+  }
+
   // Limpar filtros
   limparFiltros(): void {
     console.log('🧹 Limpando filtros');
     this.filtroNome = '';
     this.filtroStatus = null;
     this.filtroTipo = null;
+    this.filtroUnidade = null;
     this.pageIndex = 0;
     this.loadCourses();
   }
@@ -429,6 +447,55 @@ export class CardsCursosComponent  implements OnInit {
     });
   }
 
+  private loadUnidadesAcademicas(): void {
+    this.isLoadingUnidades = true;
+    this.unidadesAcademicasService.getFirstPageAsList(100, undefined, 'nome', 'ASC').subscribe({
+      next: (lista) => {
+        this.unidadesAcademicas = Array.isArray(lista) ? lista : [];
+        this.isLoadingUnidades = false;
+      },
+      error: (error) => {
+        console.error('❌ Erro ao carregar unidades acadêmicas:', error);
+        this.isLoadingUnidades = false;
+        this.populateUnidadesFromCursos(this.cursos);
+      }
+    });
+  }
+
+  private populateUnidadesFromCursos(cursos: Curso[]): void {
+    if (!Array.isArray(cursos) || cursos.length === 0) {
+      return;
+    }
+
+    const mapa = new Map<number, UnidadeAcademica>();
+    cursos.forEach(curso => {
+      const unidade = (curso as any)?.unidadeAcademica as UnidadeAcademica | undefined;
+      const unidadeId = (curso as any)?.unidadeAcademicaId ?? unidade?.id;
+      const unidadeNome = unidade?.nome ?? (curso as any)?.unidadeAcademicaNome ?? (curso as any)?.unidadeNome;
+
+      if (unidadeId && unidadeNome) {
+        mapa.set(unidadeId, { id: unidadeId, nome: unidadeNome });
+      }
+    });
+
+    if (mapa.size === 0) {
+      return;
+    }
+
+    const existentes = new Set(this.unidadesAcademicas.map(u => u.id));
+    let alterou = false;
+    mapa.forEach(unidade => {
+      if (!existentes.has(unidade.id)) {
+        this.unidadesAcademicas.push(unidade);
+        alterou = true;
+      }
+    });
+
+    if (alterou) {
+      this.unidadesAcademicas.sort((a, b) => a.nome.localeCompare(b.nome));
+    }
+  }
+
   getTipoNomeById(id: number | null | undefined): string {
     if (id == null) return '';
     const found = this.tiposCurso.find(t => t.id === id);
@@ -439,11 +506,18 @@ export class CardsCursosComponent  implements OnInit {
     return curso?.tipo?.nome || this.getTipoNomeById(curso?.tipoId) || curso?.tipoNome || '';
   }
 
+  getUnidadeNomeById(id: number | null | undefined): string {
+    if (id == null) return '';
+    const found = this.unidadesAcademicas.find(u => u.id === id);
+    return found?.nome || '';
+  }
+
   private hasActiveFilters(): boolean {
     return Boolean(
       (this.filtroNome && this.filtroNome.trim()) ||
       this.filtroStatus !== null ||
-      this.filtroTipo !== null
+      this.filtroTipo !== null ||
+      this.filtroUnidade !== null
     );
   }
 

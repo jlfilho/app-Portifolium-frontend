@@ -12,29 +12,68 @@
 
   <!-- Search Section -->
   <div class="search-section">
-    <mat-form-field appearance="outline" class="search-field">
-      <mat-label>Buscar cursos</mat-label>
-      <input
-        matInput
-        [(ngModel)]="searchTerm"
-        (ngModelChange)="onSearchChange($event)"
-        autocomplete="off">
-      <mat-icon matPrefix>search</mat-icon>
-      <button
-        mat-icon-button
-        matSuffix
-        *ngIf="searchTerm"
-        (click)="clearSearch()"
-        matTooltip="Limpar busca">
-        <mat-icon>close</mat-icon>
-      </button>
-    </mat-form-field>
+    <div class="filters-card">
+      <div class="filters-grid">
+        <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Buscar cursos</mat-label>
+        <input
+          matInput
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange($event)"
+          autocomplete="off">
+        <mat-icon matPrefix>search</mat-icon>
+        <button
+          mat-icon-button
+          matSuffix
+          *ngIf="searchTerm"
+          (click)="clearSearchText()"
+          matTooltip="Limpar busca">
+          <mat-icon>close</mat-icon>
+        </button>
+        </mat-form-field>
 
-    <!-- Results info -->
-    <div class="results-info" *ngIf="!isLoading && totalElements > 0">
-      <mat-icon>info</mat-icon>
-      <span>Encontrados <strong>{{ totalElements }}</strong> curso(s)</span>
-      <span *ngIf="searchTerm" class="search-highlight">com "{{ searchTerm }}"</span>
+        <mat-form-field appearance="outline" class="unidade-field">
+          <mat-label>Unidade Acadêmica</mat-label>
+          <mat-icon matPrefix>apartment</mat-icon>
+          <mat-select
+            [disabled]="isLoadingUnidades"
+            [value]="filtroUnidadeId"
+            (selectionChange)="onUnidadeChange($event.value)">
+            <mat-option [value]="null">Todas as unidades</mat-option>
+            <mat-option *ngFor="let unidade of unidadesAcademicas" [value]="unidade.id">
+              {{ unidade.nome }}
+            </mat-option>
+          </mat-select>
+          <mat-progress-spinner
+            *ngIf="isLoadingUnidades"
+            matSuffix
+            diameter="20"
+            mode="indeterminate">
+          </mat-progress-spinner>
+        </mat-form-field>
+      </div>
+      <div class="filters-footer">
+        <div class="results-info" *ngIf="!isLoading && totalElements > 0">
+          <mat-icon>info</mat-icon>
+          <span>Encontrados <strong>{{ totalElements }}</strong> curso(s)</span>
+          <span *ngIf="searchTerm" class="search-highlight">com "{{ searchTerm }}"</span>
+          <span *ngIf="filtroUnidadeId" class="search-highlight">na unidade selecionada</span>
+        </div>
+
+        <div class="filters-illustration">
+          <mat-icon>tune</mat-icon>
+        </div>
+
+        <button
+          mat-stroked-button
+          class="clear-button"
+          (click)="clearAllFilters()"
+          *ngIf="hasActiveFilters()"
+          matTooltip="Limpar filtros">
+          <mat-icon>filter_alt_off</mat-icon>
+          Limpar filtros
+        </button>
+      </div>
     </div>
   </div>
 
@@ -53,10 +92,9 @@
       (click)="viewCurso(curso)">
       <!-- Card Header com Imagem -->
       <div class="card-header-image" [class.has-image]="curso.fotoCapa || curso.imagemCapa">
-        <!-- Imagem de capa se existir -->
+        <!-- Imagem de capa -->
         <img
-          *ngIf="curso.fotoCapa || curso.imagemCapa"
-          [src]="getImageUrl(curso.fotoCapa || curso.imagemCapa)"
+          [src]="getCursoCardImage(curso)"
           [alt]="'Capa do curso ' + curso.nome"
           class="curso-image"
           (error)="onImageError($event)">
@@ -104,7 +142,7 @@
       mat-raised-button
       color="primary"
       *ngIf="searchTerm"
-      (click)="clearSearch()">
+      (click)="clearSearchText()">
       <mat-icon>clear</mat-icon>
       Limpar Busca
     </button>

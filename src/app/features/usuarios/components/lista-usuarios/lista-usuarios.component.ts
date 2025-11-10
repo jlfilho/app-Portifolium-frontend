@@ -27,6 +27,7 @@ import { SimpleConfirmDialogComponent } from '../../../../shared/components/simp
 import { CursosUsuarioDialogComponent } from '../cursos-usuario-dialog/cursos-usuario-dialog.component';
 import { ChangePasswordDialogComponent } from '../../../../shared/components/change-password-dialog/change-password-dialog.component';
 import { PageRequest } from '../../../../shared/models/page.model';
+import { ApiService } from '../../../../shared/api.service';
 
 @Component({
   selector: 'acadmanage-lista-usuarios',
@@ -70,7 +71,8 @@ export class ListaUsuariosComponent implements OnInit {
     private usuariosService: UsuariosService,
     private router: Router,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private apiService: ApiService
   ) {
     this.dataSource = new MatTableDataSource<Usuario>([]);
   }
@@ -155,7 +157,16 @@ export class ListaUsuariosComponent implements OnInit {
     });
   }
 
+  canChangePassword(): boolean {
+    return this.apiService.isAdmin();
+  }
+
   changePassword(usuario: Usuario): void {
+    if (!this.canChangePassword()) {
+      this.showMessage('Somente administradores podem alterar a senha de usuários.', 'error');
+      return;
+    }
+
     const dialogRef = this.dialog.open(ChangePasswordDialogComponent, {
       width: '500px',
       maxWidth: '90vw',

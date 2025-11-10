@@ -1,0 +1,130 @@
+:host {
+  --form-max-width: 560px;
+}
+
+.form-container {
+  max-width: var(--form-max-width);
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.form-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: var(--card-shadow, 0 10px 30px rgba(15, 23, 42, 0.12));
+  background: white;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  background: linear-gradient(120deg, var(--primary-color, #3f51b5), var(--secondary-color, #00897b));
+  color: #fff;
+}
+
+.header-content mat-icon {
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+}
+
+.header-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+mat-card-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+mat-card-subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+mat-card-content {
+  padding: 24px;
+  background: var(--card-content-bg, #f8fafc);
+}
+
+.form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.full-width {
+  flex: 1 1 100%;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  background: var(--card-footer-bg, #f1f5f9);
+}
+
+.cancel-button {
+  color: var(--primary-color);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.cancel-button mat-icon {
+  margin-right: 6px;
+}
+
+.submit-button {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+.submit-button mat-icon {
+  margin-right: 6px;
+}
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(2px);
+  background: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 600px) {
+  .form-container {
+    padding: 16px 12px 40px;
+  }
+
+  .header-content {
+    padding: 20px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .cancel-button,
+  .submit-button {
+    width: 100%;
+  }
+}
+
+

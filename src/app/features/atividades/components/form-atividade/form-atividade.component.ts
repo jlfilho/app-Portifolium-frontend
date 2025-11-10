@@ -34,6 +34,10 @@ import { AtividadeDTO, AtividadeUpdateDTO, AtividadeCreateDTO, PessoaPapelDTO } 
 import { Papel, PapeisDisponiveis, PapelUtils } from '../../models/papel.enum';
 import { CursoFilter } from '../../../cursos/models/curso-filter.model';
 import { extractApiMessage } from '../../../../shared/utils/message.utils';
+import { PessoasService } from '../../../pessoas/services/pessoas.service';
+import { PessoaFilter } from '../../../pessoas/models/pessoa-filter.model';
+import { Pessoa } from '../../../pessoas/models/pessoa.model';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'acadmanage-form-atividade',
@@ -128,7 +132,10 @@ export class FormAtividadeComponent implements OnInit {
     private imageCompressionService: ImageCompressionService,
     private snackBar: MatSnackBar,
     private dateAdapter: DateAdapter<Date>,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private imagemCapaDialog: MatDialog,
+    private pessoasService: PessoasService,
+    private location: Location
   ) {
     this.initForm();
     // Configurar locale pt-BR para o DatePicker
@@ -342,6 +349,9 @@ export class FormAtividadeComponent implements OnInit {
       cursoId: this.atividade.curso.id,
       categoriaId: this.atividade.categoria.id
     });
+
+    this.cursoId = this.atividade.curso.id;
+    this.cursoNome = this.atividade.curso.nome;
 
     // Configurar preview da imagem atual
     if (this.atividade.fotoCapa) {
@@ -704,8 +714,8 @@ export class FormAtividadeComponent implements OnInit {
       debounceTime(300),
       distinctUntilChanged(),
       switchMap(termo => this.searchCoordenadores(termo))
-    ).subscribe(usuarios => {
-      this.coordenadoresFiltrados = usuarios;
+    ).subscribe(coordenadores => {
+      this.coordenadoresFiltrados = coordenadores;
     });
 
     // Debounce para filtro de integrantes
@@ -719,31 +729,29 @@ export class FormAtividadeComponent implements OnInit {
   }
 
   // Métodos para buscar usuários na API
-  private searchCoordenadores(termo: string): Observable<any[]> {
-    const pageRequest = {
+  private searchCoordenadores(termo: string): Observable<Pessoa[]> {
+    const filter: PessoaFilter = {
       page: 0,
       size: 50,
-      sortBy: 'id',
-      direction: 'ASC' as 'ASC'
+      sortBy: 'nome',
+      direction: 'ASC',
+      nome: termo && termo.trim() ? termo.trim() : undefined
     };
 
-    return this.usuariosService.getAllUsersPaginado(pageRequest, termo).pipe(
-      map((page: any) => page.content || []),
-      map((usuarios: any[]) => {
-        // Filtrar coordenadores já selecionados
-        const usuariosFiltrados = usuarios.filter((pessoa: any) => {
-          const jaEhCoordenador = this.integrantesSelecionados.some(
-            integrante => integrante.id === pessoa.id && integrante.papel === Papel.COORDENADOR
-          );
-          return !jaEhCoordenador;
-        });
-
-        // Ordenar por nome
-        return usuariosFiltrados.sort((a: any, b: any) => {
-          const nomeA = (a.nome || a.name || '').toLowerCase();
-          const nomeB = (b.nome || b.name || '').toLowerCase();
-          return nomeA.localeCompare(nomeB);
-        });
+    return this.pessoasService.getPage(filter).pipe(
+      map(page => page.content || []),
+      map((pessoas: Pessoa[]) => {
+        return pessoas
+          .filter(pessoa => {
+            return !this.integrantesSelecionados.some(
+              integrante => integrante.id === pessoa.id && integrante.papel === Papel.COORDENADOR
+            );
+          })
+          .sort((a: Pessoa, b: Pessoa) => {
+            const nomeA = (a.nome || '').toLowerCase();
+            const nomeB = (b.nome || '').toLowerCase();
+            return nomeA.localeCompare(nomeB);
+          });
       })
     );
   }
@@ -776,8 +784,15 @@ export class FormAtividadeComponent implements OnInit {
 
   // Métodos para filtrar usuários no mat-autocomplete
   filtrarCoordenadores(termo: string): void {
-    this.coordenadorFiltro = termo;
-    this.coordenadorSearchSubject.next(termo);
+    const valor = termo || '';
+    const trimmed = valor.trim();
+
+    if (!trimmed && this.coordenadorId) {
+      this.removerCoordenadorSelecionado(false);
+    }
+
+    this.coordenadorFiltro = valor;
+    this.coordenadorSearchSubject.next(trimmed);
   }
 
   filtrarIntegrantes(termo: string): void {
@@ -808,6 +823,7 @@ export class FormAtividadeComponent implements OnInit {
 
     // Atualizar o campo de texto com o nome da pessoa selecionada
     this.coordenadorFiltro = pessoa.nome || pessoa.name;
+    this.coordenadorId = pessoa.id;
 
     // Remover coordenador anterior (se existir)
     const coordenadorAnteriorIndex = this.integrantesSelecionados.findIndex(i => i.papel === Papel.COORDENADOR);
@@ -933,13 +949,6 @@ export class FormAtividadeComponent implements OnInit {
     console.log('🗑️ Tentando remover integrante:', integrante);
     console.log('📋 Integrantes selecionados ANTES da remoção:', [...this.integrantesSelecionados]);
 
-    // Não permitir remover o coordenador (deve trocar no campo específico)
-    if (integrante.papel === Papel.COORDENADOR) {
-      this.showMessage('O coordenador não pode ser removido. Para trocar, selecione outro no campo "Coordenador"', 'warning');
-      console.log('⚠️ Tentativa de remover coordenador bloqueada');
-      return;
-    }
-
     const index = this.integrantesSelecionados.findIndex(i => i.id === integrante.id);
     console.log('📍 Índice encontrado:', index);
 
@@ -948,9 +957,37 @@ export class FormAtividadeComponent implements OnInit {
       console.log('❌ Integrante removido da lista:', integrante);
       console.log('📋 Integrantes restantes:', [...this.integrantesSelecionados]);
       console.log('📊 Total de integrantes:', this.integrantesSelecionados.length);
+
+      if (integrante.papel === Papel.COORDENADOR) {
+        this.removerCoordenadorSelecionado(true);
+        this.filtrarCoordenadores('');
+      }
       // Sem mensagem - só mostra ao salvar
     } else {
       console.error('❌ Integrante não encontrado para remoção!');
+    }
+  }
+
+  private removerCoordenadorSelecionado(exibirAviso: boolean): void {
+    const coordenadorIndex = this.integrantesSelecionados.findIndex(
+      integrante => integrante.papel === Papel.COORDENADOR && integrante.id === this.coordenadorId
+    );
+
+    if (coordenadorIndex > -1) {
+      const removido = this.integrantesSelecionados[coordenadorIndex];
+      this.integrantesSelecionados.splice(coordenadorIndex, 1);
+      console.log('🗑️ Coordenador removido da lista:', removido);
+    }
+
+    this.coordenadorId = null;
+    this.coordenadorFiltro = '';
+    this.atividadeForm.patchValue({ coordenador: '' });
+    const coordenadorControl = this.atividadeForm.get('coordenador');
+    coordenadorControl?.markAsDirty();
+    coordenadorControl?.updateValueAndValidity();
+
+    if (exibirAviso) {
+      this.showMessage('Coordenador removido da atividade. Selecione outro coordenador.', 'warning');
     }
   }
 
@@ -1189,7 +1226,7 @@ export class FormAtividadeComponent implements OnInit {
           console.log('💰 Fontes após atualização:', this.fontesFinanciadorasSelecionadas.length);
 
           // NÃO navegar de volta automaticamente - permitir upload de imagem
-          // this.goBack();
+          this.goBack();
         },
         error: (error) => {
           console.error('❌ Erro ao atualizar atividade:', error);
@@ -1417,14 +1454,27 @@ export class FormAtividadeComponent implements OnInit {
   }
 
   goBack(): void {
+    if (window.history.length > 1) {
+      this.location.back();
+      return;
+    }
+
+    if (this.cursoId) {
+      this.router.navigate(['/atividades/curso', this.cursoId], {
+        state: { cursoNome: this.cursoNome }
+      });
+      return;
+    }
+
     const state = history.state;
     if (state && state.cursoId) {
       this.router.navigate(['/atividades/curso', state.cursoId], {
         state: { cursoNome: state.cursoNome }
       });
-    } else {
-      this.router.navigate(['/cursos']);
+      return;
     }
+
+    this.router.navigate(['/cursos']);
   }
 
   private extractErrorMessage(error: any): string {

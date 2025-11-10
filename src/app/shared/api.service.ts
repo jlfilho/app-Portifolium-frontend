@@ -106,8 +106,25 @@ export class ApiService {
    * Verificar se o usuário tem uma role específica
    */
   hasRole(role: string): boolean {
-    const authorities = this.authoritiesSubject.value;
-    return authorities.includes(`ROLE_${role}`) || authorities.includes(role);
+    return this.hasAnyRole([role]);
+  }
+
+  hasAnyRole(roles: string[]): boolean {
+    const normalized = roles.map(role => role.startsWith('ROLE_') ? role : `ROLE_${role}`);
+    const authorities = this.authoritiesSubject.value || [];
+    if (authorities.some(auth => normalized.includes(auth))) {
+      return true;
+    }
+
+    const userInfo = this.getUserInfoFromToken();
+    const tokenAuthorities = userInfo?.authorities || [];
+    return tokenAuthorities.some(auth => {
+      if (!auth) {
+        return false;
+      }
+      const formatted = auth.startsWith('ROLE_') ? auth : `ROLE_${auth}`;
+      return normalized.includes(auth) || normalized.includes(formatted);
+    });
   }
 
   /**
@@ -170,7 +187,7 @@ export class ApiService {
    * Obter informações do usuário do token JWT
    * Retorna: { username: string, email: string, authorities: string[], name?: string }
    */
-  getUserInfoFromToken(): { username: string; email: string; authorities: string[]; name?: string } | null {
+  getUserInfoFromToken(): { id?: number; pessoaId?: number; username: string; email: string; authorities: string[]; name?: string } | null {
     const token = this.getToken();
     if (!token) {
       console.warn('⚠️ Nenhum token encontrado');
@@ -190,9 +207,17 @@ export class ApiService {
     const username = decoded.sub || '';
     const email = decoded['email'] || decoded.sub || '';
     const authorities = decoded.authorities || this.getAuthorities();
-    const name = decoded['name'] || decoded['nome'] || '';
+    const name = decoded['name'] || decoded['nome'] || decoded['nomeCompleto'] || decoded['fullName'] || decoded['given_name'] || '';
+    const rawId = decoded['id'] ?? decoded['userId'] ?? decoded['usuarioId'];
+    const rawPessoaId = decoded['pessoaId'] ?? decoded['idPessoa'] ?? decoded['pessoa'];
+    const parsedId = rawId !== undefined ? Number(rawId) : undefined;
+    const parsedPessoaId = rawPessoaId !== undefined ? Number(rawPessoaId) : undefined;
+    const id = typeof parsedId === 'number' && !Number.isNaN(parsedId) ? parsedId : undefined;
+    const pessoaId = typeof parsedPessoaId === 'number' && !Number.isNaN(parsedPessoaId) ? parsedPessoaId : undefined;
 
     return {
+      id,
+      pessoaId,
       username,
       email,
       authorities,

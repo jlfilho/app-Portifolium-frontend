@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>
+  <mat-icon color="primary">help_outline</mat-icon>
+  Como estruturar o arquivo CSV
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <p>Para importar pessoas em lote, use um arquivo CSV com a seguinte estrutura:</p>
+
+  <ul>
+    <li>Duas colunas obrigatórias: <strong>nome</strong> e <strong>cpf</strong>.</li>
+    <li>Separador pode ser vírgula (<code>,</code>) ou ponto-e-vírgula (<code>;</code>).</li>
+    <li>A primeira linha com cabeçalho é opcional, mas recomendada (ex.: <code>nome,cpf</code>).</li>
+    <li>Cada linha deve conter o nome completo e um CPF válido da pessoa.</li>
+    <li>O CPF pode conter pontos e hífen ou apenas números; o sistema normaliza e valida o número antes de salvar.</li>
+  </ul>
+
+  <section class="example-section">
+    <h3>Exemplo com vírgula:</h3>
+    <pre class="example-block"><code>nome,cpf
+João da Silva,529.982.247-25
+Maria Souza,16899535009</code></pre>
+  </section>
+
+  <section class="example-section">
+    <h3>Exemplo com ponto-e-vírgula:</h3>
+    <pre class="example-block"><code>nome;cpf
+João da Silva;529.982.247-25
+Maria Souza;16899535009</code></pre>
+  </section>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button (click)="close()">
+    <mat-icon>close</mat-icon>
+    Fechar
+  </button>
+</mat-dialog-actions>
+
+

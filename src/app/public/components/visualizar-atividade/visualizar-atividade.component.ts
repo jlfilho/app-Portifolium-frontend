@@ -50,10 +50,9 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
   isLoadingEvidencias = false;
 
   // Carrossel de evidências
-  evidenciasPaginas: EvidenciaDTO[][] = [];
-  paginaAtualEvidencias = 0;
-  evidenciasPorPagina = 3;
-  totalPaginasEvidencias = 0;
+  currentSlideIndex = 0;
+  carrosselPageSize = 5;
+  carrosselPageIndex = 0;
   lightboxOpen = false;
   lightboxIndex = 0;
   private scrollLocked = false;
@@ -112,69 +111,72 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     this.publicApiService.getEvidenciasPorAtividade(this.atividadeId).subscribe({
       next: (evidencias: EvidenciaDTO[] | null) => {
         this.evidencias = Array.isArray(evidencias) ? evidencias : [];
-        this.calcularPaginasEvidencias();
+        this.currentSlideIndex = 0;
+        this.carrosselPageIndex = 0;
         this.isLoadingEvidencias = false;
         console.log('✅ Evidências carregadas:', this.evidencias.length);
       },
       error: (error: any) => {
         console.error('❌ Erro ao carregar evidências:', error);
         this.evidencias = [];
-        this.evidenciasPaginas = [];
-        this.totalPaginasEvidencias = 0;
-        this.paginaAtualEvidencias = 0;
+        this.currentSlideIndex = 0;
+        this.carrosselPageIndex = 0;
         this.isLoadingEvidencias = false;
       }
     });
   }
 
   // Métodos do carrossel de evidências
-  calcularPaginasEvidencias(): void {
-    if (!Array.isArray(this.evidencias) || this.evidencias.length === 0) {
-      this.evidenciasPaginas = [];
-      this.totalPaginasEvidencias = 0;
-      this.paginaAtualEvidencias = 0;
-      return;
-    }
-
-    this.evidenciasPaginas = [];
-    this.totalPaginasEvidencias = Math.ceil(this.evidencias.length / this.evidenciasPorPagina);
-
-    for (let i = 0; i < this.totalPaginasEvidencias; i++) {
-      const inicio = i * this.evidenciasPorPagina;
-      const fim = inicio + this.evidenciasPorPagina;
-      this.evidenciasPaginas.push(this.evidencias.slice(inicio, fim));
-    }
-
-    console.log('📊 Páginas de evidências calculadas:', {
-      totalEvidencias: this.evidencias.length,
-      evidenciasPorPagina: this.evidenciasPorPagina,
-      totalPaginas: this.totalPaginasEvidencias,
-      paginas: this.evidenciasPaginas.map((p, i) => ({ pagina: i + 1, evidencias: p.length }))
-    });
+  get evidenciasPaginadas(): EvidenciaDTO[] {
+    const start = this.carrosselPageIndex * this.carrosselPageSize;
+    const end = start + this.carrosselPageSize;
+    return this.evidencias.slice(start, end);
   }
 
-  getEvidenciasPaginaAtual(): EvidenciaDTO[] {
-    return this.evidenciasPaginas[this.paginaAtualEvidencias] || [];
+  get currentEvidencia(): EvidenciaDTO | null {
+    return this.evidenciasPaginadas[this.currentSlideIndex] || null;
   }
 
-  proximaPaginaEvidencias(): void {
-    if (this.paginaAtualEvidencias < this.totalPaginasEvidencias - 1) {
-      this.paginaAtualEvidencias++;
-      console.log('➡️ Próxima página de evidências:', this.paginaAtualEvidencias + 1);
-    }
+  get totalCarrosselPages(): number {
+    return Math.ceil(this.evidencias.length / this.carrosselPageSize);
   }
 
-  paginaAnteriorEvidencias(): void {
-    if (this.paginaAtualEvidencias > 0) {
-      this.paginaAtualEvidencias--;
-      console.log('⬅️ Página anterior de evidências:', this.paginaAtualEvidencias + 1);
+  get hasMultiplePages(): boolean {
+    return this.evidencias.length > this.carrosselPageSize;
+  }
+
+  previousSlide(): void {
+    if (this.evidenciasPaginadas.length === 0) return;
+    this.currentSlideIndex = (this.currentSlideIndex - 1 + this.evidenciasPaginadas.length) % this.evidenciasPaginadas.length;
+  }
+
+  nextSlide(): void {
+    if (this.evidenciasPaginadas.length === 0) return;
+    this.currentSlideIndex = (this.currentSlideIndex + 1) % this.evidenciasPaginadas.length;
+  }
+
+  goToSlide(index: number): void {
+    this.currentSlideIndex = index;
+  }
+
+  previousCarrosselPage(): void {
+    if (this.carrosselPageIndex > 0) {
+      this.carrosselPageIndex--;
+      this.currentSlideIndex = 0;
     }
   }
 
-  irParaPaginaEvidencias(pagina: number): void {
-    if (pagina >= 0 && pagina < this.totalPaginasEvidencias) {
-      this.paginaAtualEvidencias = pagina;
-      console.log('🎯 Indo para página de evidências:', pagina + 1);
+  nextCarrosselPage(): void {
+    if (this.carrosselPageIndex < this.totalCarrosselPages - 1) {
+      this.carrosselPageIndex++;
+      this.currentSlideIndex = 0;
+    }
+  }
+
+  goToCarrosselPage(pageIndex: number): void {
+    if (pageIndex >= 0 && pageIndex < this.totalCarrosselPages) {
+      this.carrosselPageIndex = pageIndex;
+      this.currentSlideIndex = 0;
     }
   }
 

@@ -30,14 +30,28 @@
             name="usuarioFiltro"
             [(ngModel)]="usuarioFiltro"
             (ngModelChange)="onUserSearchChange($event)"
+            [matAutocomplete]="usuariosAuto"
             [disabled]="isLoadingUsers">
           <mat-icon matSuffix>search</mat-icon>
+          <mat-autocomplete #usuariosAuto="matAutocomplete">
+            <mat-option
+              *ngIf="!isLoadingUsers && ((usuarioFiltro || '').trim().length > 0) && filteredUsuarios.length === 0"
+              disabled>
+              Nenhum usuário encontrado
+            </mat-option>
+            <mat-option
+              *ngFor="let u of filteredUsuarios"
+              [value]="u.nome || u.name || u.email"
+              (onSelectionChange)="onUsuarioAutoOptionSelected($event, u)">
+              {{ u.nome || u.name || u.email }}
+            </mat-option>
+          </mat-autocomplete>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Adicionar usuário ao curso</mat-label>
-          <mat-select [(ngModel)]="usuarioSelecionado" [disabled]="isAdding || isLoadingUsers || usuarios.length === 0">
-            <mat-option *ngFor="let u of getAvailableUsers()" [value]="u.id">
+          <mat-select [(ngModel)]="usuarioSelecionado" [disabled]="isAdding || isLoadingUsers || filteredUsuarios.length === 0">
+            <mat-option *ngFor="let u of filteredUsuarios" [value]="u.id">
               {{ u.nome || u.name || u.email }} (ID: {{ u.id }})
             </mat-option>
           </mat-select>
@@ -45,16 +59,20 @@
             <mat-icon style="font-size: 14px; height: 14px; width: 14px; vertical-align: middle;">hourglass_empty</mat-icon>
             Carregando usuários...
           </mat-hint>
-          <mat-hint *ngIf="!isLoadingUsers && usuarios.length === 0" style="color: var(--error-color);">
+          <mat-hint *ngIf="!isLoadingUsers && availableUsers.length === 0 && ((usuarioFiltro || '').trim().length === 0)" style="color: var(--error-color);">
             <mat-icon style="font-size: 14px; height: 14px; width: 14px; vertical-align: middle;">warning</mat-icon>
             Nenhum usuário disponível. Verifique suas permissões ou contate o administrador.
           </mat-hint>
-          <mat-hint *ngIf="!isLoadingUsers && usuarios.length > 0 && getAvailableUsers().length === 0" style="color: var(--success-color);">
+          <mat-hint *ngIf="!isLoadingUsers && availableUsers.length === 0 && ((usuarioFiltro || '').trim().length > 0)" style="color: var(--error-color);">
+            <mat-icon style="font-size: 14px; height: 14px; width: 14px; vertical-align: middle;">search_off</mat-icon>
+            Nenhum usuário encontrado com esse nome.
+          </mat-hint>
+          <mat-hint *ngIf="!isLoadingUsers && availableUsers.length > 0 && filteredUsuarios.length === 0 && ((usuarioFiltro || '').trim().length === 0)" style="color: var(--success-color);">
             <mat-icon style="font-size: 14px; height: 14px; width: 14px; vertical-align: middle;">check_circle</mat-icon>
             Todos os usuários já têm acesso a este curso
           </mat-hint>
-          <mat-hint *ngIf="!isLoadingUsers && getAvailableUsers().length > 0">
-            {{ getAvailableUsers().length }} usuário(s) disponível(is)
+          <mat-hint *ngIf="!isLoadingUsers && filteredUsuarios.length > 0">
+            {{ filteredUsuarios.length }} usuário(s) disponível(is)
           </mat-hint>
         </mat-form-field>
         <button

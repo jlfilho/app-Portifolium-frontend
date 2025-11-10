@@ -19,6 +19,9 @@ import { MatDialog } from '@angular/material/dialog';
 // Services
 import { ApiService } from './../../shared/api.service';
 import { TestDialogComponent } from '../../shared/components/test-dialog/test-dialog.component';
+import { PessoasService } from '../../features/pessoas/services/pessoas.service';
+import { Pessoa } from '../../features/pessoas/models/pessoa.model';
+import { UsuariosService } from '../../features/usuarios/services/usuarios.service';
 
 @Component({
   selector: 'acadmanage-home',
@@ -51,7 +54,9 @@ export class HomeComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private pessoasService: PessoasService,
+    private usuariosService: UsuariosService
   ) {}
 
   ngOnInit(): void {
@@ -70,9 +75,18 @@ export class HomeComponent implements OnInit {
       console.log('✅ Informações extraídas do token:', userInfo);
 
       // Atualizar propriedades do componente
-      this.userName = userInfo.name || userInfo.username || 'Usuário';
+      const fallbackName = userInfo.username || userInfo.email || 'Usuário';
+      this.userName = userInfo.name?.trim() ? userInfo.name.trim() : fallbackName;
       this.userEmail = userInfo.email;
       this.userAuthorities = userInfo.authorities;
+
+      const hasName = !!userInfo.name && !!userInfo.name.trim();
+
+      if (!hasName && userInfo.pessoaId) {
+        this.fetchPessoaNome(userInfo.pessoaId, fallbackName);
+      } else if (!hasName && this.canManageUsers() && userInfo.email) {
+        this.fetchUsuarioNomePorEmail(userInfo.email, fallbackName);
+      }
 
       console.log('👤 Nome do usuário:', this.userName);
       console.log('📧 Email do usuário:', this.userEmail);
@@ -83,6 +97,40 @@ export class HomeComponent implements OnInit {
       this.userName = 'Usuário';
       this.userEmail = '';
     }
+  }
+
+  private fetchPessoaNome(pessoaId: number, fallback: string): void {
+    this.pessoasService.getById(pessoaId).subscribe({
+      next: (pessoa: Pessoa) => {
+        const nome = pessoa?.nome?.trim();
+        if (nome) {
+          this.userName = nome;
+        } else {
+          this.userName = fallback;
+        }
+      },
+      error: (error) => {
+        console.warn('⚠️ Não foi possível carregar nome da pessoa pelo ID.', error);
+        this.userName = fallback;
+      }
+    });
+  }
+
+  private fetchUsuarioNomePorEmail(email: string, fallback: string): void {
+    this.usuariosService.getUserByEmail(email).subscribe({
+      next: (usuario) => {
+        const nome = usuario?.nome?.trim();
+        if (nome) {
+          this.userName = nome;
+        } else {
+          this.userName = fallback;
+        }
+      },
+      error: (error) => {
+        console.warn('⚠️ Não foi possível carregar nome do usuário pelo e-mail.', error);
+        this.userName = fallback;
+      }
+    });
   }
 
   /**
@@ -125,6 +173,15 @@ export class HomeComponent implements OnInit {
   goToSettings(): void {
     console.log('⚙️ Navegando para configurações');
     this.router.navigate(['/configuracoes']);
+  }
+
+  /**
+   * Verifica se usuário possui uma das roles administrativas (admin/gerente/secretário)
+   */
+  canManageUsers(): boolean {
+    return this.apiService.hasRole('ADMINISTRADOR') ||
+      this.apiService.hasRole('GERENTE') ||
+      this.apiService.hasRole('SECRETARIO');
   }
 
   /**

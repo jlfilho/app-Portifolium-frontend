@@ -253,7 +253,13 @@ export class ListaAtividadesComponent implements OnInit {
       console.warn('⚠️ Atividade inválida ao tentar editar:', atividade);
       return;
     }
-    this.router.navigate(['/atividades/editar', atividade.id], { state: { atividade, cursoNome: this.cursoNome } });
+    this.router.navigate(['/atividades/editar', atividade.id], {
+      state: {
+        atividade,
+        cursoNome: this.cursoNome,
+        cursoId: this.cursoId
+      }
+    });
   }
 
   async confirmarExclusao(atividade: AtividadeDTO): Promise<void> {

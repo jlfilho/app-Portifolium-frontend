@@ -17,6 +17,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatOptionSelectionChange } from '@angular/material/core';
 
 // Services
 import { CursosService } from '../../services/cursos.service';
@@ -51,7 +53,8 @@ export interface PermissaoCurso {
     MatDividerModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatAutocompleteModule
   ],
   templateUrl: './permissoes-curso-form.component.html',
   styleUrl: './permissoes-curso-form.component.css'
@@ -62,6 +65,8 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
 
   permissoes: PermissaoCurso[] = [];
   usuarios: any[] = [];
+  availableUsers: any[] = [];
+  filteredUsuarios: any[] = [];
   usuarioSelecionado: number | null = null;
   usuarioFiltro = '';
   isLoading = true;
@@ -69,6 +74,7 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
   isAdding = false;
   errorMessage = '';
   private userSearchSubject = new Subject<string>();
+  private skipUserSearch = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -98,7 +104,6 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
       debounceTime(400),
       distinctUntilChanged()
     ).subscribe(term => {
-      this.usuarioFiltro = term;
       this.loadUsers(term);
     });
   }
@@ -111,10 +116,14 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
       next: (permissoes) => {
         this.permissoes = permissoes;
         this.isLoading = false;
+        this.refreshAvailableUsers();
+        this.updateFilteredUsuarios();
       },
       error: (error) => {
         this.errorMessage = extractApiMessage(error) || 'Erro ao carregar permissões do curso. Tente novamente.';
         this.isLoading = false;
+        this.refreshAvailableUsers();
+        this.updateFilteredUsuarios();
       }
     });
   }
@@ -139,6 +148,8 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
         // Garantir que sempre seja um array
         this.usuarios = Array.isArray(page.content) ? page.content : [];
         this.isLoadingUsers = false;
+        this.refreshAvailableUsers();
+        this.updateFilteredUsuarios();
 
         console.log('✅ Usuários carregados:', this.usuarios.length);
         if (this.usuarios.length > 0) {
@@ -161,30 +172,14 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
 
         this.usuarios = []; // Garantir que seja um array mesmo em caso de erro
         this.isLoadingUsers = false;
+        this.refreshAvailableUsers();
+        this.updateFilteredUsuarios();
       }
     });
   }
 
   getAvailableUsers(): any[] {
-    // Se ainda está carregando usuários, retornar array vazio
-    if (this.isLoadingUsers) {
-      return [];
-    }
-
-    // Verificar se this.usuarios é um array antes de usar filter
-    if (!Array.isArray(this.usuarios)) {
-      console.error('❌ this.usuarios não é um array!', this.usuarios);
-      return [];
-    }
-
-    const usuariosComPermissao = this.permissoes.map(p => p.usuarioId);
-    const availableUsers = this.usuarios.filter(u => !usuariosComPermissao.includes(u.id));
-
-    console.log('📋 Total de usuários:', this.usuarios.length);
-    console.log('📋 Usuários com permissão:', usuariosComPermissao);
-    console.log('📋 Usuários disponíveis:', availableUsers.length);
-
-    return availableUsers;
+    return this.availableUsers;
   }
 
   addUserToCourse(): void {
@@ -209,6 +204,10 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
         console.log('✅ É array?', Array.isArray(permissoes));
 
         this.permissoes = permissoes;
+        this.refreshAvailableUsers();
+        this.skipUserSearch = true;
+        this.usuarioFiltro = '';
+        this.updateFilteredUsuarios();
         this.usuarioSelecionado = null;
         this.isAdding = false;
         this.showMessage('Usuário adicionado ao curso com sucesso!', 'success');
@@ -227,6 +226,12 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
   }
 
   onUserSearchChange(term: string): void {
+    if (this.skipUserSearch) {
+      this.skipUserSearch = false;
+      return;
+    }
+    this.usuarioFiltro = term;
+    this.updateFilteredUsuarios();
     this.userSearchSubject.next(term);
   }
 
@@ -252,6 +257,8 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
     this.cursosService.removeUserFromCourse(this.cursoId, usuarioId).subscribe({
       next: (permissoes) => {
         this.permissoes = [...permissoes];
+        this.refreshAvailableUsers();
+        this.updateFilteredUsuarios();
         this.showMessage(`Usuário "${usuarioNome}" removido do curso com sucesso!`, 'success');
       },
       error: (error) => {
@@ -343,6 +350,44 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
       return 'assignment_ind';
     }
     return 'person';
+  }
+
+  onUsuarioAutoOptionSelected(event: MatOptionSelectionChange, user: any): void {
+    if (!event.isUserInput || !user) {
+      return;
+    }
+    this.skipUserSearch = true;
+    this.usuarioFiltro = user.nome || user.name || user.email || '';
+    this.usuarioSelecionado = user.id;
+    this.updateFilteredUsuarios();
+  }
+
+  private refreshAvailableUsers(): void {
+    if (!Array.isArray(this.usuarios)) {
+      this.availableUsers = [];
+      return;
+    }
+    const usuariosComPermissao = this.permissoes.map(p => p.usuarioId);
+    this.availableUsers = this.usuarios.filter(u => !usuariosComPermissao.includes(u.id));
+  }
+
+  private updateFilteredUsuarios(): void {
+    const filtro = (this.usuarioFiltro || '').trim().toLowerCase();
+    if (!filtro) {
+      this.filteredUsuarios = [...this.availableUsers];
+      return;
+    }
+    this.filteredUsuarios = this.availableUsers.filter(u => this.matchesUsuarioFiltro(u, filtro));
+  }
+
+  private matchesUsuarioFiltro(usuario: any, filtro: string): boolean {
+    const campos = [
+      usuario?.nome,
+      usuario?.name,
+      usuario?.email,
+      usuario?.cpf
+    ];
+    return campos.some(campo => typeof campo === 'string' && campo.toLowerCase().includes(filtro));
   }
 }
 

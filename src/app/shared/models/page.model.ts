@@ -40,3 +40,35 @@ export interface PageRequest {
   direction: 'ASC' | 'DESC'; // Direção da ordenação
 }
 
+export function createEmptyPage<T>(): Page<T> {
+  return {
+    content: [],
+    pageable: {
+      sort: {
+        sorted: false,
+        unsorted: true,
+        empty: true
+      },
+      pageNumber: 0,
+      pageSize: 0,
+      offset: 0,
+      paged: true,
+      unpaged: false
+    },
+    totalPages: 0,
+    totalElements: 0,
+    last: true,
+    first: true,
+    size: 0,
+    number: 0,
+    sort: {
+      sorted: false,
+      unsorted: true,
+      empty: true
+    },
+    numberOfElements: 0,
+    empty: true
+  };
+}
+
+

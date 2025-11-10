@@ -130,6 +130,7 @@
                 mat-icon-button
                 color="accent"
                 matTooltip="Alterar senha"
+                *ngIf="canChangePassword()"
                 (click)="changePassword(usuario)">
                 <mat-icon>lock_reset</mat-icon>
               </button>
@@ -231,6 +232,7 @@
                 mat-mini-fab
                 color="accent"
                 matTooltip="Alterar senha"
+                *ngIf="canChangePassword()"
                 (click)="changePassword(usuario)">
                 <mat-icon>lock_reset</mat-icon>
               </button>

@@ -159,6 +159,18 @@
         <div class="active-indicator" *ngIf="!isCollapsed"></div>
       </a>
 
+      <a
+        mat-list-item
+        routerLink="/pessoas"
+        routerLinkActive="active-link"
+        matRipple
+        class="nav-item"
+        *ngIf="canManageUsers()">
+        <mat-icon class="nav-icon">badge</mat-icon>
+        <span class="nav-text" *ngIf="!isCollapsed">Pessoas</span>
+        <div class="active-indicator" *ngIf="!isCollapsed"></div>
+      </a>
+
       <mat-divider class="nav-divider"></mat-divider>
 
       <a

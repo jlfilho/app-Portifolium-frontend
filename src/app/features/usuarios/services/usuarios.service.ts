@@ -89,6 +89,15 @@ export class UsuariosService {
   }
 
   /**
+   * GET /api/usuarios/email?email=...
+   * Buscar usuário pelo e-mail
+   */
+  getUserByEmail(email: string): Observable<Usuario> {
+    const params = new HttpParams().set('email', email);
+    return this.http.get<Usuario>(`${this.baseUrl}/usuarios/email`, { params });
+  }
+
+  /**
    * POST /api/usuarios
    * Criar novo usuário
    */

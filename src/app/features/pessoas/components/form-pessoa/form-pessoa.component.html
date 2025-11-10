@@ -1,0 +1,106 @@
+<div class="form-container">
+  <mat-card class="form-card">
+    <mat-card-header>
+      <div class="header-content">
+        <mat-icon>person</mat-icon>
+        <div class="header-texts">
+          <mat-card-title>{{ isEditMode ? 'Editar Pessoa' : 'Cadastrar Pessoa' }}</mat-card-title>
+          <mat-card-subtitle>
+            {{ isEditMode ? 'Atualize os dados cadastrais da pessoa.' : 'Informe os dados para cadastrar uma nova pessoa.' }}
+          </mat-card-subtitle>
+        </div>
+      </div>
+    </mat-card-header>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-content">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nome completo</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="nome"
+              placeholder="Ex.: Maria Silva"
+              autocomplete="off"
+              maxlength="150" />
+            <mat-error *ngIf="form.get('nome')?.hasError('required')">
+              O nome é obrigatório.
+            </mat-error>
+            <mat-error *ngIf="form.get('nome')?.hasError('minlength')">
+              O nome deve conter ao menos 3 caracteres.
+            </mat-error>
+            <mat-error *ngIf="form.get('nome')?.hasError('maxlength')">
+              O nome pode ter no máximo 150 caracteres.
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>CPF</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="cpf"
+              placeholder="000.000.000-00"
+              autocomplete="off"
+              maxlength="14"
+              (input)="onCpfInput($event)" />
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              (click)="clearCpfField()"
+              *ngIf="form.get('cpf')?.value">
+              <mat-icon>close</mat-icon>
+            </button>
+            <mat-hint>Informe apenas números.</mat-hint>
+            <mat-error *ngIf="form.get('cpf')?.hasError('required')">
+              O CPF é obrigatório.
+            </mat-error>
+            <mat-error *ngIf="form.get('cpf')?.hasError('invalidCpf')">
+              Informe um CPF válido com 11 dígitos.
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </form>
+    </mat-card-content>
+
+    <mat-divider></mat-divider>
+
+    <div class="form-actions">
+      <button
+        mat-stroked-button
+        class="cancel-button"
+        type="button"
+        (click)="onCancel()"
+        [disabled]="isSaving">
+        <mat-icon>arrow_back</mat-icon>
+        Voltar
+      </button>
+
+      <button
+        mat-raised-button
+        color="primary"
+        class="submit-button"
+        type="submit"
+        [disabled]="isSaving"
+        (click)="onSubmit()">
+        <mat-icon>{{ isEditMode ? 'save' : 'person_add' }}</mat-icon>
+        {{ isEditMode ? 'Salvar alterações' : 'Cadastrar' }}
+      </button>
+    </div>
+
+    <div class="loading-overlay" *ngIf="isLoading || isSaving">
+      <mat-progress-spinner
+        mode="indeterminate"
+        diameter="48">
+      </mat-progress-spinner>
+    </div>
+  </mat-card>
+</div>
+
+

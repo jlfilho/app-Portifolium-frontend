@@ -153,88 +153,117 @@
           </div>
         </div>
 
-        <!-- Loading das evidências -->
-        <div class="evidencias-loading" *ngIf="isLoadingEvidencias">
-          <mat-spinner diameter="40"></mat-spinner>
-          <p>Carregando evidências...</p>
+        <!-- Loading evidências -->
+        <div class="loading-evidencias" *ngIf="isLoadingEvidencias">
+          <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+          <span>Carregando evidências...</span>
         </div>
 
-        <!-- Carrossel de evidências -->
-        <div class="evidencias-carousel" *ngIf="!isLoadingEvidencias && evidencias.length > 0">
-          <!-- Controles de navegação -->
-          <div class="carousel-controls">
-            <button
-              mat-icon-button
-              class="carousel-btn prev-btn"
-              (click)="paginaAnteriorEvidencias()"
-              [disabled]="paginaAtualEvidencias === 0"
-              matTooltip="Página anterior">
-              <mat-icon>chevron_left</mat-icon>
-            </button>
+        <!-- Carrossel -->
+        <div class="carousel-container" *ngIf="!isLoadingEvidencias && evidencias.length > 0">
+          <!-- Slide atual -->
+          <div class="carousel-slide">
+            <div class="carousel-image-wrapper">
+              <img
+                [src]="getEvidenciaImageUrl(currentEvidencia!.foto)"
+                [alt]="currentEvidencia!.legenda"
+                class="carousel-image"
+                (click)="openLightbox(currentEvidencia!)">
 
-            <button
-              mat-icon-button
-              class="carousel-btn next-btn"
-              (click)="proximaPaginaEvidencias()"
-              [disabled]="paginaAtualEvidencias === totalPaginasEvidencias - 1"
-              matTooltip="Próxima página">
-              <mat-icon>chevron_right</mat-icon>
-            </button>
-          </div>
+              <!-- Botões de navegação -->
+              <button
+                mat-icon-button
+                class="carousel-btn carousel-btn-prev"
+                (click)="previousSlide()"
+                [disabled]="evidenciasPaginadas.length <= 1"
+                *ngIf="evidenciasPaginadas.length > 1">
+                <mat-icon>chevron_left</mat-icon>
+              </button>
 
-          <!-- Container do carrossel -->
-          <div class="carousel-container">
-            <div class="carousel-track" [style.transform]="'translateX(-' + (paginaAtualEvidencias * 100) + '%)'">
-              <div
-                *ngFor="let pagina of evidenciasPaginas; let i = index"
-                class="carousel-slide">
-                <div class="evidencias-grid">
-                  <div
-                    *ngFor="let evidencia of pagina"
-                    class="evidencia-card"
-                    (click)="openLightbox(evidencia)">
-                    <div class="evidencia-image-container">
-                      <img
-                        [src]="getEvidenciaImageUrl(evidencia.foto)"
-                        [alt]="evidencia.legenda"
-                        class="evidencia-image"
-                        (error)="onImageError($event)">
-                      <div class="evidencia-overlay">
-                        <mat-icon class="zoom-icon">zoom_in</mat-icon>
-                      </div>
-                    </div>
-                    <div class="evidencia-info">
-                      <p class="evidencia-legenda">{{ evidencia.legenda }}</p>
-                      <span class="evidencia-criador" *ngIf="evidencia.criadoPor">
-                        <mat-icon>person</mat-icon>
-                        {{ evidencia.criadoPor }}
-                      </span>
-                    </div>
+              <button
+                mat-icon-button
+                class="carousel-btn carousel-btn-next"
+                (click)="nextSlide()"
+                [disabled]="evidenciasPaginadas.length <= 1"
+                *ngIf="evidenciasPaginadas.length > 1">
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+
+              <!-- Indicador de posição -->
+              <div class="carousel-indicator" *ngIf="evidenciasPaginadas.length > 1">
+                {{ currentSlideIndex + 1 }} / {{ evidenciasPaginadas.length }}
+              </div>
+            </div>
+
+            <!-- Legenda -->
+            <div class="carousel-caption">
+              <div class="caption-header">
+                <div class="caption-info">
+                  <div class="caption-avatar">
+                    <mat-icon>account_circle</mat-icon>
                   </div>
+                  <div class="caption-user-info">
+                    <span class="caption-username">{{ currentEvidencia!.criadoPor || 'Usuário' }}</span>
+                    <span class="caption-location">{{ atividade.nome }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="caption-text">
+                <p>{{ currentEvidencia!.legenda }}</p>
+              </div>
+
+              <!-- Thumbnails -->
+              <div class="carousel-thumbnails" *ngIf="evidenciasPaginadas.length > 1">
+                <div
+                  *ngFor="let evidencia of evidenciasPaginadas; let i = index"
+                  class="thumbnail"
+                  [class.thumbnail-active]="i === currentSlideIndex"
+                  (click)="goToSlide(i)">
+                  <img [src]="getEvidenciaImageUrl(evidencia.foto)" [alt]="evidencia.legenda">
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Indicadores de página -->
-          <div class="carousel-indicators" *ngIf="totalPaginasEvidencias > 1">
+          <!-- Paginação do Carrossel -->
+          <div class="carousel-pagination" *ngIf="hasMultiplePages">
             <button
-              *ngFor="let pagina of evidenciasPaginas; let i = index"
-              class="indicator-btn"
-              [class.active]="i === paginaAtualEvidencias"
-              (click)="irParaPaginaEvidencias(i)"
-              [attr.aria-label]="'Ir para página ' + (i + 1)">
-              <span class="indicator-dot"></span>
+              mat-icon-button
+              (click)="previousCarrosselPage()"
+              [disabled]="carrosselPageIndex === 0"
+              matTooltip="Página anterior"
+              class="pagination-btn">
+              <mat-icon>navigate_before</mat-icon>
+            </button>
+
+            <div class="pagination-info">
+              <span class="page-indicator">
+                Página {{ carrosselPageIndex + 1 }} de {{ totalCarrosselPages }}
+              </span>
+              <span class="items-indicator">
+                (Exibindo {{ evidenciasPaginadas.length }} de {{ evidencias.length }} evidências)
+              </span>
+            </div>
+
+            <button
+              mat-icon-button
+              (click)="nextCarrosselPage()"
+              [disabled]="carrosselPageIndex === totalCarrosselPages - 1"
+              matTooltip="Próxima página"
+              class="pagination-btn">
+              <mat-icon>navigate_next</mat-icon>
             </button>
           </div>
 
-          <!-- Informações da página atual -->
-          <div class="carousel-info">
-            <span class="page-info">
-              Página {{ paginaAtualEvidencias + 1 }} de {{ totalPaginasEvidencias }}
-            </span>
-            <span class="items-info">
-              {{ getEvidenciasPaginaAtual().length }} de {{ evidencias.length }} evidência(s)
+          <!-- Dots de paginação -->
+          <div class="pagination-dots" *ngIf="hasMultiplePages && totalCarrosselPages <= 10">
+            <span
+              *ngFor="let page of [].constructor(totalCarrosselPages); let i = index"
+              class="pagination-dot"
+              [class.pagination-dot-active]="i === carrosselPageIndex"
+              (click)="goToCarrosselPage(i)"
+              [matTooltip]="'Página ' + (i + 1)">
             </span>
           </div>
         </div>

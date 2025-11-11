@@ -244,6 +244,63 @@
           </button>
         </div>
 
+        <div class="import-integrantes-card">
+          <div class="import-header">
+            <div class="import-icon">
+              <mat-icon>cloud_upload</mat-icon>
+            </div>
+            <div class="import-text">
+              <h4>Importar participantes (opcional)</h4>
+              <p>
+              Envie um arquivo CSV com as colunas <strong>nome</strong>, <strong>cpf</strong> e <strong>papel</strong>.
+                Utilize ponto e vírgula ou vírgula como separador.
+              </p>
+              <p class="import-papeis">Papéis válidos: COORDENADOR, SUBCOORDENADOR, BOLSISTA, VOLUNTARIO, PARTICIPANTE.</p>
+            </div>
+          </div>
+
+          <div class="import-actions">
+            <button
+              type="button"
+              mat-stroked-button
+              class="import-button"
+              (click)="triggerImportParticipantes()"
+              [disabled]="isImportingParticipantes || !isEditMode">
+              <mat-icon>upload_file</mat-icon>
+              Importar CSV
+            </button>
+
+            <mat-progress-spinner
+              *ngIf="isImportingParticipantes"
+              mode="indeterminate"
+              diameter="32"
+              class="import-spinner">
+            </mat-progress-spinner>
+          </div>
+
+          <div class="import-feedback success" *ngIf="importParticipantesMessage">
+            <mat-icon>check_circle</mat-icon>
+            <span>{{ importParticipantesMessage }}</span>
+          </div>
+
+          <div class="import-feedback error" *ngIf="importParticipantesError">
+            <mat-icon>error</mat-icon>
+            <span>{{ importParticipantesError }}</span>
+          </div>
+
+          <div class="import-disabled" *ngIf="!isEditMode">
+            <mat-icon>info</mat-icon>
+            <span>Salve a atividade para habilitar a importação em lote.</span>
+          </div>
+
+          <input
+            #participantesCsvInput
+            type="file"
+            accept=".csv,text/csv"
+            (change)="onParticipantesCsvSelected($event)"
+            hidden>
+        </div>
+
         <!-- Lista de Integrantes Selecionados -->
         <div class="integrantes-lista" *ngIf="integrantesSelecionados.length > 0">
           <div class="stats-info">
@@ -258,8 +315,8 @@
                   {{ getPapelIcon(integrante.papel) }}
                 </mat-icon>
                 <div class="integrante-dados">
-                  <span class="integrante-nome">{{ integrante.nome }}</span>
-                  <span class="integrante-cpf">CPF: {{ integrante.cpf }}</span>
+                  <span class="integrante-nome">{{ getNomeIntegrante(integrante) }}</span>
+                  <span class="integrante-cpf" *ngIf="integrante.cpf">CPF: {{ integrante.cpf }}</span>
                 </div>
               </div>
 

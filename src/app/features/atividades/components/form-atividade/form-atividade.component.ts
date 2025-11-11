@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, Observable, firstValueFrom } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs/operators';
+import { HttpErrorResponse } from '@angular/common/http';
 
 // Angular Material
 import { MatCardModule } from '@angular/material/card';
@@ -94,12 +95,19 @@ export class FormAtividadeComponent implements OnInit {
   papelSelecionado: Papel = Papel.PARTICIPANTE;
   papeisDisponiveis = PapeisDisponiveis;
   coordenadorId: number | null = null;
+  private integranteInfoCache = new Map<number, { nome?: string; cpf?: string }>();
+  private integranteInfoRequests = new Set<number>();
 
   // Filtros para busca de usuários
   filtroCoordenador = '';
   filtroIntegrante = '';
   pessoasFiltradas: any[] = [];
   coordenadoresFiltrados: any[] = [];
+
+  @ViewChild('participantesCsvInput') participantesCsvInput?: ElementRef<HTMLInputElement>;
+  isImportingParticipantes = false;
+  importParticipantesMessage: string | null = null;
+  importParticipantesError: string | null = null;
 
   // Controle de filtro para mat-select
   coordenadorFiltro = '';
@@ -369,18 +377,33 @@ export class FormAtividadeComponent implements OnInit {
 
     // Carregar integrantes da atividade
     if (this.atividade.integrantes && this.atividade.integrantes.length > 0) {
-      this.integrantesSelecionados = [...this.atividade.integrantes];
+      this.integrantesSelecionados = this.atividade.integrantes
+        .map(integrante => {
+          const idNormalizado = this.extractPessoaId(integrante);
+          return {
+            id: idNormalizado ?? integrante.id,
+            nome: integrante.nome ?? '',
+            cpf: integrante.cpf ?? '',
+            papel: integrante.papel
+          };
+        })
+        .filter(integrante => integrante.id !== null && integrante.id !== undefined);
+      this.integrantesSelecionados.forEach(integrante => this.ensureIntegranteInfo(integrante));
       console.log('👥 Integrantes da atividade carregados:', this.integrantesSelecionados);
 
       // Identificar o coordenador
       const coordenador = this.integrantesSelecionados.find(i => i.papel === Papel.COORDENADOR);
       if (coordenador) {
-        this.coordenadorId = coordenador.id;
+        this.coordenadorId = this.extractPessoaId(coordenador) ?? null;
         console.log('👤 Coordenador identificado:', coordenador);
       }
     }
 
     console.log('📝 Formulário preenchido com dados da atividade');
+
+    if (this.isEditMode && this.atividadeId) {
+      this.refreshIntegrantesFromApi();
+    }
   }
 
   // Métodos para upload de imagem
@@ -839,6 +862,7 @@ export class FormAtividadeComponent implements OnInit {
       // Atualizar papel para COORDENADOR
       console.log('🔄 Pessoa já era integrante, atualizando para COORDENADOR');
       this.integrantesSelecionados[integranteExistenteIndex].papel = Papel.COORDENADOR;
+      this.cacheIntegranteInfo(this.integrantesSelecionados[integranteExistenteIndex]);
     } else {
       // Adicionar como novo integrante
       const novoCoordenador: PessoaPapelDTO = {
@@ -848,6 +872,7 @@ export class FormAtividadeComponent implements OnInit {
         papel: Papel.COORDENADOR
       };
       this.integrantesSelecionados.unshift(novoCoordenador); // Adiciona no início
+      this.cacheIntegranteInfo(novoCoordenador);
       console.log('✅ Coordenador adicionado aos integrantes:', novoCoordenador);
     }
 
@@ -928,6 +953,7 @@ export class FormAtividadeComponent implements OnInit {
       };
 
       this.integrantesSelecionados.push(integrante);
+      this.cacheIntegranteInfo(integrante);
       this.pessoaSelecionada = null; // Limpar seleção
       this.pessoaSelecionadaCompleta = null; // Limpar pessoa completa
       this.papelSelecionado = Papel.PARTICIPANTE; // Resetar para padrão
@@ -966,6 +992,261 @@ export class FormAtividadeComponent implements OnInit {
     } else {
       console.error('❌ Integrante não encontrado para remoção!');
     }
+  }
+
+  triggerImportParticipantes(): void {
+    if (this.isImportingParticipantes) {
+      return;
+    }
+
+    if (!this.isEditMode || !this.atividadeId) {
+      this.showMessage('Importação disponível apenas após salvar a atividade.', 'warning');
+      return;
+    }
+
+    this.importParticipantesMessage = null;
+    this.importParticipantesError = null;
+
+    this.participantesCsvInput?.nativeElement.click();
+  }
+
+  onParticipantesCsvSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+
+    if (!this.isEditMode || !this.atividadeId) {
+      this.showMessage('Salve a atividade antes de importar participantes.', 'warning');
+      input.value = '';
+      return;
+    }
+
+    const file = input.files[0];
+    this.isImportingParticipantes = true;
+    this.importParticipantesMessage = null;
+    this.importParticipantesError = null;
+
+    this.atividadesService.importarPessoasCsv(this.atividadeId, file).subscribe({
+      next: (associacoes) => {
+        this.isImportingParticipantes = false;
+        const processed = Array.isArray(associacoes) ? associacoes.length : 0;
+        this.importParticipantesMessage =
+          processed > 0
+            ? `Importação concluída: ${processed} participante(s) processado(s).`
+            : 'Importação concluída. Nenhum participante novo foi adicionado.';
+
+        this.showMessage('Importação concluída com sucesso!', 'success');
+        this.refreshIntegrantesFromApi();
+
+        if (this.participantesCsvInput?.nativeElement) {
+          this.participantesCsvInput.nativeElement.value = '';
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        this.isImportingParticipantes = false;
+        this.handleImportParticipantesError(error);
+
+        if (this.participantesCsvInput?.nativeElement) {
+          this.participantesCsvInput.nativeElement.value = '';
+        }
+      }
+    });
+  }
+
+  private handleImportParticipantesError(error: HttpErrorResponse): void {
+    const finalize = (message: string | null) => {
+      const fallback =
+        error.status === 400
+          ? 'Não foi possível importar. Verifique se o arquivo segue o formato esperado (nome, CPF e papel).'
+          : 'Erro ao importar participantes. Tente novamente.';
+
+      const finalMessage = message || fallback;
+      this.importParticipantesError = finalMessage;
+      this.importParticipantesMessage = null;
+      this.showMessage(finalMessage, 'error');
+    };
+
+    if (error?.error instanceof Blob) {
+      const blob = error.error as Blob;
+      blob
+        .text()
+        .then(text => {
+          let parsed: any = text;
+          try {
+            parsed = JSON.parse(text);
+          } catch {
+            // mantém texto simples
+          }
+          const apiMessage = extractApiMessage(parsed);
+          if (apiMessage) {
+            finalize(apiMessage);
+            return;
+          }
+          if (typeof parsed === 'string' && parsed.trim().length > 0) {
+            finalize(parsed);
+            return;
+          }
+          finalize(null);
+        })
+        .catch(() => finalize(null));
+      return;
+    }
+
+    const apiMessage = extractApiMessage(error);
+    finalize(apiMessage);
+  }
+
+  private refreshIntegrantesFromApi(): void {
+    if (!this.isEditMode || !this.atividadeId) {
+      return;
+    }
+
+    this.atividadesService.listarPessoasPorAtividade(this.atividadeId).subscribe({
+      next: (lista) => {
+        const mapped = Array.isArray(lista)
+          ? lista
+              .map(item => this.mapIntegranteResponse(item))
+              .filter((i): i is PessoaPapelDTO => !!i)
+          : [];
+
+        this.integrantesSelecionados = mapped;
+        this.integrantesSelecionados.forEach(integrante => this.ensureIntegranteInfo(integrante));
+
+        const coordenador = this.integrantesSelecionados.find(i => i.papel === Papel.COORDENADOR);
+        if (coordenador) {
+          this.coordenadorId = coordenador.id;
+          this.atividadeForm.patchValue({ coordenador: coordenador.nome }, { emitEvent: false });
+        } else {
+          this.coordenadorId = null;
+          this.atividadeForm.patchValue({ coordenador: '' }, { emitEvent: false });
+        }
+
+        this.filtrarIntegrantes(this.integranteFiltro);
+        this.filtrarCoordenadores(this.coordenadorFiltro);
+      },
+      error: (error) => {
+        console.error('❌ Erro ao atualizar integrantes após importação:', error);
+      }
+    });
+  }
+
+  private mapIntegranteResponse(item: any): PessoaPapelDTO | null {
+    if (!item) {
+      return null;
+    }
+
+    const pessoa = item.pessoa ?? item.pessoaDTO ?? item.usuario ?? null;
+    const id = this.extractPessoaId(item) ?? this.extractPessoaId(pessoa);
+
+    if (!id) {
+      console.warn('⚠️ Registro de integrante sem ID ao importar CSV:', item);
+      return null;
+    }
+
+    const nome = item.nome ?? pessoa?.nome ?? pessoa?.nomeCompleto ?? pessoa?.descricao ?? '';
+    const cpf = item.cpf ?? pessoa?.cpf ?? pessoa?.documento ?? '';
+    const papel = item.papel ?? item.role ?? '';
+
+    if (!papel) {
+      console.warn('⚠️ Registro de integrante sem papel ao importar CSV:', item);
+      return null;
+    }
+
+    const integrante: PessoaPapelDTO = {
+      id,
+      nome,
+      cpf,
+      papel
+    };
+
+    this.ensureIntegranteInfo(integrante);
+    return integrante;
+  }
+
+  getNomeIntegrante(integrante: PessoaPapelDTO | null | undefined): string {
+    if (!integrante) {
+      return 'Participante';
+    }
+
+    const nomeNormalizado = integrante.nome?.trim();
+    if (nomeNormalizado) {
+      return nomeNormalizado;
+    }
+
+    const integranteId = this.extractPessoaId(integrante);
+
+    if (integranteId) {
+      const cached = this.integranteInfoCache.get(integranteId);
+      if (cached?.nome?.trim()) {
+        return cached.nome.trim();
+      }
+    }
+
+    if (integranteId && Array.isArray(this.pessoas)) {
+      const pessoaEncontrada = this.pessoas.find(p => {
+        const idPessoa =
+          this.extractPessoaId(p) ??
+          (typeof p.id === 'number' ? p.id : null);
+        return idPessoa === integranteId;
+      });
+
+      if (pessoaEncontrada) {
+        const nomePessoa =
+          pessoaEncontrada.nome ??
+          pessoaEncontrada.nomeCompleto ??
+          pessoaEncontrada.descricao ??
+          pessoaEncontrada.nomeExibicao ??
+          '';
+        if (nomePessoa.trim()) {
+          return nomePessoa.trim();
+        }
+      }
+    }
+
+    if (integrante.cpf) {
+      return integrante.cpf;
+    }
+
+    if (integranteId) {
+      this.ensureIntegranteInfo(integrante);
+      return `Pessoa #${integranteId}`;
+    }
+
+    return 'Participante';
+  }
+
+  private extractPessoaId(source: any): number | null {
+    if (source == null) {
+      return null;
+    }
+
+    if (typeof source === 'number') {
+      return source;
+    }
+
+    if (typeof source === 'object') {
+      if (typeof source.pessoaId === 'number') {
+        return source.pessoaId;
+      }
+      if (typeof source.id === 'number') {
+        return source.id;
+      }
+      if (typeof source.idPessoa === 'number') {
+        return source.idPessoa;
+      }
+      if (source.id && typeof source.id === 'object') {
+        const nested = source.id;
+        if (typeof nested.pessoaId === 'number') {
+          return nested.pessoaId;
+        }
+        if (typeof nested.id === 'number') {
+          return nested.id;
+        }
+      }
+    }
+
+    return null;
   }
 
   private removerCoordenadorSelecionado(exibirAviso: boolean): void {
@@ -1145,12 +1426,21 @@ export class FormAtividadeComponent implements OnInit {
       console.log('💰 Fontes Formatadas:', fontesFinanciadoraFormatadas);
 
       // Formatar integrantes no padrão esperado pelo backend
-      const integrantesFormatados = this.integrantesSelecionados.map(integrante => ({
-        id: integrante.id,
-        nome: integrante.nome,
-        cpf: integrante.cpf,
-        papel: integrante.papel
-      }));
+      const integrantesFormatados = this.integrantesSelecionados
+        .map(integrante => {
+          const integranteId = this.extractPessoaId(integrante);
+          if (!integranteId) {
+            return null;
+          }
+          return {
+            id: integranteId,
+            pessoaId: integranteId,
+            nome: integrante.nome,
+            cpf: integrante.cpf,
+            papel: integrante.papel
+          };
+        })
+        .filter((integrante): integrante is { id: number; pessoaId: number; nome: string; cpf: string; papel: string } => integrante !== null);
       console.log('👥 Integrantes Formatados:', integrantesFormatados);
       console.log('👥 Quantidade de integrantes:', this.integrantesSelecionados.length);
       console.log('👥 Integrantes Selecionados (raw):', JSON.stringify(this.integrantesSelecionados, null, 2));
@@ -1277,12 +1567,21 @@ export class FormAtividadeComponent implements OnInit {
     }));
 
     // Formatar integrantes
-    const integrantesFormatados = this.integrantesSelecionados.map(integrante => ({
-      id: integrante.id,
-      nome: integrante.nome,
-      cpf: integrante.cpf,
-      papel: integrante.papel
-    }));
+    const integrantesFormatados = this.integrantesSelecionados
+      .map(integrante => {
+        const integranteId = this.extractPessoaId(integrante);
+        if (!integranteId) {
+          return null;
+        }
+        return {
+          id: integranteId,
+          pessoaId: integranteId,
+          nome: integrante.nome,
+          cpf: integrante.cpf,
+          papel: integrante.papel
+        };
+      })
+      .filter((integrante): integrante is { id: number; pessoaId: number; nome: string; cpf: string; papel: string } => integrante !== null);
 
     console.log('💰 Fontes Formatadas:', fontesFinanciadoraFormatadas);
     console.log('👥 Integrantes Formatados:', integrantesFormatados);
@@ -1382,12 +1681,21 @@ export class FormAtividadeComponent implements OnInit {
       console.log('💰 Fontes Formatadas (saveAndGoBack):', fontesFinanciadoraFormatadas);
 
       // Formatar integrantes no padrão esperado pelo backend
-      const integrantesFormatados = this.integrantesSelecionados.map(integrante => ({
-        id: integrante.id,
-        nome: integrante.nome,
-        cpf: integrante.cpf,
-        papel: integrante.papel
-      }));
+      const integrantesFormatados = this.integrantesSelecionados
+        .map(integrante => {
+          const integranteId = this.extractPessoaId(integrante);
+          if (!integranteId) {
+            return null;
+          }
+          return {
+            id: integranteId,
+            pessoaId: integranteId,
+            nome: integrante.nome,
+            cpf: integrante.cpf,
+            papel: integrante.papel
+          };
+        })
+        .filter((integrante): integrante is { id: number; pessoaId: number; nome: string; cpf: string; papel: string } => integrante !== null);
       console.log('👥 Integrantes Formatados (saveAndGoBack):', integrantesFormatados);
 
       // Usar dados existentes da atividade
@@ -1508,4 +1816,90 @@ export class FormAtividadeComponent implements OnInit {
   get coordenador() { return this.atividadeForm.get('coordenador'); }
   get dataRealizacao() { return this.atividadeForm.get('dataRealizacao'); }
   get categoriaId() { return this.atividadeForm.get('categoriaId'); }
+
+  private cacheIntegranteInfo(integrante: PessoaPapelDTO): void {
+    const integranteId = this.extractPessoaId(integrante);
+    if (!integranteId) {
+      return;
+    }
+
+    const nome = integrante.nome?.trim();
+    const cpf = integrante.cpf?.trim();
+
+    const existente = this.integranteInfoCache.get(integranteId) || {};
+    const nomeAtualizado = nome || existente.nome;
+    const cpfAtualizado = cpf || existente.cpf;
+
+    this.integranteInfoCache.set(integranteId, {
+      nome: nomeAtualizado,
+      cpf: cpfAtualizado
+    });
+  }
+
+  private ensureIntegranteInfo(integrante: PessoaPapelDTO): void {
+    const integranteId = this.extractPessoaId(integrante);
+    if (!integranteId) {
+      return;
+    }
+
+    if (integrante.nome?.trim() || integrante.cpf?.trim()) {
+      this.cacheIntegranteInfo(integrante);
+      return;
+    }
+
+    const cached = this.integranteInfoCache.get(integranteId);
+    if (cached) {
+      if (cached.nome && !integrante.nome?.trim()) {
+        integrante.nome = cached.nome;
+      }
+      if (cached.cpf && !integrante.cpf?.trim()) {
+        integrante.cpf = cached.cpf;
+      }
+      return;
+    }
+
+    if (this.integranteInfoRequests.has(integranteId)) {
+      return;
+    }
+
+    this.integranteInfoRequests.add(integranteId);
+    this.pessoasService.getById(integranteId).subscribe({
+      next: (pessoa) => {
+        this.integranteInfoRequests.delete(integranteId);
+        if (!pessoa) {
+          return;
+        }
+
+        const nomePessoa =
+          (pessoa.nome || '')
+            .trim() ||
+          (pessoa.nomeCompleto || '')
+            .trim() ||
+          (pessoa.nomeSocial || '')
+            .trim() ||
+          (pessoa.descricao || '')
+            .trim();
+
+        const cpfPessoa = (pessoa.cpf || '').trim();
+
+        this.integranteInfoCache.set(integranteId, {
+          nome: nomePessoa || undefined,
+          cpf: cpfPessoa || undefined
+        });
+
+        const alvo = this.integrantesSelecionados.find(i => this.extractPessoaId(i) === integranteId);
+        if (alvo) {
+          if (nomePessoa && !alvo.nome?.trim()) {
+            alvo.nome = nomePessoa;
+          }
+          if (cpfPessoa && !alvo.cpf?.trim()) {
+            alvo.cpf = cpfPessoa;
+          }
+        }
+      },
+      error: () => {
+        this.integranteInfoRequests.delete(integranteId);
+      }
+    });
+  }
 }

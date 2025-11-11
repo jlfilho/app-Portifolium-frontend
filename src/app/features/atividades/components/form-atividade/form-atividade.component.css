@@ -728,6 +728,104 @@ mat-divider {
   white-space: nowrap;
 }
 
+.import-integrantes-card {
+  margin-bottom: 16px;
+  padding: 16px;
+  background: white;
+  border: 1px dashed var(--border-color);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.import-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.import-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(102, 126, 234, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  flex-shrink: 0;
+}
+
+.import-text h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.import-text p {
+  margin: 4px 0 0 0;
+  font-size: 13px;
+  color: var(--text-medium);
+}
+
+.import-text .import-papeis {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+.import-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.import-button mat-icon {
+  margin-right: 8px;
+}
+
+.import-spinner {
+  --mdc-circular-progress-active-indicator-color: var(--primary-color);
+}
+
+.import-feedback {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.import-feedback mat-icon {
+  font-size: 20px;
+}
+
+.import-feedback.success {
+  background: rgba(16, 185, 129, 0.1);
+  color: #047857;
+}
+
+.import-feedback.error {
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+}
+
+.import-disabled {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+.import-disabled mat-icon {
+  font-size: 18px;
+  color: var(--text-light);
+}
+
 /* Integrantes Table */
 .integrantes-table {
   background-color: white;
@@ -834,6 +932,19 @@ mat-divider {
 @media (max-width: 768px) {
   .add-integrante-row {
     flex-direction: column;
+  }
+
+  .import-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .import-button {
+    width: 100%;
+  }
+
+  .import-spinner {
+    align-self: center;
   }
 
   .search-field,

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -20,8 +20,10 @@ import { Papel, PapelUtils } from '../../models/papel.enum';
 import { EvidenciasService } from '../../../evidencias/services/evidencias.service';
 import { EvidenciaDTO } from '../../../evidencias/models/evidencia.model';
 import { ImageCompressionService, CompressionResult } from '../../../../shared/services/image-compression.service';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
 import { extractApiMessage } from '../../../../shared/utils/message.utils';
+import { ApiService } from '../../../../shared/api.service';
+import { BreaklinesPipe } from '../../../../shared/pipes/breaklines.pipe';
 
 @Component({
   selector: 'acadmanage-visualizar-atividade',
@@ -40,12 +42,13 @@ import { extractApiMessage } from '../../../../shared/utils/message.utils';
     MatBadgeModule,
     MatFormFieldModule,
     MatInputModule,
-    MatDialogModule
+    MatDialogModule,
+    BreaklinesPipe
   ],
   templateUrl: './visualizar-atividade.component.html',
   styleUrl: './visualizar-atividade.component.css'
 })
-export class VisualizarAtividadeComponent implements OnInit {
+export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
   atividade: AtividadeDTO | null = null;
   atividadeId!: number;
   cursoId!: number;
@@ -55,10 +58,10 @@ export class VisualizarAtividadeComponent implements OnInit {
 
   // Evidências / Carrossel
   evidencias: EvidenciaDTO[] = [];
-  currentSlideIndex = 0;
   isLoadingEvidencias = false;
 
-  // Paginação do carrossel
+  // Carrossel de evidências
+  currentSlideIndex = 0;
   carrosselPageSize = 5;
   carrosselPageIndex = 0;
 
@@ -72,6 +75,12 @@ export class VisualizarAtividadeComponent implements OnInit {
   isCompressing = false;
   compressionInfo: CompressionResult | null = null;
   deletingEvidenceId: number | null = null;
+  isEditingEvidence = false;
+  editingEvidence: EvidenciaDTO | null = null;
+
+  private fetchingExistingFile = false;
+  canManageEvidencias = false;
+  private authoritiesSub?: Subscription;
 
   constructor(
     private route: ActivatedRoute,
@@ -80,7 +89,8 @@ export class VisualizarAtividadeComponent implements OnInit {
     private evidenciasService: EvidenciasService,
     private imageCompressionService: ImageCompressionService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private apiService: ApiService
   ) {}
 
   ngOnInit(): void {
@@ -102,6 +112,13 @@ export class VisualizarAtividadeComponent implements OnInit {
 
     // Carregar evidências da atividade
     this.carregarEvidencias();
+
+    this.updatePermissions();
+    this.authoritiesSub = this.apiService.authorities.subscribe(() => this.updatePermissions());
+  }
+
+  ngOnDestroy(): void {
+    this.authoritiesSub?.unsubscribe();
   }
 
   carregarAtividade(): void {
@@ -180,6 +197,10 @@ export class VisualizarAtividadeComponent implements OnInit {
       verticalPosition: 'top',
       panelClass: [panelClass]
     });
+  }
+
+  private updatePermissions(): void {
+    this.canManageEvidencias = this.apiService.hasAnyRole(['ADMINISTRADOR', 'GERENTE', 'SECRETARIO']);
   }
 
   // ===== MÉTODOS DO CARROSSEL DE EVIDÊNCIAS =====
@@ -263,8 +284,20 @@ export class VisualizarAtividadeComponent implements OnInit {
   // ===== MÉTODOS DE UPLOAD DE EVIDÊNCIA =====
 
   toggleUploadForm(): void {
+    if (!this.canManageEvidencias) {
+      this.showMessage('Você não tem permissão para gerenciar evidências.', 'error');
+      return;
+    }
+
+    if (this.isEditingEvidence) {
+      this.cancelarEdicaoEvidencia();
+      return;
+    }
+
     this.showUploadForm = !this.showUploadForm;
     if (!this.showUploadForm) {
+      this.resetUploadForm();
+    } else {
       this.resetUploadForm();
     }
   }
@@ -366,38 +399,77 @@ export class VisualizarAtividadeComponent implements OnInit {
     this.compressionInfo = null;
   }
 
-  salvarEvidencia(): void {
-    if (!this.selectedFile || !this.legenda.trim()) {
-      this.showMessage('Selecione uma imagem e adicione uma legenda', 'warning');
+  async salvarEvidencia(): Promise<void> {
+    if (!this.canManageEvidencias) {
+      this.showMessage('Você não tem permissão para salvar evidências.', 'error');
       return;
     }
 
+    if (!this.legenda.trim()) {
+      this.showMessage('Adicione uma legenda para a evidência.', 'warning');
+      return;
+    }
+
+    let arquivoParaEnviar: File | null = this.selectedFile;
+
+    if (!this.isEditingEvidence) {
+      if (!arquivoParaEnviar) {
+        this.showMessage('Selecione uma imagem e adicione uma legenda.', 'warning');
+        return;
+      }
+    } else if (!arquivoParaEnviar && this.editingEvidence) {
+      arquivoParaEnviar = await this.obterArquivoDaEvidencia(this.editingEvidence);
+      if (!arquivoParaEnviar) {
+        return;
+      }
+    }
+
+    if (!arquivoParaEnviar) {
+      this.showMessage('Não foi possível preparar a imagem da evidência.', 'error');
+      return;
+    }
+
+    let evidenciaId: number | null = null;
+    if (this.isEditingEvidence) {
+      evidenciaId = this.editingEvidence?.id ?? null;
+      if (evidenciaId === null) {
+        this.showMessage('Não foi possível identificar a evidência a ser editada.', 'error');
+        return;
+      }
+    }
+
     this.isUploading = true;
-    console.log('📤 Enviando evidência...');
+    console.log(this.isEditingEvidence ? '📤 Atualizando evidência...' : '📤 Enviando evidência...');
 
-    this.evidenciasService.salvarEvidencia(this.atividadeId, this.legenda.trim(), this.selectedFile)
-      .subscribe({
-        next: (evidencia) => {
-          console.log('✅ Evidência salva:', evidencia);
-          this.showMessage('Evidência postada com sucesso!', 'success');
-          this.isUploading = false;
+    const legendaFormatada = this.legenda.trim();
 
-          // Recarregar evidências
-          this.carregarEvidencias();
+    const request$ = this.isEditingEvidence && evidenciaId !== null
+      ? this.evidenciasService.atualizarEvidencia(evidenciaId, legendaFormatada, arquivoParaEnviar)
+      : this.evidenciasService.salvarEvidencia(this.atividadeId, legendaFormatada, arquivoParaEnviar);
 
-          // Resetar formulário
-          this.resetUploadForm();
-          this.showUploadForm = false;
-        },
-        error: (error) => {
-          console.error('❌ Erro ao salvar evidência:', error);
-          this.showMessage(error.message || 'Erro ao postar evidência', 'error');
-          this.isUploading = false;
-        }
-      });
+    request$.subscribe({
+      next: () => {
+        const mensagem = this.isEditingEvidence ? 'Evidência atualizada com sucesso!' : 'Evidência postada com sucesso!';
+        this.showMessage(mensagem, 'success');
+        this.isUploading = false;
+        this.carregarEvidencias();
+        this.cancelarEdicaoEvidencia();
+        this.showUploadForm = false;
+      },
+      error: (error) => {
+        console.error('❌ Erro ao salvar evidência:', error);
+        this.showMessage(error.message || 'Erro ao salvar evidência.', 'error');
+        this.isUploading = false;
+      }
+    });
   }
 
   async confirmarExclusaoEvidencia(evidencia: EvidenciaDTO): Promise<void> {
+    if (!this.canManageEvidencias) {
+      this.showMessage('Você não tem permissão para excluir evidências.', 'error');
+      return;
+    }
+
     const confirmado = await this.openConfirmDialog({
       title: 'Excluir Evidência',
       message: `Tem certeza que deseja excluir a evidência "${evidencia.legenda}"? Esta ação não pode ser desfeita.`,
@@ -433,6 +505,49 @@ export class VisualizarAtividadeComponent implements OnInit {
     this.dragOver = false;
     this.compressionInfo = null;
     this.isCompressing = false;
+    this.isEditingEvidence = false;
+    this.editingEvidence = null;
+  }
+
+  editarEvidencia(evidencia: EvidenciaDTO): void {
+    if (!this.canManageEvidencias) {
+      this.showMessage('Você não tem permissão para editar evidências.', 'error');
+      return;
+    }
+
+    this.isEditingEvidence = true;
+    this.editingEvidence = evidencia;
+    this.legenda = evidencia.legenda || '';
+    this.previewUrl = this.getEvidenciaImageUrl(evidencia.foto);
+    this.selectedFile = null;
+    this.compressionInfo = null;
+    this.showUploadForm = true;
+    this.isCompressing = false;
+  }
+
+  cancelarEdicaoEvidencia(): void {
+    this.showUploadForm = false;
+    this.resetUploadForm();
+  }
+
+  private async obterArquivoDaEvidencia(evidencia: EvidenciaDTO): Promise<File | null> {
+    try {
+      const url = this.getEvidenciaImageUrl(evidencia.foto);
+      const response = await fetch(url, { credentials: 'include' });
+      if (!response.ok) {
+        throw new Error('Não foi possível carregar a imagem atual.');
+      }
+      const blob = await response.blob();
+      const nomeArquivo = evidencia.foto?.split('/').pop()?.split('?')[0] || `evidencia-${evidencia.id}.jpg`;
+      const fileName = nomeArquivo || `evidencia-${Date.now()}.jpg`;
+      const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
+      return file;
+    } catch (error) {
+      console.error('❌ Erro ao preparar arquivo existente:', error);
+      this.showMessage('Não foi possível carregar a imagem atual. Selecione uma nova foto.', 'error');
+      this.isUploading = false;
+      return null;
+    }
   }
 
   formatFileSize(bytes: number): string {

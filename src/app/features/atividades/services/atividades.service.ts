@@ -7,7 +7,8 @@ import {
   AtividadeFiltroDTO,
   AtividadeCreateDTO,
   AtividadeUpdateDTO,
-  Page
+  Page,
+  PessoaPapelDTO
 } from '../models/atividade.model';
 import { Papel } from '../models/papel.enum';
 
@@ -364,6 +365,35 @@ export class AtividadesService {
   // ============================================
   // MÉTODOS DE GERENCIAMENTO DE PESSOAS
   // ============================================
+
+  /**
+   * POST /api/atividades-pessoas/{atividadeId}/pessoas/import
+   * Importar pessoas em lote via arquivo CSV
+   * @PreAuthorize: ADMINISTRADOR, GERENTE, SECRETARIO
+   */
+  importarPessoasCsv(atividadeId: number, file: File): Observable<PessoaPapelDTO[]> {
+    const url = `${environment.apiUrl}/atividades-pessoas/${atividadeId}/pessoas/import`;
+    console.log('📡 Importando participantes via CSV:', url);
+    console.log('📄 Arquivo selecionado:', file.name, '-', file.size, 'bytes');
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.http.post<PessoaPapelDTO[]>(url, formData).pipe(
+      timeout(30000),
+      tap(response => {
+        const quantidade = Array.isArray(response) ? response.length : 0;
+        console.log(`✅ Importação concluída. Registros processados: ${quantidade}`);
+      }),
+      catchError((error: HttpErrorResponse) => {
+        console.error('❌ Erro ao importar participantes via CSV:', error);
+        console.error('❌ Status:', error?.status);
+        console.error('❌ Message:', error?.message);
+        console.error('❌ Error body:', error?.error);
+        throw error;
+      })
+    );
+  }
 
   /**
    * POST /api/atividades-pessoas/{atividadeId}/pessoas/{pessoaId}

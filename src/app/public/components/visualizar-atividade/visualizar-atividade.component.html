@@ -209,9 +209,9 @@
                 </div>
               </div>
 
-              <div class="caption-text">
-                <p>{{ currentEvidencia!.legenda }}</p>
-              </div>
+            <div class="caption-text">
+              <p [innerHTML]="currentEvidencia!.legenda | breaklines"></p>
+            </div>
 
               <!-- Thumbnails -->
               <div class="carousel-thumbnails" *ngIf="evidenciasPaginadas.length > 1">
@@ -301,7 +301,7 @@
     <div class="lightbox-caption" *ngIf="lightboxEvidencia">
       <div class="caption-text">
         <mat-icon>photo_camera</mat-icon>
-        <p>{{ lightboxEvidencia.legenda }}</p>
+        <p [innerHTML]="lightboxEvidencia.legenda | breaklines"></p>
       </div>
       <div class="caption-meta">
         <span *ngIf="lightboxEvidencia.criadoPor">

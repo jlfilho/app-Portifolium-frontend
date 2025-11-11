@@ -82,7 +82,7 @@
               Unidade acadêmica é obrigatória
             </mat-error>
             <mat-hint *ngIf="selectedUnidadeAcademica">
-              Selecionada: {{ selectedUnidadeAcademica?.nome }}
+              Selecionada: {{ selectedUnidadeAcademica!.nome }}
             </mat-hint>
           </mat-form-field>
 

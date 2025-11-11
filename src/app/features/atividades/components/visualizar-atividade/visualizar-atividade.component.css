@@ -814,6 +814,12 @@ mat-divider {
   gap: 12px;
 }
 
+.caption-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .caption-header button[mat-icon-button] {
   align-self: flex-start;
 }

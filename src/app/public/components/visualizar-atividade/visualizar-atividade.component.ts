@@ -17,6 +17,7 @@ import { AtividadeDTO, EvidenciaDTO } from '../../models/public.models';
 // Services
 import { PublicApiService } from '../../services/public-api.service';
 import { PublicNavigationService } from '../../services/public-navigation.service';
+import { BreaklinesPipe } from '../../../shared/pipes/breaklines.pipe';
 
 @Component({
   selector: 'acadmanage-visualizar-atividade-publica',
@@ -34,7 +35,8 @@ import { PublicNavigationService } from '../../services/public-navigation.servic
     MatSnackBarModule,
     MatBadgeModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    BreaklinesPipe
   ],
   templateUrl: './visualizar-atividade.component.html',
   styleUrl: './visualizar-atividade.component.css'

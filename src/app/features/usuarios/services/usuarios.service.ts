@@ -105,6 +105,23 @@ export class UsuariosService {
     return this.http.post<Usuario>(`${this.baseUrl}/usuarios`, userData);
   }
 
+  criarUsuarioParaPessoa(request: {
+    pessoaId: number;
+    email: string;
+    senha: string;
+    role: string;
+    cursosIds?: number[];
+  }): Observable<Usuario> {
+    const payload = {
+      pessoaId: request.pessoaId,
+      email: request.email,
+      senha: request.senha,
+      role: request.role,
+      cursosIds: request.cursosIds ?? []
+    };
+    return this.http.post<Usuario>(`${this.baseUrl}/usuarios/pessoa`, payload);
+  }
+
   /**
    * PUT /api/usuarios/{usuarioId}
    * Atualizar usuário

@@ -1,0 +1,75 @@
+<h2 mat-dialog-title>
+  <mat-icon>person_add</mat-icon>
+  Criar usuário para {{ data.pessoaNome }}
+</h2>
+
+<div mat-dialog-content [formGroup]="form" class="dialog-content">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>E-mail</mat-label>
+    <input
+      matInput
+      formControlName="email"
+      placeholder="nome.sobrenome@exemplo.com" />
+    <mat-error *ngIf="form.get('email')?.hasError('required')">
+      Informe o e-mail.
+    </mat-error>
+    <mat-error *ngIf="form.get('email')?.hasError('email')">
+      E-mail inválido.
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Senha provisória</mat-label>
+    <input
+      matInput
+      type="password"
+      formControlName="senha"
+      placeholder="Mínimo 6 caracteres" />
+    <mat-error *ngIf="form.get('senha')?.hasError('required')">
+      Informe uma senha provisória.
+    </mat-error>
+    <mat-error *ngIf="form.get('senha')?.hasError('minlength')">
+      A senha deve conter pelo menos 6 caracteres.
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Papel</mat-label>
+    <mat-select formControlName="role">
+      <mat-option
+        *ngFor="let role of data.rolesDisponiveis"
+        [value]="role.value">
+        {{ role.label }}
+      </mat-option>
+    </mat-select>
+    <mat-error *ngIf="form.get('role')?.hasError('required')">
+      Selecione um papel.
+    </mat-error>
+  </mat-form-field>
+
+  <p class="helper-text">
+    O usuário receberá um acesso com a senha informada. Oriente-o a alterá-la no primeiro login.
+  </p>
+</div>
+
+<div mat-dialog-actions align="end" class="dialog-actions">
+  <button
+    mat-stroked-button
+    color="primary"
+    type="button"
+    (click)="fechar()"
+    [disabled]="isSubmitting">
+    Cancelar
+  </button>
+
+  <button
+    mat-raised-button
+    color="primary"
+    type="button"
+    (click)="submit()"
+    [disabled]="form.invalid || isSubmitting">
+    <mat-icon *ngIf="!isSubmitting">save</mat-icon>
+    {{ isSubmitting ? 'Enviando...' : 'Criar usuário' }}
+  </button>
+</div>
+

@@ -194,6 +194,38 @@ table {
   gap: 8px;
 }
 
+.usuario-header {
+  text-align: center;
+}
+
+.usuario-header-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.usuario-cell {
+  text-align: center;
+}
+
+.usuario-icon {
+  font-size: 22px;
+  vertical-align: middle;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.usuario-icon.possui-usuario {
+  color: #22c55e;
+}
+
+.usuario-icon.sem-usuario {
+  color: #ef4444;
+}
+
+.usuario-cell mat-icon:hover {
+  transform: scale(1.1);
+}
+
 mat-paginator {
   padding: 12px 24px 20px;
 }

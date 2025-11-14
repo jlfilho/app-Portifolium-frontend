@@ -44,6 +44,26 @@ mat-card-header {
   flex: 1;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-relatorio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-color: rgba(255, 255, 255, 0.8) !important;
+  color: white !important;
+}
+
+.btn-relatorio mat-progress-spinner {
+  --mdc-circular-progress-active-indicator-color: white;
+  width: 18px !important;
+  height: 18px !important;
+}
+
 .btn-nova-atividade {
   background-color: white !important;
   color: var(--primary-color) !important;

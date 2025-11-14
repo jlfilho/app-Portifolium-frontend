@@ -134,9 +134,14 @@
             <span>{{ atividade.coordenador }}</span>
           </div>
 
-          <div class="info-badge" *ngIf="atividade.integrantes && atividade.integrantes.length > 0">
+          <div class="info-badge" *ngIf="getParticipantesCount(atividade) > 0">
             <mat-icon>people</mat-icon>
-            <span>{{ atividade.integrantes.length }} participante(s)</span>
+            <span>{{ getParticipantesCount(atividade) }} participante(s)</span>
+          </div>
+
+          <div class="info-badge">
+            <mat-icon>photo_library</mat-icon>
+            <span>{{ getEvidenciasCount(atividade) }} evidência(s)</span>
           </div>
         </div>
 

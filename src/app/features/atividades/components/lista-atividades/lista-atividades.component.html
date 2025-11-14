@@ -8,10 +8,28 @@
         </mat-card-title>
         <mat-card-subtitle *ngIf="cursoNome">{{ cursoNome }}</mat-card-subtitle>
       </div>
-      <button mat-raised-button color="primary" (click)="novaAtividade()" class="btn-nova-atividade">
-        <mat-icon>add_circle</mat-icon>
-        Nova Atividade
-      </button>
+      <div class="header-actions">
+        <button
+          mat-stroked-button
+          color="primary"
+          class="btn-relatorio"
+          (click)="abrirDialogRelatorio()"
+          *ngIf="podeGerarRelatorio"
+          [disabled]="isLoading || isGeneratingRelatorio">
+          <mat-progress-spinner
+            *ngIf="isGeneratingRelatorio"
+            diameter="18"
+            mode="indeterminate">
+          </mat-progress-spinner>
+          <mat-icon *ngIf="!isGeneratingRelatorio">picture_as_pdf</mat-icon>
+          <span>{{ isGeneratingRelatorio ? 'Gerando...' : 'Relatório PDF' }}</span>
+        </button>
+
+        <button mat-raised-button color="primary" (click)="novaAtividade()" class="btn-nova-atividade">
+          <mat-icon>add_circle</mat-icon>
+          Nova Atividade
+        </button>
+      </div>
     </div>
   </mat-card-header>
 
@@ -151,14 +169,19 @@
                 <span class="info-text">{{ atividade.coordenador || 'Sem coordenador' }}</span>
               </div>
 
-              <div class="info-row" *ngIf="atividade.integrantes.length > 0">
+              <div class="info-row" *ngIf="getParticipantesCount(atividade) > 0">
                 <mat-icon class="info-icon">people</mat-icon>
-                <span class="info-text">{{ atividade.integrantes.length }} participante(s)</span>
+                <span class="info-text">{{ getParticipantesCount(atividade) }} participante(s)</span>
               </div>
 
               <div class="info-row" *ngIf="atividade.fontesFinanciadora.length > 0">
                 <mat-icon class="info-icon">attach_money</mat-icon>
                 <span class="info-text">{{ atividade.fontesFinanciadora.length }} fonte(s) financiadora(s)</span>
+              </div>
+
+              <div class="info-row">
+                <mat-icon class="info-icon">photo_library</mat-icon>
+                <span class="info-text">{{ getEvidenciasCount(atividade) }} evidência(s)</span>
               </div>
             </div>
           </mat-card-content>

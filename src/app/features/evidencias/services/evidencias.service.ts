@@ -114,6 +114,47 @@ export class EvidenciasService {
   }
 
   /**
+   * PUT /api/evidencias/atividade/{atividadeId}/ordenacao
+   * Atualiza a ordem das evidências de uma atividade
+   */
+  reordenarEvidencias(
+    atividadeId: number,
+    ordenacao: Array<{ id?: number; evidenciaId?: number; ordem: number }>
+  ): Observable<EvidenciaDTO[]> {
+    const urlPrimario = `${this.baseUrl}/atividade/${atividadeId}/ordem`;
+    const urlLegado = `${this.baseUrl}/atividade/${atividadeId}/ordenacao`;
+    const payload = this.buildOrdenacaoPayload(ordenacao);
+    console.log('📡 Atualizando ordem das evidências da atividade:', atividadeId, payload);
+
+    const requestHeaders = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    const primario$ = this.http.put<EvidenciaDTO[]>(urlPrimario, payload, { headers: requestHeaders }).pipe(
+      timeout(this.requestTimeout),
+      tap(response => {
+        console.log('✅ Ordem das evidências atualizada (endpoint principal):', response?.length ?? 0);
+      })
+    );
+
+    return primario$.pipe(
+      catchError(error => {
+        if (this.deveTentarEndpointLegado(error)) {
+          console.warn('⚠️ Endpoint principal indisponível. Tentando endpoint legado /ordenacao...');
+
+          return this.http.put<EvidenciaDTO[]>(urlLegado, payload, { headers: requestHeaders }).pipe(
+            timeout(this.requestTimeout),
+            tap(response => {
+              console.log('✅ Ordem das evidências atualizada (endpoint legado):', response?.length ?? 0);
+            }),
+            catchError(errLegado => this.handleError(errLegado))
+          );
+        }
+
+        return this.handleError(error);
+      })
+    );
+  }
+
+  /**
    * Formatar URL completa da foto
    */
   getImageUrl(foto: string): string {
@@ -133,6 +174,50 @@ export class EvidenciasService {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  }
+
+  private buildOrdenacaoPayload(
+    ordenacao: Array<{ id?: number; evidenciaId?: number; ordem: number }>
+  ): Array<{ evidenciaId: number; ordem: number }> {
+    return ordenacao
+      .map(item => {
+        const evidenciaId = item.evidenciaId ?? item.id;
+        if (evidenciaId === undefined || evidenciaId === null) {
+          console.warn('⚠️ Registro de ordenação ignorado por não possuir ID:', item);
+          return null;
+        }
+        return {
+          evidenciaId,
+          ordem: item.ordem
+        };
+      })
+      .filter((item): item is { evidenciaId: number; ordem: number } => item !== null);
+  }
+
+  private deveTentarEndpointLegado(error: any): boolean {
+    if (!error) {
+      return false;
+    }
+
+    const status = error.status;
+    if (status === 404) {
+      return true;
+    }
+
+    if (status === 500) {
+      const mensagemBruta =
+        (typeof error.error === 'string' && error.error) ||
+        error.error?.message ||
+        error.message ||
+        '';
+
+      const mensagemNormalizada = mensagemBruta.toString().toLowerCase();
+      if (mensagemNormalizada.includes('no static resource') || mensagemNormalizada.includes('noresourcefound')) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**

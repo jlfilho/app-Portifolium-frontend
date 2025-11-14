@@ -334,13 +334,85 @@
           <span>Carregando evidências...</span>
         </div>
 
+        <!-- Reordenar evidências -->
+        <div
+          class="reorder-toolbar-wrapper"
+          *ngIf="canManageEvidencias && evidencias.length > 1 && !isLoadingEvidencias">
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="iniciarReordenacao()"
+            *ngIf="!isReordering">
+            <mat-icon>sort</mat-icon>
+            Reordenar evidências
+          </button>
+          <div class="reorder-toolbar" *ngIf="isReordering">
+            <div class="reorder-info">
+              <mat-icon>info</mat-icon>
+              <span>Use as setas para ajustar a posição das evidências e clique em "Salvar ordem".</span>
+            </div>
+            <div class="reorder-buttons">
+              <button
+                mat-stroked-button
+                (click)="cancelarReordenacao()"
+                [disabled]="savingOrder">
+                <mat-icon>close</mat-icon>
+                Cancelar
+              </button>
+              <button
+                mat-raised-button
+                color="primary"
+                (click)="salvarOrdemEvidencias()"
+                [disabled]="!orderChanged || savingOrder">
+                <mat-progress-spinner
+                  *ngIf="savingOrder"
+                  mode="indeterminate"
+                  diameter="20">
+                </mat-progress-spinner>
+                <mat-icon *ngIf="!savingOrder">save</mat-icon>
+                Salvar ordem
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="reorder-list" *ngIf="isReordering && !isLoadingEvidencias">
+          <div class="reorder-item" *ngFor="let evidencia of evidencias; index as i">
+            <div class="reorder-index">{{ i + 1 }}</div>
+            <img
+              class="reorder-thumb"
+              [src]="getEvidenciaImageUrlFromEvidencia(evidencia)"
+              [alt]="evidencia.legenda || ('Evidência ' + (i + 1))">
+            <div class="reorder-details">
+              <span class="reorder-title">{{ evidencia.legenda || 'Sem legenda' }}</span>
+              <span class="reorder-meta" *ngIf="evidencia.criadoPor">por {{ evidencia.criadoPor }}</span>
+            </div>
+            <div class="reorder-controls">
+              <button
+                mat-icon-button
+                (click)="moverEvidencia(evidencia, -1)"
+                [disabled]="i === 0 || savingOrder"
+                matTooltip="Mover para cima">
+                <mat-icon>arrow_upward</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                (click)="moverEvidencia(evidencia, 1)"
+                [disabled]="i === evidencias.length - 1 || savingOrder"
+                matTooltip="Mover para baixo">
+                <mat-icon>arrow_downward</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Carrossel -->
-          <div class="carousel-container" *ngIf="!isLoadingEvidencias && evidencias.length > 0">
+        <div class="carousel-container" *ngIf="!isLoadingEvidencias && evidencias.length > 0">
           <!-- Slide atual -->
           <div class="carousel-slide">
             <div class="carousel-image-wrapper">
               <img
-                [src]="getEvidenciaImageUrl(currentEvidencia!.foto)"
+                [src]="getEvidenciaImageUrlFromEvidencia(currentEvidencia!)"
                 [alt]="currentEvidencia!.legenda"
                 class="carousel-image">
 
@@ -417,7 +489,7 @@
                   class="thumbnail"
                   [class.thumbnail-active]="i === currentSlideIndex"
                   (click)="goToSlide(i)">
-                  <img [src]="getEvidenciaImageUrl(evidencia.foto)" [alt]="evidencia.legenda">
+                  <img [src]="getEvidenciaImageUrlFromEvidencia(evidencia)" [alt]="evidencia.legenda">
                 </div>
               </div>
             </div>

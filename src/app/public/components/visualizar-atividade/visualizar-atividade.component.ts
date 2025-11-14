@@ -112,9 +112,13 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
 
     this.publicApiService.getEvidenciasPorAtividade(this.atividadeId).subscribe({
       next: (evidencias: EvidenciaDTO[] | null) => {
-        this.evidencias = Array.isArray(evidencias) ? evidencias : [];
+        const normalized = Array.isArray(evidencias)
+          ? evidencias.map(e => this.normalizeEvidencia(e))
+          : [];
+        this.evidencias = this.sortEvidencias(normalized);
         this.currentSlideIndex = 0;
         this.carrosselPageIndex = 0;
+        this.lightboxIndex = 0;
         this.isLoadingEvidencias = false;
         console.log('✅ Evidências carregadas:', this.evidencias.length);
       },
@@ -123,6 +127,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
         this.evidencias = [];
         this.currentSlideIndex = 0;
         this.carrosselPageIndex = 0;
+        this.lightboxIndex = 0;
         this.isLoadingEvidencias = false;
       }
     });
@@ -225,7 +230,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
 
   getLightboxImageUrl(): string {
     const evidencia = this.lightboxEvidencia;
-    return evidencia ? this.getEvidenciaImageUrl(evidencia.foto) : '';
+    return evidencia ? this.getEvidenciaImageUrlFromEvidencia(evidencia) : '';
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -289,6 +294,10 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     return this.publicApiService.getEvidenciaImageUrl(foto);
   }
 
+  getEvidenciaImageUrlFromEvidencia(evidencia: EvidenciaDTO | null | undefined): string {
+    return this.publicApiService.getEvidenciaImageUrl(this.getEvidenciaFotoPath(evidencia));
+  }
+
   // Erro ao carregar imagem
   onImageError(event: any): void {
     event.target.style.display = 'none';
@@ -299,6 +308,39 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     this.snackBar.open(message, 'Fechar', {
       duration: 5000,
       panelClass: [`snackbar-${type}`]
+    });
+  }
+
+  private getEvidenciaFotoPath(evidencia: EvidenciaDTO | null | undefined): string {
+    if (!evidencia) {
+      return '';
+    }
+    return evidencia.foto || evidencia.urlFoto || '';
+  }
+
+  private normalizeEvidencia(evidencia: EvidenciaDTO): EvidenciaDTO {
+    const ordem =
+      typeof evidencia.ordem === 'number'
+        ? evidencia.ordem
+        : (evidencia as any)?.indice ?? undefined;
+
+    const foto = this.getEvidenciaFotoPath(evidencia);
+
+    return {
+      ...evidencia,
+      foto,
+      ordem: typeof ordem === 'number' ? ordem : undefined
+    };
+  }
+
+  private sortEvidencias(evidencias: EvidenciaDTO[]): EvidenciaDTO[] {
+    return [...evidencias].sort((a, b) => {
+      const ordemA = typeof a.ordem === 'number' ? a.ordem : Number.MAX_SAFE_INTEGER;
+      const ordemB = typeof b.ordem === 'number' ? b.ordem : Number.MAX_SAFE_INTEGER;
+      if (ordemA !== ordemB) {
+        return ordemA - ordemB;
+      }
+      return (a.id ?? Number.MAX_SAFE_INTEGER) - (b.id ?? Number.MAX_SAFE_INTEGER);
     });
   }
 }

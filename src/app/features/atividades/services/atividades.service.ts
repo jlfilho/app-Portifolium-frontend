@@ -454,11 +454,11 @@ export class AtividadesService {
    * Listar pessoas associadas a uma atividade
    * @PreAuthorize: ADMINISTRADOR, GERENTE, SECRETARIO
    */
-  listarPessoasPorAtividade(atividadeId: number): Observable<any[]> {
+  listarPessoasPorAtividade(atividadeId: number): Observable<PessoaPapelDTO[]> {
     const url = `${environment.apiUrl}/atividades-pessoas/${atividadeId}/pessoas`;
     console.log('📡 Listando pessoas da atividade:', url);
 
-    return this.http.get<any[]>(url).pipe(
+    return this.http.get<PessoaPapelDTO[]>(url).pipe(
       timeout(30000),
       tap(response => {
         console.log('✅ Pessoas da atividade carregadas:', response);

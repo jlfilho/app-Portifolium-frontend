@@ -5,6 +5,7 @@ export interface Pessoa {
   nomeCompleto?: string;
   nomeSocial?: string;
   descricao?: string;
+  possuiUsuario?: boolean;
 }
 
 

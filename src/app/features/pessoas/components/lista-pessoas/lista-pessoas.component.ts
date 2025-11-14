@@ -25,6 +25,9 @@ import { PessoaFilter } from '../../models/pessoa-filter.model';
 import { PessoaImportResponse } from '../../models/pessoa-import-response.model';
 import { ApiService } from '../../../../shared/api.service';
 import { extractApiMessage } from '../../../../shared/utils/message.utils';
+import { UsuariosService } from '../../../usuarios/services/usuarios.service';
+
+type PessoaComUsuario = Pessoa & { possuiUsuario: boolean };
 
 @Component({
   selector: 'acadmanage-lista-pessoas',
@@ -50,7 +53,7 @@ import { extractApiMessage } from '../../../../shared/utils/message.utils';
 })
 export class ListaPessoasComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = [];
-  dataSource = new MatTableDataSource<Pessoa>([]);
+  dataSource = new MatTableDataSource<PessoaComUsuario>([]);
   isLoading = false;
   hasError = false;
   errorMessage = '';
@@ -74,13 +77,14 @@ export class ListaPessoasComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly snackBar: MatSnackBar,
     private readonly dialog: MatDialog,
-    public readonly apiService: ApiService
+    public readonly apiService: ApiService,
+    private readonly usuariosService: UsuariosService
   ) {}
 
   ngOnInit(): void {
     this.displayedColumns = this.canManage()
-      ? ['id', 'nome', 'cpf', 'acoes']
-      : ['id', 'nome', 'cpf'];
+      ? ['id', 'nome', 'usuario', 'cpf', 'acoes']
+      : ['id', 'nome', 'usuario', 'cpf'];
     this.loadPessoas();
     this.setupSearch();
   }
@@ -129,7 +133,10 @@ export class ListaPessoasComponent implements OnInit, OnDestroy {
 
     this.pessoasService.getPage(filter).subscribe({
       next: (page) => {
-        this.dataSource.data = page.content || [];
+        const pessoasNormalizadas: PessoaComUsuario[] = (page.content ?? []).map(pessoa =>
+          this.normalizePessoa(pessoa)
+        );
+        this.dataSource.data = pessoasNormalizadas;
         this.totalElements = page.totalElements || 0;
         this.isLoading = false;
 
@@ -323,6 +330,80 @@ export class ListaPessoasComponent implements OnInit, OnDestroy {
       verticalPosition: 'top',
       panelClass: [panelClass]
     });
+  }
+
+  getUsuarioIcon(pessoa: Pessoa): string {
+    return pessoa.possuiUsuario ? 'verified_user' : 'person_off';
+  }
+
+  getUsuarioTooltip(pessoa: Pessoa): string {
+    return pessoa.possuiUsuario
+      ? 'Possui usuário vinculado'
+      : 'Não possui usuário vinculado';
+  }
+
+  getUsuarioIconClass(pessoa: Pessoa): string {
+    return pessoa.possuiUsuario ? 'usuario-icon possui-usuario' : 'usuario-icon sem-usuario';
+  }
+
+  canCriarUsuarioParaPessoa(pessoa: PessoaComUsuario): boolean {
+    return this.canManage() && !pessoa.possuiUsuario;
+  }
+
+  criarUsuarioParaPessoa(pessoa: PessoaComUsuario): void {
+    if (!this.canCriarUsuarioParaPessoa(pessoa)) {
+      return;
+    }
+
+    import('../dialog-novo-usuario/dialog-novo-usuario.component')
+      .then(({ DialogNovoUsuarioComponent }) => {
+        const dialogRef = this.dialog.open(DialogNovoUsuarioComponent, {
+          width: '560px',
+          data: {
+            pessoaId: pessoa.id,
+            pessoaNome: pessoa.nome,
+            rolesDisponiveis: this.getRolesDisponiveis()
+          }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+          if (!result) {
+            return;
+          }
+
+          this.usuariosService.criarUsuarioParaPessoa(result).subscribe({
+            next: () => {
+              this.showMessage(`Usuário criado para ${pessoa.nome}!`, 'success');
+              pessoa.possuiUsuario = true;
+              this.dataSource.data = this.dataSource.data.map(item =>
+                item.id === pessoa.id ? { ...item, possuiUsuario: true } : item
+              );
+            },
+            error: (error: HttpErrorResponse) => {
+              console.error('❌ Erro ao criar usuário para pessoa:', error);
+              const message = extractApiMessage(error) || 'Erro ao criar usuário para a pessoa.';
+              this.showMessage(message, 'error');
+            }
+          });
+        });
+      })
+      .catch(error => console.error('Erro ao carregar diálogo de criação de usuário:', error));
+  }
+
+  private getRolesDisponiveis(): Array<{ value: string; label: string }> {
+    return [
+      { value: 'ROLE_ADMINISTRADOR', label: 'Administrador' },
+      { value: 'ROLE_GERENTE', label: 'Gerente' },
+      { value: 'ROLE_SECRETARIO', label: 'Secretário' },
+      { value: 'ROLE_PROFESSOR', label: 'Professor' }
+    ];
+  }
+
+  private normalizePessoa(pessoa: Pessoa): PessoaComUsuario {
+    return {
+      ...pessoa,
+      possuiUsuario: !!pessoa.possuiUsuario
+    };
   }
 }
 

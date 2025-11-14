@@ -11,6 +11,10 @@ export interface AtividadeDTO {
   categoria: CategoriaDTO;
   fontesFinanciadora: FonteFinanciadoraDTO[];
   integrantes: PessoaPapelDTO[];
+  totalParticipantes?: number;
+  participantesCount?: number;
+  totalEvidencias?: number;
+  evidenciasCount?: number;
 }
 
 export interface CursoDTO {

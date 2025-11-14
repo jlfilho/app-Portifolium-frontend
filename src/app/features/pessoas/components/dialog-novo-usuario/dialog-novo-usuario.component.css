@@ -1,0 +1,75 @@
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 320px;
+  color: var(--text-primary, #1e293b);
+  margin-top: 12px;
+}
+
+.dialog-actions {
+  gap: 12px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+mat-dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-primary, #1e293b);
+  margin-bottom: 12px;
+}
+
+mat-dialog-title mat-icon {
+  color: var(--primary-color, #2563eb);
+}
+
+mat-form-field {
+  --mdc-outlined-text-field-outline-color: rgba(37, 99, 235, 0.35);
+  --mdc-outlined-text-field-hover-outline-color: var(--primary-color, #2563eb);
+  margin-top: 8px;
+}
+
+mat-form-field.mat-focused .mdc-notched-outline__leading,
+mat-form-field.mat-focused .mdc-notched-outline__notch,
+mat-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: var(--primary-color, #2563eb);
+}
+
+.helper-text {
+  font-size: 13px;
+  color: var(--text-secondary, #475569);
+  margin: 4px 0 0;
+}
+
+.dialog-actions button[color="primary"] {
+  background: linear-gradient(120deg, var(--primary-color, #2563eb), var(--secondary-color, #16a34a));
+  color: #fff;
+}
+
+.dialog-actions button[color="primary"][mat-stroked-button] {
+  background: transparent;
+  color: var(--primary-color, #2563eb);
+  border-color: rgba(37, 99, 235, 0.45);
+}
+
+.dialog-actions button[color="primary"][mat-stroked-button]:hover {
+  border-color: var(--primary-color, #2563eb);
+}
+
+.dialog-actions button[color="primary"][mat-raised-button] mat-icon {
+  margin-right: 6px;
+}
+
+:host ::ng-deep .mat-mdc-dialog-content {
+  overflow: visible;
+  padding-top: 16px;
+}
+
+:host ::ng-deep .mat-mdc-dialog-surface {
+  padding: 20px 24px 24px;
+}
+

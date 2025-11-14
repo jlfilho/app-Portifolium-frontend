@@ -46,42 +46,68 @@ export class ImageCompressionService {
       const ctx = canvas.getContext('2d');
       const img = new Image();
 
-      img.onload = () => {
+      if (!ctx) {
+        reject(new Error('Contexto 2D não disponível para compressão de imagem.'));
+        return;
+      }
+
+      img.onload = async () => {
         try {
-          // Calcular novas dimensões mantendo proporção
-          const { width, height } = this.calculateDimensions(
-            img.width,
-            img.height,
-            maxWidth,
-            maxHeight
-          );
+          const originalWidth = img.width;
+          const originalHeight = img.height;
+          let currentMaxWidth = maxWidth;
+          let currentMaxHeight = maxHeight;
+          let attempt = 0;
+          const maxAttempts = 6;
+          const sizeLimitBytes = maxSizeKB * 1024;
+          let lastResult: CompressionResult | null = null;
 
-          console.log('📐 Dimensões calculadas:', {
-            original: `${img.width}x${img.height}`,
-            nova: `${width}x${height}`
-          });
+          console.log('📐 Dimensões originais:', `${originalWidth}x${originalHeight}`);
 
-          // Configurar canvas
-          canvas.width = width;
-          canvas.height = height;
+          while (attempt < maxAttempts) {
+            const { width, height } = this.calculateDimensions(
+              originalWidth,
+              originalHeight,
+              currentMaxWidth,
+              currentMaxHeight
+            );
 
-          // Desenhar imagem redimensionada
-          ctx?.drawImage(img, 0, 0, width, height);
+            canvas.width = width;
+            canvas.height = height;
+            ctx.clearRect(0, 0, width, height);
+            ctx.drawImage(img, 0, 0, width, height);
 
-          // Tentar diferentes qualidades até atingir o tamanho desejado
-          this.compressWithQuality(canvas, file, quality, maxSizeKB)
-            .then(result => {
-              console.log('✅ Compressão concluída:', {
-                tamanhoOriginal: `${(result.originalSize / 1024 / 1024).toFixed(2)} MB`,
-                tamanhoComprimido: `${(result.compressedSize / 1024).toFixed(2)} KB`,
-                taxaCompressao: `${result.compressionRatio.toFixed(1)}%`
-              });
-              resolve(result);
-            })
-            .catch(error => {
-              console.error('❌ Erro na compressão:', error);
-              reject(error);
+            console.log(`🔄 Tentativa de compressão ${attempt + 1}:`, {
+              largura: width,
+              altura: height,
+              limiteKB: maxSizeKB
             });
+
+            lastResult = await this.compressWithQuality(canvas, file, quality, maxSizeKB);
+
+            console.log('📦 Resultado parcial:', {
+              tamanhoComprimido: `${(lastResult.compressedSize / 1024 / 1024).toFixed(2)} MB`,
+              taxaCompressao: `${lastResult.compressionRatio.toFixed(1)}%`
+            });
+
+            if (lastResult.compressedSize <= sizeLimitBytes || width <= 320 || height <= 320) {
+              console.log('✅ Compressão concluída dentro do limite definido.');
+              resolve(lastResult);
+              return;
+            }
+
+            currentMaxWidth = Math.max(Math.floor(currentMaxWidth * 0.85), 320);
+            currentMaxHeight = Math.max(Math.floor(currentMaxHeight * 0.85), 320);
+            attempt++;
+          }
+
+          if (lastResult) {
+            console.warn('⚠️ Não foi possível atingir exatamente o limite desejado, retornando melhor resultado obtido.');
+            resolve(lastResult);
+            return;
+          }
+
+          reject(new Error('Não foi possível comprimir a imagem.'));
         } catch (error) {
           console.error('❌ Erro ao processar imagem:', error);
           reject(error);

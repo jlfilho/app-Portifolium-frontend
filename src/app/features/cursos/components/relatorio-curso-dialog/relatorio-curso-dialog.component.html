@@ -1,0 +1,81 @@
+<h2 mat-dialog-title>
+  <mat-icon>picture_as_pdf</mat-icon>
+  Relatório PDF - {{ data.cursoNome || 'Curso' }}
+</h2>
+
+<mat-dialog-content class="dialog-content" [formGroup]="form">
+  <p class="dialog-description">
+    Informe o período, categorias desejadas (opcional) e adicione um texto introdutório para personalizar o relatório.
+  </p>
+
+  <div class="date-grid">
+    <mat-form-field appearance="outline">
+      <mat-label>Data início</mat-label>
+      <input matInput [matDatepicker]="pickerInicio" formControlName="dataInicio">
+      <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+      <mat-datepicker #pickerInicio></mat-datepicker>
+      <mat-icon matPrefix>event</mat-icon>
+      <mat-error *ngIf="form.get('dataInicio')?.hasError('required')">
+        Informe a data de início.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Data fim</mat-label>
+      <input matInput [matDatepicker]="pickerFim" formControlName="dataFim">
+      <mat-datepicker-toggle matSuffix [for]="pickerFim"></mat-datepicker-toggle>
+      <mat-datepicker #pickerFim></mat-datepicker>
+      <mat-icon matPrefix>event</mat-icon>
+      <mat-error *ngIf="form.get('dataFim')?.hasError('required')">
+        Informe a data final.
+      </mat-error>
+    </mat-form-field>
+  </div>
+
+  <div class="range-error" *ngIf="dataInvalida">
+    <mat-icon color="warn">error</mat-icon>
+    Data inicial não pode ser posterior à data final.
+  </div>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Categorias (opcional)</mat-label>
+    <mat-select formControlName="categorias" multiple>
+      <mat-option *ngIf="!categoriasDisponiveis.length" disabled>
+        Nenhuma categoria cadastrada.
+      </mat-option>
+      <mat-option *ngFor="let categoria of categoriasDisponiveis" [value]="categoria.id">
+        {{ categoria.nome }}
+      </mat-option>
+    </mat-select>
+    <mat-icon matPrefix>category</mat-icon>
+    <mat-hint *ngIf="!(form.value.categorias?.length)">
+      Sem categorias selecionadas, todas as atividades do período serão consideradas.
+    </mat-hint>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Introdução (opcional)</mat-label>
+    <textarea
+      matInput
+      rows="4"
+      formControlName="introducao"
+      maxlength="{{ maxIntroducaoLength }}"
+      placeholder="Mensagem inicial apresentada no início do relatório.">
+    </textarea>
+    <mat-hint align="end">
+      {{ form.get('introducao')?.value?.length || 0 }}/{{ maxIntroducaoLength }}
+    </mat-hint>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button type="button" (click)="fechar()">
+    Cancelar
+  </button>
+
+  <button mat-raised-button color="primary" type="button" (click)="submit()" [disabled]="form.invalid">
+    <mat-icon>download</mat-icon>
+    Gerar PDF
+  </button>
+</mat-dialog-actions>
+

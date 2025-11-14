@@ -14,7 +14,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { AtividadeDTO } from '../../models/atividade.model';
+import { AtividadeDTO, PessoaPapelDTO } from '../../models/atividade.model';
 import { AtividadesService } from '../../services/atividades.service';
 import { Papel, PapelUtils } from '../../models/papel.enum';
 import { EvidenciasService } from '../../../evidencias/services/evidencias.service';
@@ -81,6 +81,11 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
   private fetchingExistingFile = false;
   canManageEvidencias = false;
   private authoritiesSub?: Subscription;
+  isReordering = false;
+  orderChanged = false;
+  savingOrder = false;
+  private ordemOriginal: EvidenciaDTO[] = [];
+  private participantesBuffer: PessoaPapelDTO[] | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -100,11 +105,21 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     // Tentar obter informações do state
     const state = history.state;
     if (state && state.atividade) {
-      this.atividade = state.atividade;
-      this.cursoId = state.cursoId || (this.atividade ? this.atividade.curso.id : 0);
-      this.cursoNome = state.cursoNome || (this.atividade ? this.atividade.curso.nome : '');
+      const atividadeEstado = this.normalizeAtividade(state.atividade);
+      if (this.participantesBuffer) {
+        atividadeEstado.integrantes = this.participantesBuffer;
+        atividadeEstado.totalParticipantes = this.participantesBuffer.length;
+        atividadeEstado.participantesCount = this.participantesBuffer.length;
+      }
+      this.atividade = atividadeEstado;
+      this.cursoId = state.cursoId || atividadeEstado.curso.id;
+      this.cursoNome = state.cursoNome || atividadeEstado.curso.nome;
       this.isLoading = false;
       console.log('👁️ Atividade carregada do state:', this.atividade);
+
+      if (!atividadeEstado.integrantes || atividadeEstado.integrantes.length === 0) {
+        this.carregarAtividade(false);
+      }
     } else {
       // Carregar atividade da API
       this.carregarAtividade();
@@ -112,6 +127,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
 
     // Carregar evidências da atividade
     this.carregarEvidencias();
+    this.carregarParticipantes();
 
     this.updatePermissions();
     this.authoritiesSub = this.apiService.authorities.subscribe(() => this.updatePermissions());
@@ -121,15 +137,23 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     this.authoritiesSub?.unsubscribe();
   }
 
-  carregarAtividade(): void {
-    this.isLoading = true;
+  carregarAtividade(showLoading: boolean = true): void {
+    if (showLoading) {
+      this.isLoading = true;
+    }
     console.log('📡 Carregando atividade ID:', this.atividadeId);
 
     this.atividadesService.getAtividadeById(this.atividadeId).subscribe({
       next: (response) => {
-        this.atividade = response;
-        this.cursoId = this.atividade.curso.id;
-        this.cursoNome = this.atividade.curso.nome;
+        const atividadeNormalizada = this.normalizeAtividade(response);
+        if (this.participantesBuffer) {
+          atividadeNormalizada.integrantes = this.participantesBuffer;
+          atividadeNormalizada.totalParticipantes = this.participantesBuffer.length;
+          atividadeNormalizada.participantesCount = this.participantesBuffer.length;
+        }
+        this.atividade = atividadeNormalizada;
+        this.cursoId = atividadeNormalizada.curso.id;
+        this.cursoNome = atividadeNormalizada.curso.nome;
         this.isLoading = false;
         console.log('✅ Atividade carregada:', this.atividade);
       },
@@ -203,6 +227,72 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     this.canManageEvidencias = this.apiService.hasAnyRole(['ADMINISTRADOR', 'GERENTE', 'SECRETARIO']);
   }
 
+  private normalizeAtividade(atividade: AtividadeDTO): AtividadeDTO {
+    const integrantesArray = Array.isArray(atividade?.integrantes) ? atividade.integrantes.filter(Boolean) : [];
+    const totalParticipantes =
+      atividade.totalParticipantes ??
+      atividade.participantesCount ??
+      integrantesArray.length;
+
+    return {
+      ...atividade,
+      integrantes: integrantesArray,
+      totalParticipantes,
+      participantesCount: totalParticipantes
+    };
+  }
+
+  private carregarParticipantes(): void {
+    if (!this.atividadeId) {
+      return;
+    }
+
+    this.atividadesService.listarPessoasPorAtividade(this.atividadeId).subscribe({
+      next: (participantes) => {
+        const participantesNormalizados = this.normalizeParticipantes(participantes);
+        this.participantesBuffer = participantesNormalizados;
+
+        if (this.atividade) {
+          this.atividade = {
+            ...this.atividade,
+            integrantes: participantesNormalizados,
+            totalParticipantes: participantesNormalizados.length,
+            participantesCount: participantesNormalizados.length
+          };
+        }
+      },
+      error: (error) => {
+        console.error('❌ Erro ao carregar participantes da atividade:', error);
+        this.participantesBuffer = [];
+        if (this.atividade) {
+          this.atividade = {
+            ...this.atividade,
+            integrantes: [],
+            totalParticipantes: 0,
+            participantesCount: 0
+          };
+        }
+      }
+    });
+  }
+
+  private normalizeParticipantes(participantes: PessoaPapelDTO[] | null | undefined): PessoaPapelDTO[] {
+    if (!Array.isArray(participantes)) {
+      return [];
+    }
+
+    return participantes
+      .filter((participante): participante is PessoaPapelDTO => !!participante)
+      .map(participante => ({
+        id: participante.id ?? 0,
+        nome: participante.nome?.trim() && participante.nome.trim().length > 0
+          ? participante.nome.trim()
+          : 'Participante',
+        cpf: participante.cpf ?? '',
+        papel: participante.papel ?? ''
+      }));
+  }
+
   // ===== MÉTODOS DO CARROSSEL DE EVIDÊNCIAS =====
 
   carregarEvidencias(): void {
@@ -211,16 +301,29 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
 
     this.evidenciasService.listarEvidenciasPorAtividade(this.atividadeId).subscribe({
       next: (evidencias) => {
-        this.evidencias = evidencias;
-        this.currentSlideIndex = 0;
-        this.carrosselPageIndex = 0; // Reset paginação
+        const normalized = evidencias.map(e => this.normalizeEvidencia(e));
+        this.evidencias = this.sortEvidencias(normalized);
+        this.ordemOriginal = this.cloneEvidencias(this.evidencias);
+        this.orderChanged = false;
+        this.savingOrder = false;
+        this.refreshCarouselAfterDataChange();
         this.isLoadingEvidencias = false;
         console.log(`✅ ${evidencias.length} evidência(s) carregada(s)`);
         console.log(`📄 ${this.totalCarrosselPages} página(s) de ${this.carrosselPageSize} evidências`);
+
+        if (this.isReordering && !this.orderChanged) {
+          // Mantenha modo reordenação apenas se o usuário estiver no meio do ajuste
+          this.isReordering = false;
+        }
       },
       error: (error) => {
         console.error('❌ Erro ao carregar evidências:', error);
         this.evidencias = [];
+        this.ordemOriginal = [];
+        this.isReordering = false;
+        this.orderChanged = false;
+        this.savingOrder = false;
+        this.refreshCarouselAfterDataChange();
         this.isLoadingEvidencias = false;
       }
     });
@@ -228,6 +331,10 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
 
   getEvidenciaImageUrl(foto: string): string {
     return this.evidenciasService.getImageUrl(foto);
+  }
+
+  getEvidenciaImageUrlFromEvidencia(evidencia: EvidenciaDTO | null | undefined): string {
+    return this.evidenciasService.getImageUrl(this.getEvidenciaFotoPath(evidencia));
   }
 
   previousSlide(): void {
@@ -340,13 +447,6 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Validar tamanho (máximo 10MB)
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    if (file.size > maxSize) {
-      this.showMessage('Imagem muito grande. Tamanho máximo: 10MB', 'error');
-      return;
-    }
-
     console.log('📎 Arquivo selecionado:', file.name, this.formatFileSize(file.size));
 
     // Iniciar compressão
@@ -354,13 +454,28 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     this.compressionInfo = null;
 
     try {
+      const maxSizeBytes = 10 * 1024 * 1024; // 10MB
+      const requiresDownscale = file.size > maxSizeBytes;
+
+      if (requiresDownscale) {
+        console.log('📉 Redimensionando imagem para atender ao limite de 10MB.');
+      }
+
       // Comprimir imagem
       const compressionResult = await this.imageCompressionService.compressImage(file, {
-        maxWidth: 1920,
-        maxHeight: 1920,
+        maxWidth: requiresDownscale ? 4096 : 1920,
+        maxHeight: requiresDownscale ? 4096 : 1920,
         quality: 0.85,
-        maxSizeKB: 800 // 800KB máximo
+        maxSizeKB: requiresDownscale ? Math.floor(maxSizeBytes / 1024) : 800
       });
+
+      if (requiresDownscale && compressionResult.compressedSize > maxSizeBytes) {
+        this.showMessage('Não foi possível reduzir a imagem para até 10MB. Tente uma imagem com menor resolução.', 'error');
+        this.isCompressing = false;
+        this.selectedFile = null;
+        this.previewUrl = null;
+        return;
+      }
 
       this.selectedFile = compressionResult.compressedFile;
       this.compressionInfo = compressionResult;
@@ -518,7 +633,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     this.isEditingEvidence = true;
     this.editingEvidence = evidencia;
     this.legenda = evidencia.legenda || '';
-    this.previewUrl = this.getEvidenciaImageUrl(evidencia.foto);
+    this.previewUrl = this.getEvidenciaImageUrlFromEvidencia(evidencia);
     this.selectedFile = null;
     this.compressionInfo = null;
     this.showUploadForm = true;
@@ -530,9 +645,109 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     this.resetUploadForm();
   }
 
+  iniciarReordenacao(): void {
+    if (!this.canManageEvidencias || this.evidencias.length < 2) {
+      return;
+    }
+
+    this.isReordering = true;
+    this.orderChanged = false;
+    this.ordemOriginal = this.cloneEvidencias(this.evidencias);
+  }
+
+  cancelarReordenacao(): void {
+    if (this.savingOrder) {
+      return;
+    }
+
+    const currentId = this.getCurrentEvidenceId();
+    this.isReordering = false;
+    this.orderChanged = false;
+    this.evidencias = this.cloneEvidencias(this.ordemOriginal.length ? this.ordemOriginal : this.evidencias);
+    this.refreshCarouselAfterDataChange(currentId);
+  }
+
+  moverEvidencia(evidencia: EvidenciaDTO, direction: number): void {
+    if (!this.isReordering || this.savingOrder) {
+      return;
+    }
+
+    const index = this.evidencias.findIndex(ev => ev.id === evidencia.id);
+    if (index === -1) {
+      return;
+    }
+
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= this.evidencias.length) {
+      return;
+    }
+
+    const reordered = [...this.evidencias];
+    const [item] = reordered.splice(index, 1);
+    reordered.splice(newIndex, 0, item);
+
+    reordered.forEach((ev, idx) => {
+      ev.ordem = idx + 1;
+    });
+
+    this.evidencias = reordered;
+    this.orderChanged = true;
+    this.refreshCarouselAfterDataChange(item.id ?? null);
+  }
+
+  salvarOrdemEvidencias(): void {
+    if (!this.isReordering || this.savingOrder) {
+      return;
+    }
+
+    const payload = this.evidencias
+      .filter(ev => ev.id !== undefined && ev.id !== null)
+      .map((ev, idx) => ({
+        evidenciaId: ev.id as number,
+        ordem: idx
+      }));
+
+    if (!payload.length) {
+      this.showMessage('Nenhuma evidência encontrada para salvar a ordem.', 'warning');
+      return;
+    }
+
+    const currentId = this.getCurrentEvidenceId();
+    this.savingOrder = true;
+
+    this.evidenciasService.reordenarEvidencias(this.atividadeId, payload).subscribe({
+      next: (response) => {
+        this.savingOrder = false;
+        this.isReordering = false;
+        this.orderChanged = false;
+
+        if (Array.isArray(response) && response.length > 0) {
+          const normalized = response.map(e => this.normalizeEvidencia(e));
+          this.evidencias = this.sortEvidencias(normalized);
+        } else {
+          // Se a API não retornar dados, mantém ordem local aplicada
+          this.evidencias = this.cloneEvidencias(this.evidencias);
+        }
+
+        this.ordemOriginal = this.cloneEvidencias(this.evidencias);
+        this.refreshCarouselAfterDataChange(currentId);
+        this.showMessage('Ordem das evidências atualizada com sucesso!', 'success');
+      },
+      error: (error) => {
+        this.savingOrder = false;
+        const apiMessage = extractApiMessage(error);
+        this.showMessage(apiMessage || error.message || 'Erro ao atualizar ordem das evidências.', 'error');
+        this.evidencias = this.cloneEvidencias(this.ordemOriginal.length ? this.ordemOriginal : this.evidencias);
+        this.refreshCarouselAfterDataChange(currentId);
+        this.isReordering = false;
+        this.orderChanged = false;
+      }
+    });
+  }
+
   private async obterArquivoDaEvidencia(evidencia: EvidenciaDTO): Promise<File | null> {
     try {
-      const url = this.getEvidenciaImageUrl(evidencia.foto);
+      const url = this.getEvidenciaImageUrlFromEvidencia(evidencia);
       const response = await fetch(url, { credentials: 'include' });
       if (!response.ok) {
         throw new Error('Não foi possível carregar a imagem atual.');
@@ -556,6 +771,75 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  }
+
+  private getEvidenciaFotoPath(evidencia: EvidenciaDTO | null | undefined): string {
+    if (!evidencia) {
+      return '';
+    }
+    return evidencia.foto || evidencia.urlFoto || '';
+  }
+
+  private normalizeEvidencia(evidencia: EvidenciaDTO): EvidenciaDTO {
+    const ordem =
+      typeof evidencia.ordem === 'number'
+        ? evidencia.ordem
+        : (evidencia as any)?.indice ?? undefined;
+
+    const foto = this.getEvidenciaFotoPath(evidencia);
+
+    return {
+      ...evidencia,
+      foto,
+      ordem: typeof ordem === 'number' ? ordem : undefined
+    };
+  }
+
+  private sortEvidencias(evidencias: EvidenciaDTO[]): EvidenciaDTO[] {
+    return [...evidencias].sort((a, b) => {
+      const ordemA = typeof a.ordem === 'number' ? a.ordem : Number.MAX_SAFE_INTEGER;
+      const ordemB = typeof b.ordem === 'number' ? b.ordem : Number.MAX_SAFE_INTEGER;
+      if (ordemA !== ordemB) {
+        return ordemA - ordemB;
+      }
+      return (a.id ?? Number.MAX_SAFE_INTEGER) - (b.id ?? Number.MAX_SAFE_INTEGER);
+    });
+  }
+
+  private cloneEvidencias(evidencias: EvidenciaDTO[]): EvidenciaDTO[] {
+    return evidencias.map(ev => ({ ...ev }));
+  }
+
+  private refreshCarouselAfterDataChange(targetEvidenceId?: number | null): void {
+    if (!this.evidencias.length) {
+      this.currentSlideIndex = 0;
+      this.carrosselPageIndex = 0;
+      return;
+    }
+
+    const targetId =
+      targetEvidenceId ??
+      this.getCurrentEvidenceId() ??
+      this.evidencias[0]?.id ??
+      null;
+
+    if (targetId !== null && targetId !== undefined) {
+      const newIndex = this.evidencias.findIndex(ev => ev.id === targetId);
+      if (newIndex >= 0) {
+        this.carrosselPageIndex = Math.floor(newIndex / this.carrosselPageSize);
+        this.currentSlideIndex = newIndex % this.carrosselPageSize;
+        return;
+      }
+    }
+
+    this.carrosselPageIndex = 0;
+    this.currentSlideIndex = 0;
+  }
+
+  private getCurrentEvidenceId(): number | null {
+    const absoluteIndex = this.carrosselPageIndex * this.carrosselPageSize + this.currentSlideIndex;
+    const evidencia = this.evidencias[absoluteIndex];
+    return evidencia?.id ?? null;
   }
 
   private async openConfirmDialog(data: { title: string; message: string; confirmText: string; cancelText: string }): Promise<boolean> {

@@ -83,8 +83,8 @@ export class ListaPessoasComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.displayedColumns = this.canManage()
-      ? ['id', 'nome', 'usuario', 'cpf', 'acoes']
-      : ['id', 'nome', 'usuario', 'cpf'];
+      ? ['nome', 'usuario', 'cpf', 'acoes']
+      : ['nome', 'usuario', 'cpf'];
     this.loadPessoas();
     this.setupSearch();
   }
@@ -395,7 +395,7 @@ export class ListaPessoasComponent implements OnInit, OnDestroy {
       { value: 'ROLE_ADMINISTRADOR', label: 'Administrador' },
       { value: 'ROLE_GERENTE', label: 'Gerente' },
       { value: 'ROLE_SECRETARIO', label: 'Secretário' },
-      { value: 'ROLE_PROFESSOR', label: 'Professor' }
+      { value: 'ROLE_COORDENADOR_ATIVIDADE', label: 'Coordenador de Atividade' }
     ];
   }
 

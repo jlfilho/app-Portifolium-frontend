@@ -50,7 +50,8 @@ export class FormUsuarioComponent implements OnInit {
   roles = [
     { value: 'ROLE_ADMINISTRADOR', label: 'Administrador', icon: 'admin_panel_settings' },
     { value: 'ROLE_GERENTE', label: 'Gerente', icon: 'manage_accounts' },
-    { value: 'ROLE_SECRETARIO', label: 'Secretário(a)', icon: 'assignment_ind' }
+    { value: 'ROLE_SECRETARIO', label: 'Secretário(a)', icon: 'assignment_ind' },
+    { value: 'ROLE_COORDENADOR_ATIVIDADE', label: 'Coordenador de Atividade', icon: 'event_note' }
   ];
 
   constructor(
@@ -303,6 +304,8 @@ export class FormUsuarioComponent implements OnInit {
       return 'primary';
     } else if (roleUpper.includes('SECRETARIO')) {
       return 'accent';
+    } else if (roleUpper.includes('COORDENADOR_ATIVIDADE') || roleUpper.includes('COORDENADOR ATIVIDADE')) {
+      return ''; // Retorna vazio para usar classe CSS customizada
     }
     return '';
   }
@@ -315,8 +318,15 @@ export class FormUsuarioComponent implements OnInit {
       return 'manage_accounts';
     } else if (roleUpper.includes('SECRETARIO')) {
       return 'assignment_ind';
+    } else if (roleUpper.includes('COORDENADOR_ATIVIDADE') || roleUpper.includes('COORDENADOR ATIVIDADE')) {
+      return 'event_note';
     }
     return 'person';
+  }
+
+  getRoleLabel(roleValue: string): string {
+    const role = this.roles.find(r => r.value === roleValue);
+    return role ? role.label : roleValue;
   }
 
   // Getters

@@ -53,7 +53,7 @@ import { ApiService } from '../../../../shared/api.service';
   styleUrl: './lista-usuarios.component.css'
 })
 export class ListaUsuariosComponent implements OnInit {
-  displayedColumns: string[] = ['id', 'nome', 'email', 'cpf', 'role', 'cursos', 'actions'];
+  displayedColumns: string[] = ['nome', 'email', 'cpf', 'role', 'cursos', 'actions'];
   dataSource!: MatTableDataSource<Usuario>;
   isLoading = true;
 
@@ -61,7 +61,7 @@ export class ListaUsuariosComponent implements OnInit {
   totalElements = 0;
   pageSize = 10;
   pageIndex = 0;
-  sortBy = 'id';
+  sortBy = 'nome'; // Ordenação por nome
   sortDirection: 'ASC' | 'DESC' = 'ASC';
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -84,12 +84,13 @@ export class ListaUsuariosComponent implements OnInit {
   ngAfterViewInit(): void {
     // Conectar eventos do MatSort para paginação do servidor
     if (this.sort) {
-      this.sort.sortChange.subscribe(() => {
-        this.pageIndex = 0; // Resetar para primeira página ao ordenar
-        this.sortBy = this.sort.active || 'id';
-        this.sortDirection = this.sort.direction === 'desc' ? 'DESC' : 'ASC';
-        this.loadUsers();
-      });
+      // Desabilitar ordenação interativa - backend só suporta ordenação por 'id'
+      // this.sort.sortChange.subscribe(() => {
+      //   this.pageIndex = 0;
+      //   this.sortBy = this.sort.active || 'id';
+      //   this.sortDirection = this.sort.direction === 'desc' ? 'DESC' : 'ASC';
+      //   this.loadUsers();
+      // });
     }
   }
 

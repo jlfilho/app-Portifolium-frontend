@@ -1672,11 +1672,11 @@ export class FormAtividadeComponent implements OnInit {
           this.router.navigate(['/atividades/curso', this.cursoId]);
         }
       },
-        error: (error) => {
-          console.error('❌ Erro ao criar atividade:', error);
-          console.error('❌ Status:', error?.status);
-          console.error('❌ Error Body:', error?.error);
-          this.isSaving = false;
+      error: (error) => {
+        console.error('❌ Erro ao criar atividade:', error);
+        console.error('❌ Status:', error?.status);
+        console.error('❌ Error Body:', error?.error);
+        this.isSaving = false;
           if (error?.status === 403) {
             this.showMessage(
               'Você não tem permissão para criar atividades. Verifique se você tem a role necessária e está associado ao curso.',
@@ -1685,7 +1685,7 @@ export class FormAtividadeComponent implements OnInit {
           } else {
             this.showMessage('Erro ao criar atividade: ' + this.extractErrorMessage(error), 'error');
           }
-        }
+      }
     });
   }
 

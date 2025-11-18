@@ -18,7 +18,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 // Services
 import { ApiService } from './../../shared/api.service';
-import { TestDialogComponent } from '../../shared/components/test-dialog/test-dialog.component';
+import { PerfilUsuarioDialogComponent } from '../../shared/components/perfil-usuario-dialog/perfil-usuario-dialog.component';
 import { PessoasService } from '../../features/pessoas/services/pessoas.service';
 import { Pessoa } from '../../features/pessoas/models/pessoa.model';
 import { UsuariosService } from '../../features/usuarios/services/usuarios.service';
@@ -75,20 +75,33 @@ export class HomeComponent implements OnInit {
       console.log('✅ Informações extraídas do token:', userInfo);
 
       // Atualizar propriedades do componente
-      const fallbackName = userInfo.username || userInfo.email || 'Usuário';
-      this.userName = userInfo.name?.trim() ? userInfo.name.trim() : fallbackName;
-      this.userEmail = userInfo.email;
+      this.userEmail = userInfo.email || userInfo.username || '';
       this.userAuthorities = userInfo.authorities;
 
-      const hasName = !!userInfo.name && !!userInfo.name.trim();
+      // Verificar se o token tem o nome
+      const nameFromToken = userInfo.name?.trim();
+      const hasName = !!nameFromToken;
 
-      if (!hasName && userInfo.pessoaId) {
-        this.fetchPessoaNome(userInfo.pessoaId, fallbackName);
-      } else if (!hasName && this.canManageUsers() && userInfo.email) {
-        this.fetchUsuarioNomePorEmail(userInfo.email, fallbackName);
+      if (hasName && nameFromToken) {
+        // Se o token tem o nome, usar diretamente
+        this.userName = nameFromToken;
+        console.log('👤 Nome do usuário (do token):', this.userName);
+      } else {
+        // Se não tem nome no token, inicializar com placeholder e buscar
+        this.userName = 'Carregando...';
+        
+        // Priorizar busca por pessoaId, depois por email
+        if (userInfo.pessoaId) {
+          this.fetchPessoaNome(userInfo.pessoaId);
+        } else if (this.userEmail) {
+          // Buscar por email (funciona para todos os usuários)
+          this.fetchUsuarioNomePorEmail(this.userEmail);
+        } else {
+          // Fallback final se não conseguir buscar
+          this.userName = 'Usuário';
+        }
       }
 
-      console.log('👤 Nome do usuário:', this.userName);
       console.log('📧 Email do usuário:', this.userEmail);
       console.log('🔐 Permissões:', this.userAuthorities);
     } else {
@@ -99,36 +112,50 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  private fetchPessoaNome(pessoaId: number, fallback: string): void {
+  private fetchPessoaNome(pessoaId: number): void {
     this.pessoasService.getById(pessoaId).subscribe({
       next: (pessoa: Pessoa) => {
         const nome = pessoa?.nome?.trim();
         if (nome) {
           this.userName = nome;
+          console.log('👤 Nome do usuário (da pessoa):', this.userName);
         } else {
-          this.userName = fallback;
+          // Se não encontrou nome na pessoa, tentar buscar por email
+          if (this.userEmail) {
+            this.fetchUsuarioNomePorEmail(this.userEmail);
+          } else {
+            this.userName = 'Usuário';
+          }
         }
       },
       error: (error) => {
         console.warn('⚠️ Não foi possível carregar nome da pessoa pelo ID.', error);
-        this.userName = fallback;
+        // Se falhar, tentar buscar por email
+        if (this.userEmail) {
+          this.fetchUsuarioNomePorEmail(this.userEmail);
+        } else {
+          this.userName = 'Usuário';
+        }
       }
     });
   }
 
-  private fetchUsuarioNomePorEmail(email: string, fallback: string): void {
+  private fetchUsuarioNomePorEmail(email: string): void {
     this.usuariosService.getUserByEmail(email).subscribe({
       next: (usuario) => {
         const nome = usuario?.nome?.trim();
         if (nome) {
           this.userName = nome;
+          console.log('👤 Nome do usuário (do usuário):', this.userName);
         } else {
-          this.userName = fallback;
+          // Se não encontrou nome, usar email como último recurso
+          this.userName = email.split('@')[0] || 'Usuário';
         }
       },
       error: (error) => {
         console.warn('⚠️ Não foi possível carregar nome do usuário pelo e-mail.', error);
-        this.userName = fallback;
+        // Como último recurso, usar parte do email antes do @
+        this.userName = email ? email.split('@')[0] : 'Usuário';
       }
     });
   }
@@ -160,19 +187,23 @@ export class HomeComponent implements OnInit {
   }
 
   /**
-   * Navega para a página de perfil
+   * Abre o diálogo de perfil do usuário
    */
   goToProfile(): void {
-    console.log('📱 Navegando para perfil do usuário');
-    this.router.navigate(['/perfil']);
-  }
+    console.log('📱 Abrindo perfil do usuário');
+    
+    if (!this.userEmail) {
+      console.warn('⚠️ Email do usuário não disponível');
+      return;
+    }
 
-  /**
-   * Navega para a página de configurações
-   */
-  goToSettings(): void {
-    console.log('⚙️ Navegando para configurações');
-    this.router.navigate(['/configuracoes']);
+    this.dialog.open(PerfilUsuarioDialogComponent, {
+      width: '600px',
+      maxWidth: '90vw',
+      data: {
+        userEmail: this.userEmail
+      }
+    });
   }
 
   /**
@@ -200,19 +231,4 @@ export class HomeComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  /**
-   * Testa o diálogo para verificar se está funcionando
-   */
-  testDialog(): void {
-    console.log('🧪 Testando diálogo...');
-
-    const dialogRef = this.dialog.open(TestDialogComponent, {
-      width: '500px',
-      data: { message: 'Teste de diálogo' }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('📋 Resultado do diálogo:', result);
-    });
-  }
 }

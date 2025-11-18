@@ -1,0 +1,109 @@
+<div class="editar-perfil-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>edit</mat-icon>
+      Editar Perfil
+    </h2>
+    <button mat-icon-button (click)="onCancel()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <form [formGroup]="perfilForm" class="perfil-form">
+      <!-- Informações Pessoais -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon>person</mat-icon>
+          Informações Pessoais
+        </h3>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nome</mat-label>
+          <input matInput formControlName="nome" placeholder="Digite seu nome completo">
+          <mat-icon matPrefix>person</mat-icon>
+          <mat-error *ngIf="nome?.hasError('required')">
+            Nome é obrigatório
+          </mat-error>
+          <mat-error *ngIf="nome?.hasError('minlength')">
+            Nome deve ter no mínimo 3 caracteres
+          </mat-error>
+          <mat-error *ngIf="nome?.hasError('maxlength')">
+            Nome deve ter no máximo 100 caracteres
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>CPF</mat-label>
+          <input 
+            matInput 
+            formControlName="cpf" 
+            placeholder="000.000.000-00"
+            (input)="onCPFInput($event)"
+            (blur)="onCPFBlur()"
+            maxlength="14">
+          <mat-icon matPrefix>badge</mat-icon>
+          <mat-hint>Formato: 000.000.000-00</mat-hint>
+          <mat-error *ngIf="cpf?.hasError('required')">
+            CPF é obrigatório
+          </mat-error>
+          <mat-error *ngIf="cpf?.hasError('pattern')">
+            CPF inválido. Use o formato: 000.000.000-00
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>E-mail</mat-label>
+          <input matInput formControlName="email" type="email" placeholder="seu@email.com">
+          <mat-icon matPrefix>email</mat-icon>
+          <mat-error *ngIf="email?.hasError('required')">
+            E-mail é obrigatório
+          </mat-error>
+          <mat-error *ngIf="email?.hasError('email')">
+            E-mail inválido
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Segurança -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon>security</mat-icon>
+          Segurança
+        </h3>
+
+        <div class="password-section">
+          <p class="password-description">Altere sua senha para manter sua conta segura.</p>
+          <button 
+            mat-raised-button 
+            color="primary" 
+            type="button"
+            (click)="abrirTrocaSenha()"
+            class="change-password-btn">
+            <mat-icon>lock</mat-icon>
+            Alterar Senha
+          </button>
+        </div>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" [disabled]="isSaving">
+      <mat-icon>close</mat-icon>
+      Cancelar
+    </button>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="onSubmit()" 
+      [disabled]="isSaving || perfilForm.invalid">
+      <mat-icon *ngIf="!isSaving">save</mat-icon>
+      <mat-progress-spinner *ngIf="isSaving" mode="indeterminate" diameter="20" class="button-spinner"></mat-progress-spinner>
+      {{ isSaving ? 'Salvando...' : 'Salvar' }}
+    </button>
+  </mat-dialog-actions>
+</div>
+

@@ -245,4 +245,44 @@ export class ApiService {
 
     return userInfo.email || userInfo.username || '';
   }
+
+  /**
+   * Verificar se o usuário pode criar atividades
+   * Permite: ADMINISTRADOR, GERENTE, SECRETARIO, COORDENADOR_ATIVIDADE
+   */
+  podeCriarAtividade(): boolean {
+    return this.hasAnyRole(['ADMINISTRADOR', 'GERENTE', 'SECRETARIO', 'COORDENADOR_ATIVIDADE']);
+  }
+
+  /**
+   * Verificar se o usuário pode editar/excluir atividades (sem verificação de coordenador específico)
+   * Permite: ADMINISTRADOR, GERENTE, SECRETARIO, COORDENADOR_ATIVIDADE
+   * Nota: Para COORDENADOR_ATIVIDADE, ainda é necessário verificar se é coordenador da atividade específica
+   */
+  podeGerenciarAtividades(): boolean {
+    return this.hasAnyRole(['ADMINISTRADOR', 'GERENTE', 'SECRETARIO', 'COORDENADOR_ATIVIDADE']);
+  }
+
+  /**
+   * Verificar se o usuário tem role de administrador, gerente ou secretário
+   * (sempre podem editar atividades onde estão associados ao curso)
+   */
+  isAdminGerenteOuSecretario(): boolean {
+    return this.hasAnyRole(['ADMINISTRADOR', 'GERENTE', 'SECRETARIO']);
+  }
+
+  /**
+   * Verificar se o usuário é coordenador de atividade
+   */
+  isCoordenadorAtividade(): boolean {
+    return this.hasRole('COORDENADOR_ATIVIDADE');
+  }
+
+  /**
+   * Obter pessoaId do usuário logado (se disponível no token)
+   */
+  getPessoaId(): number | undefined {
+    const userInfo = this.getUserInfoFromToken();
+    return userInfo?.pessoaId;
+  }
 }

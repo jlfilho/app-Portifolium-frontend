@@ -107,7 +107,8 @@
               <span class="user-name">{{ p.usuarioNome }}</span>
               <mat-chip
                 class="badge-status"
-                [ngClass]="getRoleColor(p.permissao)">
+                [ngClass]="getRoleColor(p.permissao)"
+                [class.coordenador-atividade]="isCoordenadorAtividade(p.permissao)">
                 <mat-icon class="role-icon">{{ getRoleIcon(p.permissao) }}</mat-icon>
                 {{ p.permissao }}
               </mat-chip>

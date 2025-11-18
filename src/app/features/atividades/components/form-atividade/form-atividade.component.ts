@@ -203,6 +203,7 @@ export class FormAtividadeComponent implements OnInit {
       statusPublicacao: [false],
       coordenador: [''],
       dataRealizacao: ['', Validators.required],
+      dataFim: [null], // Campo opcional para data fim
       cursoId: [{ value: '', disabled: true }], // Desabilitado - curso não pode ser alterado
       categoriaId: ['', Validators.required]
     });
@@ -354,6 +355,7 @@ export class FormAtividadeComponent implements OnInit {
       statusPublicacao: this.atividade.statusPublicacao,
       coordenador: this.atividade.coordenador,
       dataRealizacao: this.atividade.dataRealizacao,
+      dataFim: this.atividade.dataFim || null,
       cursoId: this.atividade.curso.id,
       categoriaId: this.atividade.categoria.id
     });
@@ -1409,6 +1411,14 @@ export class FormAtividadeComponent implements OnInit {
         dataRealizacao = dataRealizacao.toISOString().split('T')[0]; // YYYY-MM-DD
       }
 
+      // Converter dataFim para formato ISO se necessário
+      let dataFim = formData.dataFim;
+      if (dataFim instanceof Date) {
+        dataFim = dataFim.toISOString().split('T')[0]; // YYYY-MM-DD
+      } else if (!dataFim || dataFim === '') {
+        dataFim = null; // Garantir que seja null se vazio
+      }
+
       // Tentar diferentes formatos de dados
       let atividadeUpdate: any;
 
@@ -1461,6 +1471,7 @@ export class FormAtividadeComponent implements OnInit {
           statusPublicacao: formData.statusPublicacao !== null ? formData.statusPublicacao : false,
           coordenador: formData.coordenador || '',
           dataRealizacao: dataRealizacao || '',
+          dataFim: dataFim || null,
           fotoCapa: this.atividade.fotoCapa || '',
           curso: {
             id: this.atividade.curso.id,
@@ -1483,6 +1494,7 @@ export class FormAtividadeComponent implements OnInit {
           statusPublicacao: formData.statusPublicacao !== null ? formData.statusPublicacao : false,
           coordenador: formData.coordenador || '',
           dataRealizacao: dataRealizacao || '',
+          dataFim: dataFim || null,
           cursoId: formData.cursoId || 0,
           categoriaId: formData.categoriaId || 0,
           fontesFinanciadoraIds: fontesFinanciadoraIds
@@ -1522,8 +1534,15 @@ export class FormAtividadeComponent implements OnInit {
           console.error('❌ Erro ao atualizar atividade:', error);
           console.error('❌ Status:', error?.status);
           console.error('❌ Error Body:', error?.error);
-          this.showMessage('Erro ao atualizar atividade: ' + this.extractErrorMessage(error), 'error');
           this.isSaving = false;
+          if (error?.status === 403) {
+            this.showMessage(
+              'Você não tem permissão para editar esta atividade. Apenas coordenadores da atividade podem editá-la.',
+              'error'
+            );
+          } else {
+            this.showMessage('Erro ao atualizar atividade: ' + this.extractErrorMessage(error), 'error');
+          }
         }
       });
   }
@@ -1540,6 +1559,14 @@ export class FormAtividadeComponent implements OnInit {
     let dataRealizacao = formData.dataRealizacao;
     if (dataRealizacao instanceof Date) {
       dataRealizacao = dataRealizacao.toISOString().split('T')[0];
+    }
+
+    // Converter dataFim para formato ISO se necessário
+    let dataFim = formData.dataFim;
+    if (dataFim instanceof Date) {
+      dataFim = dataFim.toISOString().split('T')[0];
+    } else if (!dataFim || dataFim === '') {
+      dataFim = null;
     }
 
     // Buscar curso completo
@@ -1594,6 +1621,7 @@ export class FormAtividadeComponent implements OnInit {
       statusPublicacao: formData.statusPublicacao !== null ? formData.statusPublicacao : false,
       coordenador: formData.coordenador || '',
       dataRealizacao: dataRealizacao || '',
+      dataFim: dataFim || null,
       curso: {
         id: curso.id,
         nome: curso.nome,
@@ -1644,13 +1672,20 @@ export class FormAtividadeComponent implements OnInit {
           this.router.navigate(['/atividades/curso', this.cursoId]);
         }
       },
-      error: (error) => {
-        console.error('❌ Erro ao criar atividade:', error);
-        console.error('❌ Status:', error?.status);
-        console.error('❌ Error Body:', error?.error);
-        this.showMessage('Erro ao criar atividade: ' + this.extractErrorMessage(error), 'error');
-        this.isSaving = false;
-      }
+        error: (error) => {
+          console.error('❌ Erro ao criar atividade:', error);
+          console.error('❌ Status:', error?.status);
+          console.error('❌ Error Body:', error?.error);
+          this.isSaving = false;
+          if (error?.status === 403) {
+            this.showMessage(
+              'Você não tem permissão para criar atividades. Verifique se você tem a role necessária e está associado ao curso.',
+              'error'
+            );
+          } else {
+            this.showMessage('Erro ao criar atividade: ' + this.extractErrorMessage(error), 'error');
+          }
+        }
     });
   }
 
@@ -1665,6 +1700,14 @@ export class FormAtividadeComponent implements OnInit {
       let dataRealizacao = formData.dataRealizacao;
       if (dataRealizacao instanceof Date) {
         dataRealizacao = dataRealizacao.toISOString().split('T')[0];
+      }
+
+      // Converter dataFim para formato ISO se necessário
+      let dataFim = formData.dataFim;
+      if (dataFim instanceof Date) {
+        dataFim = dataFim.toISOString().split('T')[0];
+      } else if (!dataFim || dataFim === '') {
+        dataFim = null;
       }
 
       // Extrair IDs das fontes financiadoras selecionadas
@@ -1713,6 +1756,7 @@ export class FormAtividadeComponent implements OnInit {
           statusPublicacao: formData.statusPublicacao !== null ? formData.statusPublicacao : false,
           coordenador: formData.coordenador || '',
           dataRealizacao: dataRealizacao || '',
+          dataFim: dataFim || null,
           fotoCapa: this.atividade.fotoCapa || '',
           curso: {
             id: this.atividade.curso.id,
@@ -1734,6 +1778,7 @@ export class FormAtividadeComponent implements OnInit {
           statusPublicacao: formData.statusPublicacao !== null ? formData.statusPublicacao : false,
           coordenador: formData.coordenador || '',
           dataRealizacao: dataRealizacao || '',
+          dataFim: dataFim || null,
           cursoId: formData.cursoId || 0,
           categoriaId: formData.categoriaId || 0,
           fontesFinanciadoraIds: fontesFinanciadoraIds
@@ -1751,8 +1796,15 @@ export class FormAtividadeComponent implements OnInit {
         },
         error: (error) => {
           console.error('❌ Erro ao salvar:', error);
-          this.showMessage('Erro ao atualizar atividade: ' + this.extractErrorMessage(error), 'error');
           this.isSaving = false;
+          if (error?.status === 403) {
+            this.showMessage(
+              'Você não tem permissão para editar esta atividade. Apenas coordenadores da atividade podem editá-la.',
+              'error'
+            );
+          } else {
+            this.showMessage('Erro ao atualizar atividade: ' + this.extractErrorMessage(error), 'error');
+          }
         }
       });
     } else {
@@ -1815,6 +1867,7 @@ export class FormAtividadeComponent implements OnInit {
   get statusPublicacao() { return this.atividadeForm.get('statusPublicacao'); }
   get coordenador() { return this.atividadeForm.get('coordenador'); }
   get dataRealizacao() { return this.atividadeForm.get('dataRealizacao'); }
+  get dataFim() { return this.atividadeForm.get('dataFim'); }
   get categoriaId() { return this.atividadeForm.get('categoriaId'); }
 
   private cacheIntegranteInfo(integrante: PessoaPapelDTO): void {

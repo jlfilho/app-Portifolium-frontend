@@ -25,7 +25,12 @@
           <span>{{ isGeneratingRelatorio ? 'Gerando...' : 'Relatório PDF' }}</span>
         </button>
 
-        <button mat-raised-button color="primary" (click)="novaAtividade()" class="btn-nova-atividade">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="novaAtividade()" 
+          class="btn-nova-atividade"
+          *ngIf="podeCriarAtividade">
           <mat-icon>add_circle</mat-icon>
           Nova Atividade
         </button>
@@ -75,7 +80,7 @@
         <!-- Filtro por Data Início -->
         <mat-form-field appearance="outline" class="filter-field">
           <mat-label>Data Início</mat-label>
-          <input matInput [matDatepicker]="pickerInicio" [(ngModel)]="filtroDataInicio">
+          <input matInput [matDatepicker]="pickerInicio" [(ngModel)]="filtroDataInicio" [ngModelOptions]="{standalone: true}">
           <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
           <mat-datepicker #pickerInicio></mat-datepicker>
           <mat-icon matPrefix>event</mat-icon>
@@ -84,7 +89,7 @@
         <!-- Filtro por Data Fim -->
         <mat-form-field appearance="outline" class="filter-field">
           <mat-label>Data Fim</mat-label>
-          <input matInput [matDatepicker]="pickerFim" [(ngModel)]="filtroDataFim">
+          <input matInput [matDatepicker]="pickerFim" [(ngModel)]="filtroDataFim" [ngModelOptions]="{standalone: true}">
           <mat-datepicker-toggle matSuffix [for]="pickerFim"></mat-datepicker-toggle>
           <mat-datepicker #pickerFim></mat-datepicker>
           <mat-icon matPrefix>event</mat-icon>
@@ -156,7 +161,7 @@
             <div class="card-info-resumido">
               <div class="info-row">
                 <mat-icon class="info-icon">event</mat-icon>
-                <span class="info-text">{{ formatarData(atividade.dataRealizacao) }}</span>
+                <span class="info-text">{{ formatarDataAtividade(atividade) }}</span>
               </div>
 
               <div class="info-row">
@@ -202,7 +207,8 @@
               color="primary"
               (click)="editarAtividade(atividade)"
               class="btn-editar"
-              [disabled]="isLoading">
+              [disabled]="isLoading"
+              *ngIf="podeEditarAtividade(atividade)">
               <mat-icon>edit</mat-icon>
               Editar
             </button>
@@ -211,7 +217,8 @@
               color="warn"
               (click)="confirmarExclusao(atividade)"
               class="btn-excluir"
-              [disabled]="isLoading">
+              [disabled]="isLoading"
+              *ngIf="podeExcluirAtividade(atividade)">
               <mat-icon>delete</mat-icon>
               Excluir
             </button>

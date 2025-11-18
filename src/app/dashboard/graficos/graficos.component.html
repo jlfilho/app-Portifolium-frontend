@@ -8,22 +8,55 @@
       </h1>
       <p class="dashboard-subtitle">Visão geral do sistema AcadManage</p>
     </div>
-    <button mat-icon-button matTooltip="Atualizar dados" class="refresh-btn">
+    <button 
+      mat-icon-button 
+      matTooltip="Atualizar dados" 
+      class="refresh-btn"
+      (click)="carregarDashboard()"
+      [disabled]="loading">
       <mat-icon>refresh</mat-icon>
     </button>
   </div>
 
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+    <p>Carregando dashboard...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <mat-icon class="error-icon">error_outline</mat-icon>
+    <h2>Erro ao carregar dashboard</h2>
+    <p>{{ error }}</p>
+    <button mat-raised-button color="primary" (click)="carregarDashboard()">
+      <mat-icon>refresh</mat-icon>
+      Tentar novamente
+    </button>
+  </div>
+
+  <!-- Empty State (sem cursos associados) -->
+  <div *ngIf="!loading && !error && dashboard && !temDados()" class="empty-state">
+    <mat-icon class="empty-icon">school_off</mat-icon>
+    <h2>Nenhum curso associado</h2>
+    <p>Você não possui cursos associados. Entre em contato com o administrador.</p>
+  </div>
+
   <!-- Cards Estatísticos -->
-  <div class="stats-grid">
+  <div *ngIf="!loading && !error && dashboard && temDados()" class="stats-grid">
     <mat-card *ngFor="let card of statsCards" class="stat-card" [style.border-left-color]="card.color">
       <mat-card-content>
         <div class="stat-header">
           <div class="stat-icon" [style.background-color]="card.color + '20'">
             <mat-icon [style.color]="card.color">{{ card.icon }}</mat-icon>
           </div>
-          <div class="stat-trend" [class.positive]="card.trend && card.trend > 0" [class.negative]="card.trend && card.trend < 0">
-            <mat-icon>{{ card.trend && card.trend > 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
-            <span>{{ card.trend }}%</span>
+          <div 
+            class="stat-trend" 
+            [class.positive]="card.trend !== undefined && card.trend > 0" 
+            [class.negative]="card.trend !== undefined && card.trend < 0"
+            *ngIf="card.trend !== undefined">
+            <mat-icon>{{ card.trend > 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+            <span>{{ formatarPercentualCrescimento(card.trend || 0) }}</span>
           </div>
         </div>
         <div class="stat-body">
@@ -36,9 +69,9 @@
   </div>
 
   <!-- Gráficos e Informações -->
-  <div class="charts-grid">
+  <div *ngIf="!loading && !error && dashboard && temDados()" class="charts-grid">
     <!-- Atividades por Categoria -->
-    <mat-card class="chart-card">
+    <mat-card class="chart-card" *ngIf="atividadesPorCategoria.length > 0">
       <mat-card-header>
         <mat-card-title>
           <mat-icon>pie_chart</mat-icon>
@@ -76,7 +109,7 @@
         <div class="chart-container">
           <div class="donut-chart">
             <div class="donut-center">
-              <span class="donut-percentage">65%</span>
+              <span class="donut-percentage">{{ getPercentualPublicadas().toFixed(0) }}%</span>
               <span class="donut-label">Publicadas</span>
             </div>
           </div>
@@ -91,8 +124,8 @@
       </mat-card-content>
     </mat-card>
 
-    <!-- Usuários por Role -->
-    <mat-card class="chart-card full-width">
+    <!-- Usuários por Role (apenas para admin) -->
+    <mat-card class="chart-card full-width" *ngIf="ehAdmin() && usuariosPorRole.length > 0">
       <mat-card-header>
         <mat-card-title>
           <mat-icon>bar_chart</mat-icon>
@@ -109,7 +142,7 @@
             <div class="bar-container">
               <div
                 class="bar-fill"
-                [style.width.%]="(item.value / 234) * 100"
+                [style.width.%]="(item.value / getTotalUsuarios()) * 100"
                 [style.background-color]="item.color">
               </div>
             </div>
@@ -120,9 +153,9 @@
   </div>
 
   <!-- Cursos em Destaque e Atividades Recentes -->
-  <div class="content-grid">
+  <div *ngIf="!loading && !error && dashboard && temDados()" class="content-grid">
     <!-- Cursos em Destaque -->
-    <mat-card class="content-card">
+    <mat-card class="content-card" *ngIf="topCursos.length > 0">
       <mat-card-header>
         <mat-card-title>
           <mat-icon>star</mat-icon>
@@ -158,7 +191,7 @@
     </mat-card>
 
     <!-- Atividades Recentes -->
-    <mat-card class="content-card">
+    <mat-card class="content-card" *ngIf="recentActivities.length > 0">
       <mat-card-header>
         <mat-card-title>
           <mat-icon>history</mat-icon>
@@ -172,7 +205,7 @@
         <div class="activity-list">
           <div *ngFor="let activity of recentActivities" class="activity-item">
             <div class="activity-icon" [style.background-color]="getActivityColor(activity.status) + '20'">
-              <mat-icon [style.color]="getActivityColor(activity.status)">{{ activity.icon }}</mat-icon>
+              <mat-icon [style.color]="getActivityColor(activity.status)">{{ getActivityIcon(activity.status) }}</mat-icon>
             </div>
             <div class="activity-info">
               <p class="activity-title">{{ activity.title }}</p>
@@ -184,50 +217,12 @@
     </mat-card>
   </div>
 
-  <!-- Metas e Progresso -->
-  <mat-card class="metas-card">
-    <mat-card-header>
-      <mat-card-title>
-        <mat-icon>flag</mat-icon>
-        Metas e Progresso
-      </mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="metas-grid">
-        <div *ngFor="let meta of metas" class="meta-item">
-          <div class="meta-header">
-            <div class="meta-info">
-              <h4 class="meta-titulo">{{ meta.titulo }}</h4>
-              <p class="meta-valores">
-                <span class="meta-atual" [style.color]="meta.color">
-                  {{ meta.unidade === 'R$' ? formatCurrency(meta.atual) : formatNumber(meta.atual) }}
-                </span>
-                <span class="meta-separator">/</span>
-                <span class="meta-total">
-                  {{ meta.unidade === 'R$' ? formatCurrency(meta.meta) : formatNumber(meta.meta) }} {{ meta.unidade !== 'R$' ? meta.unidade : '' }}
-                </span>
-              </p>
-            </div>
-            <div class="meta-percentage" [style.color]="meta.color">
-              {{ meta.progresso }}%
-            </div>
-          </div>
-          <mat-progress-bar
-            mode="determinate"
-            [value]="meta.progresso"
-            [color]="meta.progresso >= 80 ? 'primary' : meta.progresso >= 50 ? 'accent' : 'warn'">
-          </mat-progress-bar>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
-
   <!-- Ações Rápidas -->
   <mat-card class="actions-card">
     <mat-card-header>
       <mat-card-title>
         <mat-icon>flash_on</mat-icon>
-        Ações Rápidas
+        Acesso rápido aos menus
       </mat-card-title>
     </mat-card-header>
     <mat-card-content>

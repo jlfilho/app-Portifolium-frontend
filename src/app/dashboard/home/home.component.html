@@ -56,17 +56,9 @@
       </div>
     </div>
     <mat-divider></mat-divider>
-    <button mat-menu-item (click)="testDialog()">
-      <mat-icon>bug_report</mat-icon>
-      <span>Teste Diálogo</span>
-    </button>
     <button mat-menu-item (click)="goToProfile()">
       <mat-icon>person</mat-icon>
       <span>Meu Perfil</span>
-    </button>
-    <button mat-menu-item (click)="goToSettings()">
-      <mat-icon>settings</mat-icon>
-      <span>Configurações</span>
     </button>
     <mat-divider></mat-divider>
     <button mat-menu-item (click)="logout()" class="logout-item">
@@ -172,17 +164,6 @@
       </a>
 
       <mat-divider class="nav-divider"></mat-divider>
-
-      <a
-        mat-list-item
-        routerLink="/configuracoes"
-        routerLinkActive="active-link"
-        matRipple
-        class="nav-item">
-        <mat-icon class="nav-icon">settings</mat-icon>
-        <span class="nav-text" *ngIf="!isCollapsed">Configurações</span>
-        <div class="active-indicator" *ngIf="!isCollapsed"></div>
-      </a>
     </mat-nav-list>
 
     <!-- Footer da Sidebar -->

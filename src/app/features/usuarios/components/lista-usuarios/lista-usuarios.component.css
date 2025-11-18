@@ -424,6 +424,24 @@ mat-divider {
   --mdc-chip-elevated-container-color: #A78BFA !important;
 }
 
+/* Cor customizada para COORDENADOR_ATIVIDADE */
+::ng-deep .mat-mdc-chip.coordenador-atividade {
+  --mdc-chip-label-text-color: white !important;
+  --mdc-chip-elevated-container-color: #10B981 !important;
+  --mdc-chip-container-color: #10B981 !important;
+  background-color: #10B981 !important;
+}
+
+::ng-deep .mat-mdc-chip.coordenador-atividade .mat-mdc-chip-action-label,
+::ng-deep .mat-mdc-chip.coordenador-atividade span,
+::ng-deep .mat-mdc-chip.coordenador-atividade .mat-icon {
+  color: white !important;
+}
+
+::ng-deep .mat-mdc-chip.coordenador-atividade.mdc-evolution-chip {
+  background-color: #10B981 !important;
+}
+
 ::ng-deep .mat-mdc-chip .mat-icon {
   color: white !important;
 }

@@ -225,8 +225,15 @@ export class ListaUsuariosComponent implements OnInit {
       return 'primary';
     } else if (roleUpper.includes('SECRETARIO')) {
       return 'accent';
+    } else if (roleUpper.includes('COORDENADOR_ATIVIDADE') || roleUpper.includes('COORDENADOR ATIVIDADE')) {
+      return ''; // Retorna vazio para usar classe CSS customizada
     }
     return '';
+  }
+
+  isCoordenadorAtividade(role: string): boolean {
+    const roleUpper = role.toUpperCase();
+    return roleUpper.includes('COORDENADOR_ATIVIDADE') || roleUpper.includes('COORDENADOR ATIVIDADE');
   }
 
   getRoleIcon(role: string): string {
@@ -237,6 +244,8 @@ export class ListaUsuariosComponent implements OnInit {
       return 'manage_accounts';
     } else if (roleUpper.includes('SECRETARIO')) {
       return 'assignment_ind';
+    } else if (roleUpper.includes('COORDENADOR_ATIVIDADE') || roleUpper.includes('COORDENADOR ATIVIDADE')) {
+      return 'event_note';
     }
     return 'person';
   }

@@ -91,7 +91,10 @@
           <ng-container matColumnDef="role">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Função </th>
             <td mat-cell *matCellDef="let usuario">
-              <mat-chip [color]="getRoleColor(usuario.role)" class="role-chip">
+              <mat-chip 
+                [color]="getRoleColor(usuario.role)" 
+                [class.coordenador-atividade]="isCoordenadorAtividade(usuario.role)"
+                class="role-chip">
                 <mat-icon class="role-icon">{{ getRoleIcon(usuario.role) }}</mat-icon>
                 {{ usuario.role }}
               </mat-chip>
@@ -190,7 +193,11 @@
               <mat-icon>{{ getRoleIcon(usuario.role) }}</mat-icon>
               <span class="label">Função:</span>
               <span class="value">
-                <mat-chip [color]="getRoleColor(usuario.role)" class="role-chip">
+                <mat-chip 
+                  [color]="getRoleColor(usuario.role)" 
+                  [class.coordenador-atividade]="isCoordenadorAtividade(usuario.role)"
+                  class="role-chip">
+                  <mat-icon class="role-icon">{{ getRoleIcon(usuario.role) }}</mat-icon>
                   {{ usuario.role }}
                 </mat-chip>
               </span>

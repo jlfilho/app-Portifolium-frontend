@@ -126,6 +126,16 @@ mat-card-content {
   color: var(--warning-color) !important;
 }
 
+.badge-status.coordenador-atividade {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: var(--success-color) !important;
+}
+
+.badge-status.coordenador-atividade .role-icon,
+.badge-status.coordenador-atividade mat-icon {
+  color: var(--success-color) !important;
+}
+
 .user-id {
   color: var(--text-light);
   font-size: 12px;

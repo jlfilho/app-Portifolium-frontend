@@ -78,6 +78,16 @@
           </mat-error>
         </mat-form-field>
 
+        <!-- Data Fim (Opcional) -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Data Fim (Opcional)</mat-label>
+          <input matInput [matDatepicker]="pickerFim" formControlName="dataFim" placeholder="Deixe vazio para evento em data única">
+          <mat-datepicker-toggle matSuffix [for]="pickerFim"></mat-datepicker-toggle>
+          <mat-datepicker #pickerFim></mat-datepicker>
+          <mat-icon matPrefix>event_available</mat-icon>
+          <mat-hint>Preencha apenas se a atividade tiver período (ex: de 15/03 a 20/03)</mat-hint>
+        </mat-form-field>
+
         <!-- Status de Publicação -->
         <mat-form-field appearance="outline" class="form-field">
           <mat-label>Status de Publicação</mat-label>

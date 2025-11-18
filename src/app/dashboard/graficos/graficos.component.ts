@@ -13,6 +13,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+
+// Services e Models
+import { DashboardService } from '../services/dashboard.service';
+import { DashboardDTO, MetricaDTO, ChartData } from '../models/dashboard.dto';
+import { extractApiMessage } from '../../shared/utils/message.utils';
 
 interface StatCard {
   title: string;
@@ -32,12 +39,6 @@ interface ActivityItem {
   icon: string;
 }
 
-interface ChartData {
-  label: string;
-  value: number;
-  color: string;
-}
-
 @Component({
   selector: 'acadmanage-graficos',
   standalone: true,
@@ -53,12 +54,17 @@ interface ChartData {
     MatTooltipModule,
     MatProgressBarModule,
     MatTableModule,
-    MatTabsModule
+    MatTabsModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule
   ],
   templateUrl: './graficos.component.html',
   styleUrl: './graficos.component.css'
 })
 export class GraficosComponent implements OnInit {
+  dashboard: DashboardDTO | null = null;
+  loading = true;
+  error: string | null = null;
 
   // Cards Estatísticos
   statsCards: StatCard[] = [];
@@ -74,235 +80,260 @@ export class GraficosComponent implements OnInit {
   // Cursos em Destaque
   topCursos: any[] = [];
 
-  // Metas e Progresso
-  metas: any[] = [];
+  // Cores para categorias
+  private categoriaColors: { [key: string]: string } = {
+    'Ensino': '#3B82F6',
+    'Pesquisa': '#10B981',
+    'Extensão': '#8B5CF6',
+    'Inovação': '#F59E0B',
+    'Outros': '#64748B'
+  };
 
-  constructor() {}
+  // Cores para métricas
+  private metricColors: string[] = [
+    '#3B82F6', // Total de Cursos
+    '#10B981', // Atividades Ativas
+    '#8B5CF6', // Usuários Cadastrados
+    '#06B6D4', // Pessoas Cadastradas
+    '#F59E0B', // Fontes Financiadoras
+    '#EF4444'  // Publicações
+  ];
+
+  // Ícones para métricas
+  private metricIcons: string[] = [
+    'school',      // Total de Cursos
+    'event',       // Atividades Ativas
+    'people',      // Usuários Cadastrados
+    'person',      // Pessoas Cadastradas
+    'attach_money', // Fontes Financiadoras
+    'publish'       // Publicações
+  ];
+
+  constructor(
+    private dashboardService: DashboardService,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
-    this.loadMockData();
+    this.carregarDashboard();
   }
 
-  loadMockData(): void {
-    console.log('📊 Carregando dados mockados do dashboard...');
+  carregarDashboard(): void {
+    this.loading = true;
+    this.error = null;
 
-    // Carregar todos os dados mockados
+    this.dashboardService.obterDadosDashboard().subscribe({
+      next: (data) => {
+        this.dashboard = data;
+        this.processarDados();
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('❌ Erro ao carregar dashboard:', err);
+        this.loading = false;
+
+        if (err.status === 401) {
+          this.error = 'Não autorizado. Faça login novamente.';
+        } else if (err.status === 403) {
+          this.error = 'Você não tem permissão para acessar o dashboard.';
+        } else if (err.status === 500) {
+          this.error = 'Erro no servidor. Tente novamente mais tarde.';
+        } else {
+          const apiMessage = extractApiMessage(err);
+          this.error = apiMessage || 'Erro ao carregar dashboard. Tente novamente.';
+        }
+
+        this.showMessage(this.error, 'error');
+      }
+    });
+  }
+
+  private processarDados(): void {
+    if (!this.dashboard) return;
+
     this.loadStatsCards();
     this.loadRecentActivities();
     this.loadChartData();
     this.loadTopCursos();
-    this.loadMetas();
   }
 
   // Cards Estatísticos
-  loadStatsCards(): void {
-    this.statsCards = [
-      {
-        title: 'Total de Cursos',
-        value: 15,
-        icon: 'school',
-        color: '#3B82F6',
-        trend: 12,
-        description: '12% mais que o mês anterior'
-      },
-      {
-        title: 'Atividades Ativas',
-        value: 48,
-        icon: 'event',
-        color: '#10B981',
-        trend: 8,
-        description: '8% de crescimento'
-      },
-      {
-        title: 'Usuários Cadastrados',
-        value: 234,
-        icon: 'people',
-        color: '#8B5CF6',
-        trend: 15,
-        description: '15% de aumento'
-      },
-      {
-        title: 'Fontes Financiadoras',
-        value: 12,
-        icon: 'attach_money',
-        color: '#F59E0B',
-        trend: -5,
-        description: '2 novas fontes este mês'
-      },
-      {
-        title: 'Publicações',
-        value: 89,
-        icon: 'publish',
-        color: '#EF4444',
-        trend: 20,
-        description: '20% mais publicações'
-      },
-      {
-        title: 'Taxa de Conclusão',
-        value: '87%',
-        icon: 'analytics',
-        color: '#06B6D4',
-        trend: 5,
-        description: '5% de melhoria'
-      }
+  private loadStatsCards(): void {
+    if (!this.dashboard) return;
+
+    const metricas = this.dashboard.metricasGerais;
+    const metricasArray: MetricaDTO[] = [
+      metricas.totalCursos,
+      metricas.atividadesAtivas,
+      metricas.usuariosCadastrados,
+      metricas.pessoasCadastradas,
+      metricas.fontesFinanciadoras,
+      metricas.publicacoes
     ];
+
+    const titulos = [
+      'Total de Cursos',
+      'Atividades Ativas',
+      'Usuários Cadastrados',
+      'Pessoas Cadastradas',
+      'Fontes Financiadoras',
+      'Publicações'
+    ];
+
+    this.statsCards = metricasArray.map((metrica, index) => ({
+      title: titulos[index],
+      value: metrica.valor,
+      icon: this.metricIcons[index],
+      color: this.metricColors[index],
+      trend: metrica.percentualCrescimento,
+      description: metrica.descricaoCrescimento
+    }));
   }
 
   // Atividades Recentes
-  loadRecentActivities(): void {
-    this.recentActivities = [
-      {
-        id: 1,
-        title: 'Nova atividade cadastrada: Workshop de IA',
-        type: 'create',
-        date: '2 horas atrás',
-        status: 'success',
-        icon: 'add_circle'
-      },
-      {
-        id: 2,
-        title: 'Curso de Engenharia de Software atualizado',
-        type: 'update',
-        date: '5 horas atrás',
-        status: 'info',
-        icon: 'update'
-      },
-      {
-        id: 3,
-        title: 'Novo usuário registrado: Maria Santos',
-        type: 'user',
-        date: '1 dia atrás',
-        status: 'success',
-        icon: 'person_add'
-      },
-      {
-        id: 4,
-        title: 'Atividade "Seminário de Pesquisa" publicada',
-        type: 'publish',
-        date: '1 dia atrás',
-        status: 'info',
-        icon: 'publish'
-      },
-      {
-        id: 5,
-        title: 'Prazo de inscrição se aproximando',
-        type: 'warning',
-        date: '2 dias atrás',
-        status: 'warning',
-        icon: 'warning'
-      },
-      {
-        id: 6,
-        title: 'Fonte financiadora CNPq adicionada',
-        type: 'finance',
-        date: '3 dias atrás',
-        status: 'success',
-        icon: 'attach_money'
-      }
-    ];
+  private loadRecentActivities(): void {
+    if (!this.dashboard) return;
+
+    this.recentActivities = this.dashboard.atividadesRecentes.map((item, index) => ({
+      id: index + 1,
+      title: item.descricao,
+      type: item.tipo.toLowerCase(),
+      date: item.tempoDecorrido,
+      status: item.tipo === 'Publicação' ? 'info' : 'success' as 'success' | 'warning' | 'error' | 'info',
+      icon: item.tipo === 'Publicação' ? 'publish' : 'info'
+    }));
   }
 
   // Dados para Gráficos
-  loadChartData(): void {
+  private loadChartData(): void {
+    if (!this.dashboard) return;
+
     // Atividades por Categoria
-    this.atividadesPorCategoria = [
-      { label: 'Ensino', value: 32, color: '#3B82F6' },
-      { label: 'Pesquisa', value: 28, color: '#10B981' },
-      { label: 'Extensão', value: 24, color: '#8B5CF6' },
-      { label: 'Inovação', value: 16, color: '#F59E0B' }
-    ];
+    this.atividadesPorCategoria = this.dashboard.atividadesPorCategoria.map(item => ({
+      label: item.categoria,
+      value: item.quantidade,
+      color: this.categoriaColors[item.categoria] || this.categoriaColors['Outros']
+    }));
 
     // Atividades por Status
+    const status = this.dashboard.statusPublicacao;
     this.atividadesPorStatus = [
-      { label: 'Publicadas', value: 65, color: '#10B981' },
-      { label: 'Não Publicadas', value: 35, color: '#64748B' }
+      { label: 'Publicadas', value: status.publicadas, color: '#10B981' },
+      { label: 'Não Publicadas', value: status.naoPublicadas, color: '#64748B' }
     ];
 
-    // Usuários por Role
-    this.usuariosPorRole = [
-      { label: 'Alunos', value: 150, color: '#3B82F6' },
-      { label: 'Professores', value: 45, color: '#10B981' },
-      { label: 'Secretários', value: 25, color: '#8B5CF6' },
-      { label: 'Gerentes', value: 10, color: '#F59E0B' },
-      { label: 'Administradores', value: 4, color: '#EF4444' }
-    ];
+    // Usuários por Role (apenas para admin)
+    // Usar dados diretamente do endpoint de estatísticas do dashboard
+    if (!this.dashboard.distribuicaoUsuarios || this.dashboard.distribuicaoUsuarios.length === 0) {
+      this.usuariosPorRole = [];
+      return;
+    }
+
+    // Log para debug - verificar dados recebidos do endpoint
+    console.log('📊 Dados de distribuição recebidos do endpoint:', this.dashboard.distribuicaoUsuarios);
+
+    // Mapear tipos do backend para nomes padronizados (case-insensitive)
+    const normalizarTipo = (tipo: string): string => {
+      const tipoLower = tipo.toLowerCase().trim();
+
+      // Mapeamento completo de possíveis variações
+      if (tipoLower.includes('administrador')) {
+        return 'Administradores';
+      }
+      if (tipoLower.includes('gerente')) {
+        return 'Gerentes';
+      }
+      if (tipoLower.includes('secretário') || tipoLower.includes('secretario')) {
+        return 'Secretários';
+      }
+      if (tipoLower.includes('coordenador') && tipoLower.includes('atividade')) {
+        return 'Coordenador de atividades';
+      }
+
+      // Se não mapeou, retorna o original
+      return tipo;
+    };
+
+    // Filtrar e mapear tipos permitidos (remover Alunos e Professores)
+    const tiposPermitidos = ['Administradores', 'Gerentes', 'Secretários', 'Coordenador de atividades'];
+    const distribuicaoProcessada = this.dashboard.distribuicaoUsuarios
+      .map(item => {
+        // Normalizar o tipo
+        const tipoNormalizado = normalizarTipo(item.tipo);
+        return {
+          tipo: tipoNormalizado,
+          quantidade: item.quantidade,
+          tipoOriginal: item.tipo // Para debug
+        };
+      })
+      .filter(item => tiposPermitidos.includes(item.tipo))
+      // Agrupar por tipo normalizado e somar quantidades
+      .reduce((acc, item) => {
+        const existente = acc.find(x => x.tipo === item.tipo);
+        if (existente) {
+          existente.quantidade += item.quantidade;
+        } else {
+          acc.push({ tipo: item.tipo, quantidade: item.quantidade });
+        }
+        return acc;
+      }, [] as { tipo: string; quantidade: number }[]);
+
+    // Log para debug - verificar dados processados
+    console.log('📊 Dados processados:', distribuicaoProcessada);
+
+    // Verificar se "Coordenador de atividades" existe, se não, adicionar com valor 0
+    const temCoordenador = distribuicaoProcessada.some(item => item.tipo === 'Coordenador de atividades');
+    if (!temCoordenador) {
+      distribuicaoProcessada.push({
+        tipo: 'Coordenador de atividades',
+        quantidade: 0
+      });
+    }
+
+    // Ordenar para garantir ordem: Administradores, Gerentes, Secretários, Coordenador de atividades
+    const ordem = ['Administradores', 'Gerentes', 'Secretários', 'Coordenador de atividades'];
+    distribuicaoProcessada.sort((a, b) => {
+      const indexA = ordem.indexOf(a.tipo);
+      const indexB = ordem.indexOf(b.tipo);
+      // Se não encontrar na ordem, coloca no final
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      return indexA - indexB;
+    });
+
+    // Mapear para ChartData com cores específicas
+    const colorMap: { [key: string]: string } = {
+      'Administradores': '#3B82F6',      // Azul
+      'Gerentes': '#10B981',              // Verde
+      'Secretários': '#8B5CF6',           // Roxo
+      'Coordenador de atividades': '#10B981' // Verde (mesma cor de Gerentes)
+    };
+
+    this.usuariosPorRole = distribuicaoProcessada.map((item) => ({
+      label: item.tipo,
+      value: item.quantidade,
+      color: colorMap[item.tipo] || '#64748B'
+    }));
+
+    // Log final para debug
+    console.log('📊 Distribuição de usuários final:', this.usuariosPorRole);
   }
 
   // Cursos em Destaque
-  loadTopCursos(): void {
-    this.topCursos = [
-      {
-        id: 1,
-        nome: 'Engenharia de Software',
-        atividades: 18,
-        usuarios: 85,
-        status: 'Ativo',
-        color: '#3B82F6'
-      },
-      {
-        id: 2,
-        nome: 'Ciência da Computação',
-        atividades: 15,
-        usuarios: 72,
-        status: 'Ativo',
-        color: '#10B981'
-      },
-      {
-        id: 3,
-        nome: 'Sistemas de Informação',
-        atividades: 12,
-        usuarios: 64,
-        status: 'Ativo',
-        color: '#8B5CF6'
-      },
-      {
-        id: 4,
-        nome: 'Análise e Desenvolvimento',
-        atividades: 10,
-        usuarios: 58,
-        status: 'Ativo',
-        color: '#F59E0B'
-      }
-    ];
+  private loadTopCursos(): void {
+    if (!this.dashboard) return;
+
+    const colors = ['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B'];
+    this.topCursos = this.dashboard.cursosDestaque.map((curso, index) => ({
+      id: index + 1,
+      nome: curso.nome,
+      atividades: curso.quantidadeAtividades,
+      usuarios: curso.quantidadeUsuarios,
+      status: 'Ativo',
+      color: colors[index % colors.length]
+    }));
   }
 
-  // Metas e Progresso
-  loadMetas(): void {
-    this.metas = [
-      {
-        titulo: 'Atividades de Extensão',
-        atual: 24,
-        meta: 30,
-        unidade: 'atividades',
-        progresso: 80,
-        color: '#3B82F6'
-      },
-      {
-        titulo: 'Projetos de Pesquisa',
-        atual: 18,
-        meta: 20,
-        unidade: 'projetos',
-        progresso: 90,
-        color: '#10B981'
-      },
-      {
-        titulo: 'Publicações Científicas',
-        atual: 42,
-        meta: 50,
-        unidade: 'publicações',
-        progresso: 84,
-        color: '#8B5CF6'
-      },
-      {
-        titulo: 'Captação de Recursos',
-        atual: 350000,
-        meta: 500000,
-        unidade: 'R$',
-        progresso: 70,
-        color: '#F59E0B'
-      }
-    ];
-  }
 
   // Métodos auxiliares
   getTotalAtividades(): number {
@@ -345,9 +376,61 @@ export class GraficosComponent implements OnInit {
     return new Intl.NumberFormat('pt-BR').format(value);
   }
 
+  // Formatação de percentual de crescimento
+  formatarPercentualCrescimento(percentual: number): string {
+    if (percentual > 0) {
+      return `+${percentual.toFixed(1)}%`;
+    } else if (percentual < 0) {
+      return `${percentual.toFixed(1)}%`;
+    }
+    return '0%';
+  }
+
+  // Verificar se é crescimento
+  ehCrescimento(percentual: number): boolean {
+    return percentual > 0;
+  }
+
+  // Verificar se tem dados
+  temDados(): boolean {
+    return this.dashboard !== null &&
+           this.dashboard.metricasGerais.totalCursos.valor > 0;
+  }
+
+  // Verificar se é admin (tem distribuição de usuários)
+  ehAdmin(): boolean {
+    return this.dashboard !== null &&
+           this.dashboard.distribuicaoUsuarios.length > 0;
+  }
+
+  // Obter percentual de publicadas
+  getPercentualPublicadas(): number {
+    if (!this.dashboard) return 0;
+    return this.dashboard.statusPublicacao.percentualPublicadas;
+  }
+
+  // Obter total de usuários para cálculo de percentual
+  getTotalUsuarios(): number {
+    if (!this.dashboard) return 1;
+    return this.usuariosPorRole.reduce((sum, item) => sum + item.value, 0) || 1;
+  }
+
   // Navegação
   navigateTo(route: string): void {
     console.log('🔗 Navegando para:', route);
-    // Implementar navegação conforme necessário
+  }
+
+  // Mostrar mensagem
+  private showMessage(message: string, type: 'success' | 'error' | 'warning'): void {
+    const panelClass = type === 'success' ? 'snackbar-success' :
+                      type === 'error' ? 'snackbar-error' :
+                      'snackbar-warning';
+
+    this.snackBar.open(message, 'Fechar', {
+      duration: 4000,
+      horizontalPosition: 'end',
+      verticalPosition: 'top',
+      panelClass: [panelClass]
+    });
   }
 }

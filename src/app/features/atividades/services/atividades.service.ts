@@ -11,6 +11,7 @@ import {
   PessoaPapelDTO
 } from '../models/atividade.model';
 import { Papel } from '../models/papel.enum';
+import { ApiService } from '../../../shared/api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,10 @@ import { Papel } from '../models/papel.enum';
 export class AtividadesService {
   private baseUrl = `${environment.apiUrl}/atividades`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private apiService: ApiService
+  ) {}
 
   /**
    * GET /api/atividades/curso/{cursoId}
@@ -495,5 +499,48 @@ export class AtividadesService {
         throw error;
       })
     );
+  }
+
+  /**
+   * Verificar se o usuário pode editar uma atividade específica
+   * @param atividade A atividade a ser verificada
+   * @returns true se o usuário pode editar, false caso contrário
+   */
+  podeEditarAtividade(atividade: AtividadeDTO): boolean {
+    // Admin, Gerente e Secretário sempre podem (se associados ao curso)
+    if (this.apiService.isAdminGerenteOuSecretario()) {
+      return true; // Backend fará verificação de associação ao curso
+    }
+
+    // Coordenador de Atividade só pode editar se for coordenador desta atividade
+    if (this.apiService.isCoordenadorAtividade()) {
+      const pessoaId = this.apiService.getPessoaId();
+      if (!pessoaId || !atividade.integrantes) {
+        return false;
+      }
+
+      // Verificar se o usuário está na lista de integrantes como coordenador
+      return atividade.integrantes.some(
+        integrante => integrante.id === pessoaId && integrante.papel === Papel.COORDENADOR
+      );
+    }
+
+    return false;
+  }
+
+  /**
+   * Verificar se o usuário pode criar atividades
+   * @returns true se o usuário pode criar, false caso contrário
+   */
+  podeCriarAtividade(): boolean {
+    return this.apiService.podeCriarAtividade();
+  }
+
+  /**
+   * Verificar se o usuário pode gerenciar atividades (criar/editar/excluir)
+   * @returns true se o usuário pode gerenciar, false caso contrário
+   */
+  podeGerenciarAtividades(): boolean {
+    return this.apiService.podeGerenciarAtividades();
   }
 }

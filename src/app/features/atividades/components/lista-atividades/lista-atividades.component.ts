@@ -209,7 +209,7 @@ export class ListaAtividadesComponent implements OnInit {
   }
 
   aplicarFiltros(): void {
-    this.pageIndex = 0; // Resetar para primeira página
+    this.pageIndex = 0; // Resetar para primeira página ao aplicar filtros
     this.loadAtividades();
   }
 
@@ -238,6 +238,10 @@ export class ListaAtividadesComponent implements OnInit {
   }
 
   novaAtividade(): void {
+    if (!this.podeCriarAtividade) {
+      this.showMessage('Você não tem permissão para criar atividades', 'warning');
+      return;
+    }
     console.log('➕ Criando nova atividade para curso:', this.cursoId);
     // Navegar para o formulário de criação
     this.router.navigate(['/atividades/nova', this.cursoId], {
@@ -266,6 +270,13 @@ export class ListaAtividadesComponent implements OnInit {
       console.warn('⚠️ Atividade inválida ao tentar editar:', atividade);
       return;
     }
+    if (!this.podeEditarAtividade(atividade)) {
+      this.showMessage(
+        'Você não tem permissão para editar esta atividade. Apenas coordenadores da atividade podem editá-la.',
+        'warning'
+      );
+      return;
+    }
     this.router.navigate(['/atividades/editar', atividade.id], {
       state: {
         atividade,
@@ -276,6 +287,13 @@ export class ListaAtividadesComponent implements OnInit {
   }
 
   async confirmarExclusao(atividade: AtividadeDTO): Promise<void> {
+    if (!this.podeExcluirAtividade(atividade)) {
+      this.showMessage(
+        'Você não tem permissão para excluir esta atividade. Apenas coordenadores da atividade podem excluí-la.',
+        'warning'
+      );
+      return;
+    }
     const confirmado = await this.openConfirmDialog({
       title: 'Excluir Atividade',
       message: `Tem certeza que deseja excluir a atividade "${atividade?.nome}"? Essa ação não pode ser desfeita.`,
@@ -296,9 +314,16 @@ export class ListaAtividadesComponent implements OnInit {
         this.loadAtividades();
       },
       error: (error) => {
-        const apiMessage = extractApiMessage(error);
-        this.showMessage(apiMessage || 'Erro ao excluir atividade. Tente novamente.', 'error');
         this.isLoading = false;
+        if (error?.status === 403) {
+          this.showMessage(
+            'Você não tem permissão para excluir esta atividade. Apenas coordenadores da atividade podem excluí-la.',
+            'error'
+          );
+        } else {
+          const apiMessage = extractApiMessage(error);
+          this.showMessage(apiMessage || 'Erro ao excluir atividade. Tente novamente.', 'error');
+        }
       }
     });
   }
@@ -336,6 +361,23 @@ export class ListaAtividadesComponent implements OnInit {
   formatarData(dataISO: string): string {
     const data = new Date(dataISO);
     return data.toLocaleDateString('pt-BR');
+  }
+
+  formatarDataAtividade(atividade: AtividadeDTO): string {
+    if (!atividade.dataRealizacao) return 'Data não informada';
+    
+    const dataInicio = new Date(atividade.dataRealizacao + 'T00:00:00');
+    const dataInicioFormatada = dataInicio.toLocaleDateString('pt-BR');
+    
+    if (!atividade.dataFim) {
+      // Evento em data única
+      return dataInicioFormatada;
+    } else {
+      // Evento em período
+      const dataFim = new Date(atividade.dataFim + 'T00:00:00');
+      const dataFimFormatada = dataFim.toLocaleDateString('pt-BR');
+      return `${dataInicioFormatada} a ${dataFimFormatada}`;
+    }
   }
 
   private showMessage(message: string, type: 'success' | 'error' | 'warning'): void {
@@ -501,6 +543,19 @@ export class ListaAtividadesComponent implements OnInit {
 
   get podeGerarRelatorio(): boolean {
     return this.apiService.hasAnyRole(['ADMINISTRADOR', 'GERENTE', 'SECRETARIO']);
+  }
+
+  get podeCriarAtividade(): boolean {
+    return this.atividadesService.podeCriarAtividade();
+  }
+
+  podeEditarAtividade(atividade: AtividadeDTO): boolean {
+    return this.atividadesService.podeEditarAtividade(atividade);
+  }
+
+  podeExcluirAtividade(atividade: AtividadeDTO): boolean {
+    // Mesma lógica de edição
+    return this.atividadesService.podeEditarAtividade(atividade);
   }
 
   async abrirDialogRelatorio(): Promise<void> {

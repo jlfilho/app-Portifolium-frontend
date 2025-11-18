@@ -179,6 +179,23 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     return dataObj.toLocaleDateString('pt-BR');
   }
 
+  formatarDataAtividade(atividade: AtividadeDTO): string {
+    if (!atividade.dataRealizacao) return 'Data não informada';
+    
+    const dataInicio = new Date(atividade.dataRealizacao + 'T00:00:00');
+    const dataInicioFormatada = dataInicio.toLocaleDateString('pt-BR');
+    
+    if (!atividade.dataFim) {
+      // Evento em data única
+      return dataInicioFormatada;
+    } else {
+      // Evento em período
+      const dataFim = new Date(atividade.dataFim + 'T00:00:00');
+      const dataFimFormatada = dataFim.toLocaleDateString('pt-BR');
+      return `${dataInicioFormatada} a ${dataFimFormatada}`;
+    }
+  }
+
   getPapelLabel(papel: string): string {
     return PapelUtils.getLabel(papel as Papel);
   }
@@ -193,6 +210,14 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
 
   editarAtividade(): void {
     if (!this.atividade) return;
+
+    if (!this.atividadesService.podeEditarAtividade(this.atividade)) {
+      this.showMessage(
+        'Você não tem permissão para editar esta atividade. Apenas coordenadores da atividade podem editá-la.',
+        'warning'
+      );
+      return;
+    }
 
     console.log('✏️ Navegando para edição da atividade:', this.atividadeId);
     this.router.navigate(['/atividades/editar', this.atividadeId], {
@@ -224,7 +249,22 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
   }
 
   private updatePermissions(): void {
-    this.canManageEvidencias = this.apiService.hasAnyRole(['ADMINISTRADOR', 'GERENTE', 'SECRETARIO']);
+    // Verificar se pode gerenciar evidências (inclui COORDENADOR_ATIVIDADE)
+    // Mas ainda precisa verificar se é coordenador da atividade específica
+    this.canManageEvidencias = this.apiService.podeGerenciarAtividades();
+    
+    // Se for COORDENADOR_ATIVIDADE, verificar se é coordenador desta atividade
+    if (this.apiService.isCoordenadorAtividade() && this.atividade) {
+      const pessoaId = this.apiService.getPessoaId();
+      if (pessoaId && this.atividade.integrantes) {
+        const isCoordenador = this.atividade.integrantes.some(
+          integrante => integrante.id === pessoaId && integrante.papel === 'COORDENADOR'
+        );
+        this.canManageEvidencias = isCoordenador;
+      } else {
+        this.canManageEvidencias = false;
+      }
+    }
   }
 
   private normalizeAtividade(atividade: AtividadeDTO): AtividadeDTO {
@@ -573,8 +613,16 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('❌ Erro ao salvar evidência:', error);
-        this.showMessage(error.message || 'Erro ao salvar evidência.', 'error');
         this.isUploading = false;
+        if (error?.status === 403) {
+          this.showMessage(
+            'Você não tem permissão para gerenciar evidências desta atividade. Apenas coordenadores da atividade podem gerenciá-las.',
+            'error'
+          );
+        } else {
+          const apiMessage = extractApiMessage(error);
+          this.showMessage(apiMessage || 'Erro ao salvar evidência.', 'error');
+        }
       }
     });
   }
@@ -606,9 +654,16 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
         this.carregarEvidencias();
       },
       error: (error) => {
-        const apiMessage = extractApiMessage(error);
-        this.showMessage(apiMessage || error.message || 'Erro ao excluir evidência.', 'error');
         this.deletingEvidenceId = null;
+        if (error?.status === 403) {
+          this.showMessage(
+            'Você não tem permissão para excluir evidências desta atividade. Apenas coordenadores da atividade podem excluí-las.',
+            'error'
+          );
+        } else {
+          const apiMessage = extractApiMessage(error);
+          this.showMessage(apiMessage || error.message || 'Erro ao excluir evidência.', 'error');
+        }
       }
     });
   }

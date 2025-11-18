@@ -280,6 +280,24 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     return dataObj.toLocaleDateString('pt-BR');
   }
 
+  // Formatar data da atividade (suporta período)
+  formatarDataAtividade(atividade: any): string {
+    if (!atividade?.dataRealizacao) return 'Data não informada';
+    
+    const dataInicio = new Date(atividade.dataRealizacao + 'T00:00:00');
+    const dataInicioFormatada = dataInicio.toLocaleDateString('pt-BR');
+    
+    if (!atividade.dataFim) {
+      // Evento em data única
+      return dataInicioFormatada;
+    } else {
+      // Evento em período
+      const dataFim = new Date(atividade.dataFim + 'T00:00:00');
+      const dataFimFormatada = dataFim.toLocaleDateString('pt-BR');
+      return `${dataInicioFormatada} a ${dataFimFormatada}`;
+    }
+  }
+
   // Obter URL da imagem
   getImageUrl(fotoCapa: string): string {
     if (!fotoCapa) return '';

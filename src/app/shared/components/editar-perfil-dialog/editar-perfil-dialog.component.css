@@ -1,0 +1,221 @@
+/* ============================================
+   EDITAR PERFIL DIALOG - PALETA DE CORES
+   ============================================ */
+
+.editar-perfil-dialog {
+  min-width: 500px;
+  max-width: 600px;
+  background-color: var(--bg-card);
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--card-header-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dialog-header h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin: 0;
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  -webkit-text-fill-color: var(--text-primary);
+}
+
+.dialog-header mat-icon {
+  color: var(--primary-color);
+  -webkit-text-fill-color: var(--primary-color);
+}
+
+.close-button {
+  color: var(--text-medium);
+  transition: all var(--transition-base);
+}
+
+.close-button:hover {
+  background-color: var(--bg-hover);
+  color: var(--primary-color);
+}
+
+mat-dialog-content {
+  padding: var(--spacing-lg);
+  max-height: 70vh;
+  overflow-y: auto;
+  background-color: var(--bg-content);
+}
+
+.perfil-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.form-section {
+  padding: var(--spacing-lg) 0;
+}
+
+.form-section:first-child {
+  padding-top: 0;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.section-title mat-icon {
+  color: var(--primary-color);
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: var(--spacing-md);
+}
+
+.full-width:last-child {
+  margin-bottom: 0;
+}
+
+/* Password Section */
+.password-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.password-description {
+  margin: 0;
+  font-size: var(--font-size-small);
+  color: var(--text-secondary);
+  line-height: var(--line-height-small);
+}
+
+.change-password-btn {
+  align-self: flex-start;
+  background: var(--primary-button-gradient);
+  color: white;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-md);
+}
+
+.change-password-btn:hover {
+  box-shadow: var(--shadow-primary);
+  transform: translateY(-1px);
+}
+
+/* Divider */
+mat-divider {
+  margin: var(--spacing-lg) 0;
+  border-color: var(--border-color);
+}
+
+/* Dialog Actions */
+mat-dialog-actions {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: 1px solid var(--border-color);
+  gap: var(--spacing-sm);
+  background-color: var(--bg-actions);
+}
+
+.button-spinner {
+  display: inline-block;
+  margin-right: var(--spacing-sm);
+}
+
+/* Form Field Styles */
+::ng-deep .mat-mdc-form-field {
+  width: 100%;
+}
+
+::ng-deep .mat-mdc-text-field-wrapper {
+  background-color: var(--bg-card);
+}
+
+::ng-deep .mat-mdc-form-field .mat-mdc-text-field-wrapper .mat-mdc-form-field-input-control input,
+::ng-deep .mat-mdc-form-field .mat-mdc-text-field-wrapper .mat-mdc-form-field-input-control textarea {
+  color: var(--text-primary);
+}
+
+::ng-deep .mat-mdc-form-field .mat-mdc-floating-label {
+  color: var(--text-secondary);
+}
+
+::ng-deep .mat-mdc-form-field .mat-mdc-form-field-focus-overlay {
+  background-color: var(--bg-hover);
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
+  color: var(--primary-color);
+}
+
+::ng-deep .mat-mdc-form-field .mat-mdc-form-field-subscript-wrapper {
+  color: var(--error-color);
+}
+
+::ng-deep .mat-mdc-form-field .mat-mdc-form-field-icon-prefix,
+::ng-deep .mat-mdc-form-field .mat-mdc-form-field-icon-suffix {
+  color: var(--text-secondary);
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-form-field-icon-prefix,
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-form-field-icon-suffix {
+  color: var(--primary-color);
+}
+
+/* Buttons */
+::ng-deep mat-dialog-actions button[mat-raised-button][color="primary"] {
+  background: var(--primary-button-gradient);
+  color: white;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+}
+
+::ng-deep mat-dialog-actions button[mat-raised-button][color="primary"]:hover:not(:disabled) {
+  box-shadow: var(--shadow-primary);
+  transform: translateY(-1px);
+}
+
+::ng-deep mat-dialog-actions button[mat-button] {
+  color: var(--text-secondary);
+  transition: all var(--transition-base);
+}
+
+::ng-deep mat-dialog-actions button[mat-button]:hover:not(:disabled) {
+  background-color: var(--bg-hover);
+  color: var(--primary-color);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .editar-perfil-dialog {
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  mat-dialog-content {
+    padding: var(--spacing-md);
+  }
+}
+

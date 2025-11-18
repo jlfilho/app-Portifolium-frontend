@@ -37,7 +37,7 @@
       </h1>
 
       <p class="hero-subtitle">
-        {{ atividade.curso.nome }} &bull; {{ formatarData(atividade.dataRealizacao) }}
+        {{ atividade.curso.nome }} &bull; {{ formatarDataAtividade(atividade) }}
       </p>
 
       <div class="hero-meta">
@@ -88,7 +88,7 @@
             <mat-icon>event</mat-icon>
             <div>
               <span class="label">Data de realização</span>
-              <span class="value">{{ formatarData(atividade.dataRealizacao) }}</span>
+              <span class="value">{{ formatarDataAtividade(atividade) }}</span>
             </div>
           </div>
 

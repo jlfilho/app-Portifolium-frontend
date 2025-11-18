@@ -1,0 +1,363 @@
+/* ============================================
+   PERFIL USUÁRIO DIALOG - PALETA DE CORES
+   ============================================ */
+
+.perfil-dialog {
+  min-width: 500px;
+  max-width: 700px;
+  background-color: var(--bg-card);
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--card-header-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dialog-header h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin: 0;
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  -webkit-text-fill-color: var(--text-primary);
+}
+
+.dialog-header mat-icon {
+  color: var(--primary-color);
+  -webkit-text-fill-color: var(--primary-color);
+}
+
+.close-button {
+  color: var(--text-medium);
+  transition: all var(--transition-base);
+}
+
+.close-button:hover {
+  background-color: var(--bg-hover);
+  color: var(--primary-color);
+}
+
+mat-dialog-content {
+  padding: var(--spacing-lg);
+  max-height: 70vh;
+  overflow-y: auto;
+  background-color: var(--bg-content);
+}
+
+/* Loading State */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px var(--spacing-lg);
+  gap: var(--spacing-md);
+}
+
+.loading-container p {
+  color: var(--text-secondary);
+  font-size: var(--font-size-small);
+}
+
+::ng-deep .loading-container .mat-mdc-progress-spinner {
+  --mdc-circular-progress-active-indicator-color: var(--primary-color);
+}
+
+/* Error State */
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px var(--spacing-lg);
+  gap: var(--spacing-md);
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: var(--error-color);
+}
+
+.error-container p {
+  color: var(--error-color);
+  font-size: var(--font-size-small);
+}
+
+/* Profile Card */
+.profile-card {
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  background-color: var(--bg-card);
+  overflow: hidden;
+}
+
+.profile-card mat-card-content {
+  padding: var(--spacing-lg);
+  background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-content) 100%);
+}
+
+/* Sections */
+.section {
+  padding: var(--spacing-lg) 0;
+}
+
+.section:first-child {
+  padding-top: 0;
+}
+
+.section:last-child {
+  padding-bottom: 0;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-lg) 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+  border-radius: var(--border-radius-md);
+  border-left: 4px solid var(--primary-color);
+  position: relative;
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--primary-button-gradient);
+  border-radius: var(--border-radius-sm) 0 0 var(--border-radius-sm);
+}
+
+.section-title mat-icon {
+  color: var(--primary-color);
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  background: var(--chip-background);
+  padding: var(--spacing-xs);
+  border-radius: var(--border-radius-sm);
+}
+
+/* Field Group */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+}
+
+.field:hover {
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-md);
+  background: linear-gradient(135deg, var(--bg-darker) 0%, var(--bg-dark) 100%);
+}
+
+.field-label {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.field-label::before {
+  content: '';
+  width: 3px;
+  height: 14px;
+  background: var(--primary-button-gradient);
+  border-radius: var(--border-radius-sm);
+  display: inline-block;
+}
+
+.field-value {
+  font-size: var(--font-size-body);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-xs) 0;
+  line-height: var(--line-height-body);
+}
+
+/* Role Chip */
+.role-chip {
+  margin-top: var(--spacing-xs);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+}
+
+.role-chip:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* Cor customizada para COORDENADOR_ATIVIDADE */
+::ng-deep .mat-mdc-chip.coordenador-atividade {
+  --mdc-chip-label-text-color: white !important;
+  --mdc-chip-elevated-container-color: var(--success-color) !important;
+  --mdc-chip-container-color: var(--success-color) !important;
+  background-color: var(--success-color) !important;
+}
+
+::ng-deep .mat-mdc-chip.coordenador-atividade .mat-mdc-chip-action-label,
+::ng-deep .mat-mdc-chip.coordenador-atividade span,
+::ng-deep .mat-mdc-chip.coordenador-atividade .mat-icon {
+  color: white !important;
+}
+
+/* Cursos List */
+.cursos-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.curso-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+}
+
+.curso-item:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-color);
+}
+
+.curso-icon {
+  color: var(--primary-color);
+}
+
+.curso-nome {
+  flex: 1;
+  font-size: var(--font-size-body);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.status-chip {
+  font-size: var(--font-size-caption);
+}
+
+.status-chip.active {
+  background-color: var(--success-color) !important;
+  color: white !important;
+}
+
+.status-chip.inactive {
+  background-color: var(--text-medium) !important;
+  color: white !important;
+}
+
+/* No Cursos */
+.no-cursos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.no-cursos mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: var(--border-color);
+}
+
+.no-cursos p {
+  margin: 0;
+  font-size: var(--font-size-small);
+}
+
+/* Divider */
+mat-divider {
+  margin: var(--spacing-lg) 0;
+  border-color: var(--border-color);
+}
+
+/* Dialog Actions */
+mat-dialog-actions {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-actions);
+  gap: var(--spacing-sm);
+}
+
+/* Buttons */
+::ng-deep mat-dialog-actions button[mat-raised-button][color="primary"] {
+  background: var(--primary-button-gradient);
+  color: white;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+}
+
+::ng-deep mat-dialog-actions button[mat-raised-button][color="primary"]:hover:not(:disabled) {
+  box-shadow: var(--shadow-primary);
+  transform: translateY(-1px);
+}
+
+::ng-deep mat-dialog-actions button[mat-button] {
+  color: var(--text-secondary);
+  transition: all var(--transition-base);
+}
+
+::ng-deep mat-dialog-actions button[mat-button]:hover:not(:disabled) {
+  background-color: var(--bg-hover);
+  color: var(--primary-color);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .perfil-dialog {
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  mat-dialog-content {
+    padding: var(--spacing-md);
+  }
+}
+

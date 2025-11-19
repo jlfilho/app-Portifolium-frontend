@@ -6,17 +6,20 @@
     class="menu-button"
     (click)="toggleSidebar()"
     matTooltip="Menu"
-    matTooltipPosition="right">
+    matTooltipPosition="right"
+    aria-label="Toggle menu">
     <mat-icon>{{ isCollapsed ? 'menu_open' : 'menu' }}</mat-icon>
   </button>
 
   <!-- Logo e Nome -->
   <div class="header-brand">
-    <div class="header-logo"></div>
-    <span class="header-title">
+    <div class="header-logo">
+      <div class="logo-glow"></div>
+    </div>
+    <div class="header-title">
       <strong>Portifólium</strong>
-      <span class="header-subtitle">Sistema de Gestão</span>
-    </span>
+      <span class="header-subtitle">O portfólio do seu curso!</span>
+    </div>
   </div>
 
   <!-- Spacer -->
@@ -24,23 +27,23 @@
 
   <!-- Informações do Usuário -->
   <div class="user-info">
-    <button
-      mat-icon-button
-      class="notification-button"
-      matTooltip="Notificações"
-      matBadge="3"
-      matBadgeColor="warn"
-      matBadgeSize="small">
-      <mat-icon>notifications</mat-icon>
-    </button>
+    <!-- Avatar do Usuário -->
+    <div class="user-avatar-container">
+      <div class="user-avatar-circle">
+        <span class="user-initial">{{ getUserInitial() }}</span>
+      </div>
+      <div class="user-status-indicator"></div>
+    </div>
 
     <!-- Menu do Usuário -->
     <button
       mat-button
       class="user-menu-button"
       [matMenuTriggerFor]="menu">
-      <mat-icon class="user-avatar">account_circle</mat-icon>
-      <span class="user-name">{{ userName }}</span>
+      <div class="user-info-text">
+        <span class="user-name">{{ userName }}</span>
+        <span class="user-role-badge">{{ getUserRoleShort() }}</span>
+      </div>
       <mat-icon class="dropdown-icon">expand_more</mat-icon>
     </button>
   </div>
@@ -48,7 +51,12 @@
   <!-- Menu Dropdown -->
   <mat-menu #menu="matMenu" class="user-dropdown">
     <div class="menu-header">
-      <mat-icon class="menu-avatar">account_circle</mat-icon>
+      <div class="menu-avatar-container">
+        <div class="menu-avatar-circle">
+          <span class="menu-user-initial">{{ getUserInitial() }}</span>
+        </div>
+        <div class="menu-status-indicator"></div>
+      </div>
       <div class="menu-user-info">
         <strong>{{ userName }}</strong>
         <small>{{ userEmail }}</small>

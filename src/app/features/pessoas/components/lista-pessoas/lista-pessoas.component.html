@@ -90,7 +90,6 @@
       <div class="error-state" *ngIf="hasError && !isLoading">
         <mat-icon color="warn">error_outline</mat-icon>
         <p>{{ errorMessage }}</p>
-        <button mat-stroked-button color="primary" (click)="loadPessoas()">Tentar novamente</button>
       </div>
 
       <div class="empty-state" *ngIf="!isLoading && !hasError && !hasData()">
@@ -101,11 +100,11 @@
         </p>
       </div>
 
-      <table
-        mat-table
-        [dataSource]="dataSource"
-        class="mat-elevation-z1"
-        *ngIf="hasData()">
+      <div class="table-container" *ngIf="hasData()">
+        <table
+          mat-table
+          [dataSource]="dataSource"
+          class="pessoas-table">
 
         <ng-container matColumnDef="nome">
           <th mat-header-cell *matHeaderCellDef>Nome</th>
@@ -168,6 +167,7 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
+      </div>
     </div>
 
     <mat-paginator

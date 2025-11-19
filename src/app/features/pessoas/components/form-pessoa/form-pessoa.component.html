@@ -89,8 +89,8 @@
         type="submit"
         [disabled]="isSaving"
         (click)="onSubmit()">
-        <mat-icon>{{ isEditMode ? 'save' : 'person_add' }}</mat-icon>
-        {{ isEditMode ? 'Salvar alterações' : 'Cadastrar' }}
+        <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+        {{ isEditMode ? 'Atualizar' : 'Cadastrar' }}
       </button>
     </div>
 

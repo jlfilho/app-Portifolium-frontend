@@ -47,7 +47,7 @@ import { TipoCursoFilter } from '../../../cursos/models/tipo-curso-filter.model'
   styleUrl: './lista-tipos-curso.component.css'
 })
 export class ListaTiposCursoComponent implements OnInit {
-  displayedColumns: string[] = ['id', 'nome', 'acao'];
+  displayedColumns: string[] = ['nome', 'acao'];
   tipos: TipoCurso[] = [];
   isLoading = true;
   errorMessage: string = '';

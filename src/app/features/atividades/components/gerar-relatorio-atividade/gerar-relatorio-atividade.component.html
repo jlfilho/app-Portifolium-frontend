@@ -1,0 +1,54 @@
+<div class="relatorio-dialog">
+  <h2 mat-dialog-title>
+    <mat-icon>description</mat-icon>
+    Gerar Relatório de Atividade
+  </h2>
+
+  <mat-dialog-content>
+    <p *ngIf="data.atividadeNome" class="atividade-info">
+      <strong>Atividade:</strong> {{ data.atividadeNome }}
+    </p>
+
+    <form [formGroup]="relatorioForm" class="relatorio-form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Introdução (opcional)</mat-label>
+        <textarea
+          matInput
+          formControlName="introducao"
+          rows="5"
+          placeholder="Digite um texto de introdução personalizado para o relatório...">
+        </textarea>
+        <mat-hint>
+          Este texto aparecerá no início do relatório. Pode ser deixado em branco.
+        </mat-hint>
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button
+      mat-button
+      (click)="cancelar()"
+      [disabled]="isLoading">
+      Cancelar
+    </button>
+    <button
+      mat-button
+      (click)="visualizarRelatorio()"
+      [disabled]="isLoading"
+      color="primary">
+      <mat-icon>visibility</mat-icon>
+      Visualizar
+    </button>
+    <button
+      mat-raised-button
+      (click)="gerarRelatorio()"
+      [disabled]="isLoading"
+      color="primary">
+      <mat-icon *ngIf="!isLoading">download</mat-icon>
+      <mat-spinner *ngIf="isLoading" diameter="20" class="inline-spinner"></mat-spinner>
+      {{ isLoading ? 'Gerando...' : 'Baixar PDF' }}
+    </button>
+  </mat-dialog-actions>
+</div>
+

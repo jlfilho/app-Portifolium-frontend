@@ -37,6 +37,15 @@
           <mat-icon>arrow_back</mat-icon>
           Voltar
         </button>
+        <button
+          mat-stroked-button
+          color="primary"
+          (click)="abrirDialogRelatorio()"
+          *ngIf="temPermissaoGerarRelatorio()"
+          matTooltip="Gerar relatório em PDF">
+          <mat-icon>description</mat-icon>
+          Relatório PDF
+        </button>
         <button mat-raised-button color="primary" (click)="editarAtividade()">
           <mat-icon>edit</mat-icon>
           Editar
@@ -321,7 +330,7 @@
                     diameter="20"
                     style="display: inline-block; margin-right: 8px;">
                   </mat-progress-spinner>
-                  {{ isUploading ? (isEditingEvidence ? 'Salvando...' : 'Postando...') : (isEditingEvidence ? 'Salvar alterações' : 'Postar Evidência') }}
+                  {{ isUploading ? (isEditingEvidence ? 'Salvando...' : 'Postando...') : (isEditingEvidence ? 'Atualizar' : 'Postar Evidência') }}
                 </button>
               </div>
             </mat-card-content>

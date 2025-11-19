@@ -51,7 +51,7 @@ export interface Categoria {
   styleUrl: './lista-categorias.component.css'
 })
 export class ListaCategoriasComponent implements OnInit {
-  displayedColumns: string[] = ['id', 'nome', 'acao'];
+  displayedColumns: string[] = ['nome', 'acao'];
   dataSource!: MatTableDataSource<Categoria>;
   isLoading = true;
   errorMessage: string = '';

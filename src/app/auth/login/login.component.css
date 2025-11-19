@@ -357,6 +357,32 @@ form {
 }
 
 /* ========================================
+   🔑 RECUPERAÇÃO DE SENHA
+   ======================================== */
+.recovery-link {
+  margin-top: 8px;
+  text-align: center;
+}
+
+.recovery-button {
+  font-size: 14px !important;
+  text-transform: none !important;
+  color: var(--primary-color) !important;
+  padding: 8px 16px !important;
+}
+
+.recovery-button mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+}
+
+.recovery-button:hover {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+/* ========================================
    📄 FOOTER
    ======================================== */
 .login-footer {

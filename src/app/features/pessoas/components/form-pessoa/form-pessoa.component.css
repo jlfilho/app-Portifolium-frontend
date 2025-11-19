@@ -89,8 +89,7 @@ mat-card-content {
 }
 
 .submit-button {
-  background: var(--primary-color);
-  color: #fff;
+  /* Cor padronizada via styles.css global */
 }
 
 .submit-button mat-icon {

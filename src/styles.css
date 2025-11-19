@@ -99,16 +99,59 @@ p { font-size: var(--font-size-body); line-height: var(--line-height-body); marg
    CUSTOMIZAÇÕES ESSENCIAIS DO MATERIAL
    ============================================ */
 
-/* Botões com Gradiente */
-::ng-deep .mat-mdc-raised-button.mat-primary {
+/* Botões com Gradiente - PADRONIZAÇÃO GLOBAL */
+::ng-deep .mat-mdc-raised-button.mat-primary,
+::ng-deep button.mat-mdc-raised-button.mat-primary,
+::ng-deep .mat-mdc-button.mat-primary[mat-raised-button],
+::ng-deep button[mat-raised-button].mat-primary,
+::ng-deep .submit-button.mat-primary,
+::ng-deep .submit-button.mat-mdc-raised-button.mat-primary,
+::ng-deep button.submit-button.mat-primary,
+::ng-deep button.submit-button[mat-raised-button].mat-primary,
+::ng-deep button[mat-raised-button].submit-button.mat-primary,
+::ng-deep .btn-primary.mat-mdc-raised-button,
+::ng-deep button.btn-primary.mat-mdc-raised-button,
+::ng-deep .mat-mdc-raised-button.btn-primary {
   background: var(--primary-button-gradient) !important;
+  background-color: transparent !important;
   color: #FFFFFF !important;
-  box-shadow: var(--shadow-primary);
+  box-shadow: var(--shadow-primary) !important;
+  border: none !important;
 }
 
-::ng-deep .mat-mdc-raised-button.mat-primary:hover {
+::ng-deep .mat-mdc-raised-button.mat-primary:hover,
+::ng-deep button.mat-mdc-raised-button.mat-primary:hover,
+::ng-deep .mat-mdc-button.mat-primary[mat-raised-button]:hover,
+::ng-deep button[mat-raised-button].mat-primary:hover,
+::ng-deep .submit-button.mat-primary:hover:not([disabled]),
+::ng-deep .submit-button.mat-mdc-raised-button.mat-primary:hover:not([disabled]),
+::ng-deep button.submit-button.mat-primary:hover:not([disabled]),
+::ng-deep button.submit-button[mat-raised-button].mat-primary:hover:not([disabled]),
+::ng-deep button[mat-raised-button].submit-button.mat-primary:hover:not([disabled]),
+::ng-deep .btn-primary.mat-mdc-raised-button:hover:not([disabled]),
+::ng-deep button.btn-primary.mat-mdc-raised-button:hover:not([disabled]),
+::ng-deep .mat-mdc-raised-button.btn-primary:hover:not([disabled]) {
   background: var(--gradient-accent) !important;
-  box-shadow: var(--shadow-accent);
+  background-color: transparent !important;
+  box-shadow: var(--shadow-accent) !important;
+}
+
+::ng-deep .mat-mdc-raised-button.mat-primary:disabled,
+::ng-deep button.mat-mdc-raised-button.mat-primary:disabled,
+::ng-deep .mat-mdc-button.mat-primary[mat-raised-button]:disabled,
+::ng-deep button[mat-raised-button].mat-primary:disabled,
+::ng-deep .submit-button.mat-primary:disabled,
+::ng-deep .submit-button.mat-mdc-raised-button.mat-primary:disabled,
+::ng-deep button.submit-button.mat-primary:disabled,
+::ng-deep button.submit-button[mat-raised-button].mat-primary:disabled,
+::ng-deep button[mat-raised-button].submit-button.mat-primary:disabled,
+::ng-deep .btn-primary.mat-mdc-raised-button:disabled,
+::ng-deep button.btn-primary.mat-mdc-raised-button:disabled,
+::ng-deep .mat-mdc-raised-button.btn-primary:disabled {
+  background: rgba(59, 130, 246, 0.3) !important;
+  background-color: transparent !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  box-shadow: none !important;
 }
 
 /* Tooltips */
@@ -129,6 +172,25 @@ p { font-size: var(--font-size-body); line-height: var(--line-height-body); marg
 ::ng-deep .mat-mdc-chip.mat-primary {
   --mdc-chip-elevated-container-color: var(--chip-gradient) !important;
   --mdc-chip-label-text-color: #FFFFFF !important;
+}
+
+/* Chips "Ativo" com mat-primary - aplicar verde */
+::ng-deep .mat-mdc-chip.mat-primary.status-chip,
+::ng-deep .mat-mdc-chip.mat-primary[highlighted="true"],
+::ng-deep .mat-mdc-chip.mat-primary.mdc-evolution-chip[highlighted="true"] {
+  --mdc-chip-elevated-container-color: #10B981 !important;
+  --mdc-chip-container-color: #10B981 !important;
+  background-color: #10B981 !important;
+  color: white !important;
+}
+
+::ng-deep .mat-mdc-chip.mat-primary.status-chip .mat-mdc-chip-action-label,
+::ng-deep .mat-mdc-chip.mat-primary.status-chip span,
+::ng-deep .mat-mdc-chip.mat-primary[highlighted="true"] .mat-mdc-chip-action-label,
+::ng-deep .mat-mdc-chip.mat-primary[highlighted="true"] span,
+::ng-deep .mat-mdc-chip.mat-primary.mdc-evolution-chip[highlighted="true"] .mat-mdc-chip-action-label,
+::ng-deep .mat-mdc-chip.mat-primary.mdc-evolution-chip[highlighted="true"] span {
+  color: white !important;
 }
 
 ::ng-deep .mat-mdc-chip.mat-accent {

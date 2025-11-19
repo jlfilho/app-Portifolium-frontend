@@ -1,0 +1,312 @@
+/* ========================================
+   🎨 PALETA "MINIMAL TECH LIGHT+"
+   ======================================== */
+:host {
+  --primary-color: #3B82F6;
+  --secondary-color: #8B5CF6;
+  --accent-color: #6366F1;
+  --background-light: #F8FAFC;
+  --background-lighter: #F1F5F9;
+  --background-gradient: #E2E8F0;
+  --card-bg: #FFFFFF;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --error-color: #EF4444;
+  --warning-color: #F59E0B;
+  --success-color: #10B981;
+}
+
+/* ========================================
+   🌍 PÁGINA COMPLETA
+   ======================================== */
+.recovery-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--background-light) 0%, var(--background-lighter) 50%, var(--background-gradient) 100%);
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+}
+
+/* Background decorativo com círculos animados */
+.background-decoration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.1;
+  animation: float 20s infinite ease-in-out;
+}
+
+.circle-1 {
+  width: 300px;
+  height: 300px;
+  background: var(--primary-color);
+  top: -100px;
+  left: -100px;
+  animation-delay: 0s;
+}
+
+.circle-2 {
+  width: 200px;
+  height: 200px;
+  background: var(--accent-color);
+  bottom: -50px;
+  right: -50px;
+  animation-delay: 5s;
+}
+
+.circle-3 {
+  width: 150px;
+  height: 150px;
+  background: var(--secondary-color);
+  top: 50%;
+  right: 10%;
+  animation-delay: 10s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+/* ========================================
+   📦 CONTAINER
+   ======================================== */
+.recovery-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 500px;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   📋 HEADER
+   ======================================== */
+.recovery-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.logo-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: var(--primary-color);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+  border-radius: 50%;
+  padding: 16px;
+}
+
+.page-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.page-subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ========================================
+   🃏 CARD DE RECUPERAÇÃO
+   ======================================== */
+.recovery-card {
+  background: var(--card-bg) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  padding: 8px !important;
+  margin-bottom: 24px;
+}
+
+.recovery-card mat-card-header {
+  margin-bottom: 24px;
+  padding: 16px 16px 0 16px;
+}
+
+.recovery-card mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 24px !important;
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+  margin: 0 !important;
+}
+
+.title-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  color: var(--primary-color) !important;
+}
+
+.recovery-card mat-card-content {
+  padding: 16px;
+}
+
+.recovery-card mat-card-actions {
+  padding: 16px;
+  margin-top: 8px;
+}
+
+/* ========================================
+   📝 FORMULÁRIO
+   ======================================== */
+.step-content {
+  width: 100%;
+}
+
+.step-description {
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.success-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+  border-radius: 8px;
+  border-left: 4px solid var(--success-color);
+}
+
+.success-icon {
+  color: var(--success-color);
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.success-info p {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.success-info strong {
+  color: var(--success-color);
+}
+
+.recovery-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.inline-spinner {
+  display: inline-block;
+  margin-right: 8px;
+}
+
+/* ========================================
+   📄 FOOTER
+   ======================================== */
+.recovery-footer {
+  text-align: center;
+  margin-top: 24px;
+}
+
+.back-to-login {
+  color: var(--primary-color) !important;
+}
+
+.back-to-login mat-icon {
+  margin-right: 4px;
+}
+
+/* ========================================
+   🎨 MATERIAL OVERRIDES
+   ======================================== */
+::ng-deep .recovery-card .mat-mdc-form-field.mat-focused .mat-icon[matprefix] {
+  color: var(--primary-color) !important;
+}
+
+::ng-deep .recovery-card .mat-mdc-icon-button:hover {
+  color: var(--primary-color) !important;
+}
+
+::ng-deep .recovery-card mat-card-actions button[mat-raised-button][color="primary"] {
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color)) !important;
+  color: white !important;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4) !important;
+}
+
+::ng-deep .recovery-card mat-card-actions button[mat-raised-button][color="primary"]:hover:not([disabled]) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.6) !important;
+}
+
+::ng-deep .inline-spinner circle {
+  stroke: white !important;
+}
+
+/* ========================================
+   📱 RESPONSIVIDADE
+   ======================================== */
+@media (max-width: 600px) {
+  .recovery-container {
+    max-width: 100%;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .recovery-card {
+    padding: 4px !important;
+  }
+
+  .recovery-card mat-card-content {
+    padding: 12px;
+  }
+}
+

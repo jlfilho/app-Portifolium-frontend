@@ -6,6 +6,11 @@ export const routes: Routes = [
     path: 'login',
     loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent)
   },
+  {
+    path: 'recuperar-senha',
+    loadComponent: () => import('./auth/components/recuperar-senha/recuperar-senha.component').then(m => m.RecuperarSenhaComponent),
+    title: 'Recuperar Senha'
+  },
   // Rotas públicas
   {
     path: 'cursos-publicos',

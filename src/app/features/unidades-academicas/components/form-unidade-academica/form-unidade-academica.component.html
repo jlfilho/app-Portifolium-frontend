@@ -38,7 +38,7 @@
 
           <button mat-raised-button color="primary" class="submit-button" type="submit" [disabled]="isSaving">
             <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
-            {{ isEditMode ? 'Salvar Alterações' : 'Cadastrar Unidade' }}
+            {{ isEditMode ? 'Atualizar' : 'Cadastrar' }}
             <mat-progress-spinner
               *ngIf="isSaving"
               diameter="20"

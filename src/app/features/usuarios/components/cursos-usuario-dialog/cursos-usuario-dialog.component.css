@@ -233,8 +233,19 @@
 }
 
 /* Chip Ativo - Verde */
-::ng-deep .status-chip[highlighted="true"] {
+::ng-deep .status-chip[highlighted="true"],
+::ng-deep .mat-mdc-chip.status-chip.mat-primary[highlighted="true"],
+::ng-deep .mat-mdc-chip.status-chip.mat-primary {
+  --mdc-chip-elevated-container-color: #10B981 !important;
+  --mdc-chip-container-color: #10B981 !important;
   background-color: #10B981 !important; /* Verde esmeralda */
+  color: white !important;
+}
+
+::ng-deep .status-chip[highlighted="true"] .mat-mdc-chip-action-label,
+::ng-deep .status-chip[highlighted="true"] span,
+::ng-deep .mat-mdc-chip.status-chip.mat-primary .mat-mdc-chip-action-label,
+::ng-deep .mat-mdc-chip.status-chip.mat-primary span {
   color: white !important;
 }
 

@@ -175,7 +175,7 @@
         (click)="onSubmit()"
         [disabled]="isSaving || usuarioForm.invalid"
         matTooltip="Salvar usuário">
-        <mat-icon>{{ isSaving ? 'hourglass_empty' : 'save' }}</mat-icon>
+        <mat-icon>{{ isSaving ? 'hourglass_empty' : (isEditMode ? 'save' : 'add') }}</mat-icon>
         {{ isSaving ? 'Salvando...' : (isEditMode ? 'Atualizar' : 'Cadastrar') }}
       </button>
     </mat-card-actions>

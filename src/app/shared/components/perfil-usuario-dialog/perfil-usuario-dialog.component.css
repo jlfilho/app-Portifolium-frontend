@@ -279,12 +279,29 @@ mat-dialog-content {
 }
 
 .status-chip.active {
-  background-color: var(--success-color) !important;
+  background-color: #10B981 !important;
   color: white !important;
 }
 
 .status-chip.inactive {
   background-color: var(--text-medium) !important;
+  color: white !important;
+}
+
+/* Chips "Ativo" com mat-primary - aplicar verde */
+::ng-deep .mat-mdc-chip.status-chip.mat-primary,
+::ng-deep .mat-mdc-chip.status-chip[highlighted="true"],
+::ng-deep .mat-mdc-chip.mat-primary:has-text("Ativo") {
+  --mdc-chip-elevated-container-color: #10B981 !important;
+  --mdc-chip-container-color: #10B981 !important;
+  background-color: #10B981 !important;
+  color: white !important;
+}
+
+::ng-deep .mat-mdc-chip.status-chip.mat-primary .mat-mdc-chip-action-label,
+::ng-deep .mat-mdc-chip.status-chip.mat-primary span,
+::ng-deep .mat-mdc-chip.status-chip[highlighted="true"] .mat-mdc-chip-action-label,
+::ng-deep .mat-mdc-chip.status-chip[highlighted="true"] span {
   color: white !important;
 }
 

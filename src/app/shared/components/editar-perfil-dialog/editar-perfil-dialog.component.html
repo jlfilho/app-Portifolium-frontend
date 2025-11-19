@@ -102,7 +102,7 @@
       [disabled]="isSaving || perfilForm.invalid">
       <mat-icon *ngIf="!isSaving">save</mat-icon>
       <mat-progress-spinner *ngIf="isSaving" mode="indeterminate" diameter="20" class="button-spinner"></mat-progress-spinner>
-      {{ isSaving ? 'Salvando...' : 'Salvar' }}
+      {{ isSaving ? 'Salvando...' : 'Atualizar' }}
     </button>
   </mat-dialog-actions>
 </div>

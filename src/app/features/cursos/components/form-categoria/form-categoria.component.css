@@ -201,12 +201,14 @@ form {
 }
 
 .submit-button {
-  box-shadow: 0 2px 8px rgba(91, 91, 234, 0.3);
+  /* Estilos padronizados via styles.css global */
+  /* Não sobrescrever background, color ou box-shadow aqui */
 }
 
 .submit-button:hover:not([disabled]) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(91, 91, 234, 0.5);
+  /* Estilos padronizados via styles.css global */
+  /* Não sobrescrever background, color ou box-shadow aqui */
 }
 
 .submit-button[disabled] {

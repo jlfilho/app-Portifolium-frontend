@@ -8,7 +8,7 @@
       <p>Gerencie as unidades acadêmicas vinculadas aos cursos.</p>
     </div>
 
-    <button mat-raised-button class="btn-primary add-button" (click)="addUnidade()">
+    <button mat-raised-button color="primary" class="btn-primary add-button" (click)="addUnidade()">
       <mat-icon>add</mat-icon>
       Nova Unidade
     </button>
@@ -39,11 +39,6 @@
 
     <div class="table-wrapper" *ngIf="!isLoading; else loadingTemplate">
       <table mat-table [dataSource]="unidades" matSort class="unidades-table">
-
-        <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
-          <td mat-cell *matCellDef="let unidade">{{ unidade.id }}</td>
-        </ng-container>
 
         <ng-container matColumnDef="nome">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Nome</th>

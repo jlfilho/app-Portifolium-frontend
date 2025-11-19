@@ -99,6 +99,19 @@
             </span>
             <span *ngIf="isLoading">Entrando...</span>
           </button>
+
+          <!-- Link de Recuperação de Senha -->
+          <div class="recovery-link">
+            <button
+              mat-button
+              type="button"
+              color="primary"
+              (click)="abrirRecuperarSenha()"
+              class="recovery-button">
+              <mat-icon>lock_reset</mat-icon>
+              Esqueci minha senha
+            </button>
+          </div>
         </form>
       </mat-card-content>
     </mat-card>

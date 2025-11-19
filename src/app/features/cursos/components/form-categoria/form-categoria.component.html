@@ -82,7 +82,7 @@
             </mat-spinner>
             <span *ngIf="!isSaving">
               <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
-              {{ isEditMode ? 'Salvar' : 'Criar' }}
+              {{ isEditMode ? 'Atualizar' : 'Cadastrar' }}
             </span>
             <span *ngIf="isSaving">
               {{ isEditMode ? 'Salvando...' : 'Criando...' }}

@@ -43,7 +43,7 @@ import { extractApiMessage } from '../../../../shared/utils/message.utils';
   styleUrl: './lista-unidades-academicas.component.css'
 })
 export class ListaUnidadesAcademicasComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['id', 'nome', 'descricao', 'acoes'];
+  displayedColumns: string[] = ['nome', 'descricao', 'acoes'];
   unidades: UnidadeAcademica[] = [];
 
   isLoading = false;

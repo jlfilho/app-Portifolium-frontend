@@ -529,9 +529,9 @@
       Voltar
     </button>
     <button mat-raised-button color="primary" type="button" (click)="onSubmit()" [disabled]="isSaving">
-      <mat-icon *ngIf="!isSaving">save</mat-icon>
+      <mat-icon *ngIf="!isSaving">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
       <mat-progress-spinner *ngIf="isSaving" mode="indeterminate" diameter="20"></mat-progress-spinner>
-      {{ isSaving ? 'Salvando...' : 'Salvar' }}
+      {{ isSaving ? 'Salvando...' : (isEditMode ? 'Atualizar' : 'Cadastrar') }}
     </button>
   </mat-card-actions>
 </mat-card>

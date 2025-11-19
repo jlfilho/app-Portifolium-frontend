@@ -172,10 +172,40 @@ export class HomeComponent implements OnInit {
       return 'Professor';
     } else if (this.userAuthorities.includes('ROLE_SECRETARIO')) {
       return 'Secretário';
+    } else if (this.userAuthorities.includes('ROLE_COORDENADOR_ATIVIDADE')) {
+      return 'Coordenador de Atividades';
     } else if (this.userAuthorities.includes('ROLE_ALUNO')) {
       return 'Aluno';
     }
     return 'Usuário';
+  }
+
+  /**
+   * Obtém a inicial do nome do usuário para o avatar
+   */
+  getUserInitial(): string {
+    if (this.userName && this.userName !== 'Usuário' && this.userName !== 'Carregando...') {
+      const names = this.userName.trim().split(' ');
+      if (names.length >= 2) {
+        return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+      }
+      return this.userName[0].toUpperCase();
+    }
+    return 'U';
+  }
+
+  /**
+   * Obtém a versão abreviada da role do usuário
+   */
+  getUserRoleShort(): string {
+    const role = this.getUserRole();
+    if (role.includes('Administrador')) return 'ADM';
+    if (role.includes('Gerente')) return 'GER';
+    if (role.includes('Secretário')) return 'SEC';
+    if (role.includes('Coordenador')) return 'COORD';
+    if (role.includes('Professor')) return 'PROF';
+    if (role.includes('Aluno')) return 'ALUNO';
+    return 'USR';
   }
 
   /**

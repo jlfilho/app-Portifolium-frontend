@@ -24,6 +24,7 @@ import { firstValueFrom, Subscription } from 'rxjs';
 import { extractApiMessage } from '../../../../shared/utils/message.utils';
 import { ApiService } from '../../../../shared/api.service';
 import { BreaklinesPipe } from '../../../../shared/pipes/breaklines.pipe';
+import { GerarRelatorioAtividadeComponent } from '../gerar-relatorio-atividade/gerar-relatorio-atividade.component';
 
 @Component({
   selector: 'acadmanage-visualizar-atividade',
@@ -265,6 +266,50 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
         this.canManageEvidencias = false;
       }
     }
+  }
+
+  temPermissaoGerarRelatorio(): boolean {
+    const authorities = this.apiService.getAuthorities();
+    
+    // Verificar se tem uma das roles permitidas
+    const temRolePermitida = authorities.some(role => 
+      role === 'ROLE_ADMINISTRADOR' ||
+      role === 'ROLE_GERENTE' ||
+      role === 'ROLE_SECRETARIO' ||
+      role === 'ROLE_COORDENADOR_ATIVIDADE'
+    );
+
+    if (!temRolePermitida) {
+      return false;
+    }
+
+    // Se for COORDENADOR_ATIVIDADE, verificar se é coordenador desta atividade
+    if (this.apiService.isCoordenadorAtividade() && this.atividade) {
+      const pessoaId = this.apiService.getPessoaId();
+      if (pessoaId && this.atividade.integrantes) {
+        return this.atividade.integrantes.some(
+          integrante => integrante.id === pessoaId && integrante.papel === 'COORDENADOR'
+        );
+      }
+      return false;
+    }
+
+    return true;
+  }
+
+  abrirDialogRelatorio(): void {
+    if (!this.atividade) {
+      return;
+    }
+
+    const dialogRef = this.dialog.open(GerarRelatorioAtividadeComponent, {
+      width: '600px',
+      maxWidth: '90vw',
+      data: {
+        atividadeId: this.atividadeId,
+        atividadeNome: this.atividade.nome
+      }
+    });
   }
 
   private normalizeAtividade(atividade: AtividadeDTO): AtividadeDTO {

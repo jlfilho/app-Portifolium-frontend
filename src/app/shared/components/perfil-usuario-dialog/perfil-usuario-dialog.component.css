@@ -131,7 +131,7 @@ mat-dialog-content {
   color: var(--text-primary);
   margin: 0 0 var(--spacing-lg) 0;
   padding: var(--spacing-sm) var(--spacing-md);
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 8%, transparent) 0%, color-mix(in srgb, var(--secondary-color) 8%, transparent) 100%);
   border-radius: var(--border-radius-md);
   border-left: 4px solid var(--primary-color);
   position: relative;
@@ -225,17 +225,62 @@ mat-dialog-content {
   transform: translateY(-1px);
 }
 
-/* Cor customizada para COORDENADOR_ATIVIDADE */
-::ng-deep .mat-mdc-chip.coordenador-atividade {
+/* ========================================
+   🎨 MATERIAL OVERRIDES - Mesmo padrão da lista de usuários
+   ======================================== */
+/* Administrador: mat-warn -> --primary-color */
+::ng-deep .role-chip.mat-mdc-chip.mat-warn {
   --mdc-chip-label-text-color: white !important;
-  --mdc-chip-elevated-container-color: var(--success-color) !important;
-  --mdc-chip-container-color: var(--success-color) !important;
-  background-color: var(--success-color) !important;
+  --mdc-chip-elevated-container-color: var(--primary-color) !important;
+  --mdc-chip-container-color: var(--primary-color) !important;
+  background-color: var(--primary-color) !important;
 }
 
-::ng-deep .mat-mdc-chip.coordenador-atividade .mat-mdc-chip-action-label,
-::ng-deep .mat-mdc-chip.coordenador-atividade span,
-::ng-deep .mat-mdc-chip.coordenador-atividade .mat-icon {
+::ng-deep .role-chip.mat-mdc-chip.mat-warn .mat-mdc-chip-action-label,
+::ng-deep .role-chip.mat-mdc-chip.mat-warn span,
+::ng-deep .role-chip.mat-mdc-chip.mat-warn .mat-icon {
+  color: white !important;
+}
+
+/* Gerente: mat-primary -> --secondary-color */
+::ng-deep .role-chip.mat-mdc-chip.mat-primary {
+  --mdc-chip-label-text-color: white !important;
+  --mdc-chip-elevated-container-color: var(--secondary-color) !important;
+  --mdc-chip-container-color: var(--secondary-color) !important;
+  background-color: var(--secondary-color) !important;
+}
+
+::ng-deep .role-chip.mat-mdc-chip.mat-primary .mat-mdc-chip-action-label,
+::ng-deep .role-chip.mat-mdc-chip.mat-primary span,
+::ng-deep .role-chip.mat-mdc-chip.mat-primary .mat-icon {
+  color: white !important;
+}
+
+/* Secretário: mat-accent -> --accent-color */
+::ng-deep .role-chip.mat-mdc-chip.mat-accent {
+  --mdc-chip-label-text-color: white !important;
+  --mdc-chip-elevated-container-color: var(--accent-color) !important;
+  --mdc-chip-container-color: var(--accent-color) !important;
+  background-color: var(--accent-color) !important;
+}
+
+::ng-deep .role-chip.mat-mdc-chip.mat-accent .mat-mdc-chip-action-label,
+::ng-deep .role-chip.mat-mdc-chip.mat-accent span,
+::ng-deep .role-chip.mat-mdc-chip.mat-accent .mat-icon {
+  color: white !important;
+}
+
+/* Coordenador de Atividade: coordenador-atividade -> --accent-color-light */
+::ng-deep .role-chip.mat-mdc-chip.coordenador-atividade {
+  --mdc-chip-label-text-color: white !important;
+  --mdc-chip-elevated-container-color: var(--accent-color-light) !important;
+  --mdc-chip-container-color: var(--accent-color-light) !important;
+  background-color: var(--accent-color-light) !important;
+}
+
+::ng-deep .role-chip.mat-mdc-chip.coordenador-atividade .mat-mdc-chip-action-label,
+::ng-deep .role-chip.mat-mdc-chip.coordenador-atividade span,
+::ng-deep .role-chip.mat-mdc-chip.coordenador-atividade .mat-icon {
   color: white !important;
 }
 
@@ -279,7 +324,7 @@ mat-dialog-content {
 }
 
 .status-chip.active {
-  background-color: #10B981 !important;
+  background-color: var(--success-color) !important;
   color: white !important;
 }
 
@@ -292,9 +337,9 @@ mat-dialog-content {
 ::ng-deep .mat-mdc-chip.status-chip.mat-primary,
 ::ng-deep .mat-mdc-chip.status-chip[highlighted="true"],
 ::ng-deep .mat-mdc-chip.mat-primary:has-text("Ativo") {
-  --mdc-chip-elevated-container-color: #10B981 !important;
-  --mdc-chip-container-color: #10B981 !important;
-  background-color: #10B981 !important;
+  --mdc-chip-elevated-container-color: var(--success-color) !important;
+  --mdc-chip-container-color: var(--success-color) !important;
+  background-color: var(--success-color) !important;
   color: white !important;
 }
 
@@ -302,6 +347,13 @@ mat-dialog-content {
 ::ng-deep .mat-mdc-chip.status-chip.mat-primary span,
 ::ng-deep .mat-mdc-chip.status-chip[highlighted="true"] .mat-mdc-chip-action-label,
 ::ng-deep .mat-mdc-chip.status-chip[highlighted="true"] span {
+  color: white !important;
+}
+
+/* Botões do Dialog */
+::ng-deep .perfil-dialog mat-dialog-actions button[mat-raised-button][color="primary"],
+::ng-deep .perfil-dialog mat-dialog-actions button[mat-raised-button][color="primary"] .mdc-button__label,
+::ng-deep .perfil-dialog mat-dialog-actions button[mat-raised-button][color="primary"] .mdc-button__label * {
   color: white !important;
 }
 
@@ -346,9 +398,14 @@ mat-dialog-actions {
 /* Buttons */
 ::ng-deep mat-dialog-actions button[mat-raised-button][color="primary"] {
   background: var(--primary-button-gradient);
-  color: white;
+  color: white !important;
   box-shadow: var(--shadow-md);
   transition: all var(--transition-base);
+}
+
+::ng-deep mat-dialog-actions button[mat-raised-button][color="primary"] .mdc-button__label,
+::ng-deep mat-dialog-actions button[mat-raised-button][color="primary"] .mdc-button__label * {
+  color: white !important;
 }
 
 ::ng-deep mat-dialog-actions button[mat-raised-button][color="primary"]:hover:not(:disabled) {

@@ -27,7 +27,7 @@ export const adminManagerSecretaryGuard: CanActivateFn = (route, state) => {
   }
 
   console.warn('Acesso negado: usuário não possui permissões necessárias');
-  router.navigate(['/dashboard']);
+  router.navigate(['/admin/dashboard']);
   return false;
 };
 

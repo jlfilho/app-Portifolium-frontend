@@ -97,7 +97,8 @@
     </button>
     <button 
       mat-raised-button 
-      color="primary" 
+      color="primary"
+      class="btn-primary"
       (click)="onSubmit()" 
       [disabled]="isSaving || perfilForm.invalid">
       <mat-icon *ngIf="!isSaving">save</mat-icon>

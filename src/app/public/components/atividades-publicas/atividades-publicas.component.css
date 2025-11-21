@@ -1,28 +1,16 @@
 /* ===== VARIÁVEIS ===== */
-:host {
-  --primary: #667eea;
-  --primary-dark: #5568d3;
-  --secondary: #764ba2;
-  --accent: #f093fb;
-  --success: #10b981;
-  --published: #10b981;
-  --text-dark: #1e293b;
-  --text-medium: #475569;
-  --text-light: #94a3b8;
-  --bg-light: #f8fafc;
-  --border: #e2e8f0;
-}
+/* Usa variáveis globais de src/styles/variables.css */
 
 /* ===== CONTAINER ===== */
 .page-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary-button-gradient);
   padding-bottom: 60px;
 }
 
 /* ===== HERO SECTION ===== */
 .hero-section {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 0.95) 0%, color-mix(in srgb, var(--secondary-color) 0.95) 100%);
   padding: 40px 24px 50px;
   position: relative;
   overflow: hidden;
@@ -141,8 +129,8 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 15% 20%, rgba(102, 126, 234, 0.18), transparent 55%),
-              radial-gradient(circle at 80% 35%, rgba(118, 75, 162, 0.12), transparent 60%);
+  background: radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--primary-color) 0.18), transparent 55%),
+              radial-gradient(circle at 80% 35%, color-mix(in srgb, var(--secondary-color) 0.12), transparent 60%);
   pointer-events: none;
   z-index: -1;
 }
@@ -169,7 +157,7 @@
   width: 56px;
   height: 56px;
   border-radius: 18px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.25));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 0.2), color-mix(in srgb, var(--secondary-color) 0.25));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -200,12 +188,12 @@
 
 .summary-chip {
   background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
-  color: #fff !important;
+  color: white !important;
   font-weight: 600;
   letter-spacing: 0.4px;
   padding: 0 12px;
   border-radius: 16px;
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.35);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--primary-color) 0.35);
 }
 
 .summary-description {

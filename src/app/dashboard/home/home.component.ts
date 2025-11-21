@@ -258,7 +258,7 @@ export class HomeComponent implements OnInit {
   logout(): void {
     console.log('🚪 Efetuando logout...');
     this.apiService.logout();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/cursos-publicos']);
   }
 
 }

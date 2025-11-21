@@ -147,7 +147,7 @@ export class FormUsuarioComponent implements OnInit {
 
         // Redireciona de volta para listagem
         setTimeout(() => {
-          this.router.navigate(['/usuarios']);
+          this.router.navigate(['/admin/usuarios']);
         }, 2000);
       }
     });
@@ -207,7 +207,7 @@ export class FormUsuarioComponent implements OnInit {
             'success'
           );
           this.isSaving = false;
-          this.router.navigate(['/usuarios']);
+          this.router.navigate(['/admin/usuarios']);
         },
         error: (error) => {
           console.error('=== ERRO AO SALVAR USUÁRIO ===');
@@ -245,7 +245,7 @@ export class FormUsuarioComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/usuarios']);
+    this.router.navigate(['/admin/usuarios']);
   }
 
   onReset(): void {

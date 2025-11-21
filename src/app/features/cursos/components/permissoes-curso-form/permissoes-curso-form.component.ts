@@ -308,7 +308,7 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
   }
 
   back(): void {
-    this.router.navigate(['/cursos']);
+    this.router.navigate(['/admin/cursos']);
   }
 
   private showMessage(message: string, type: 'success' | 'error' | 'warning'): void {
@@ -331,11 +331,11 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
   getRoleColor(role: string): string {
     const roleUpper = role.toUpperCase();
     if (roleUpper.includes('ADMINISTRADOR')) {
-      return 'error';
+      return 'warn'; // Usa mat-warn -> --primary-color
     } else if (roleUpper.includes('GERENTE')) {
-      return 'success';
+      return 'primary'; // Usa mat-primary -> --secondary-color
     } else if (roleUpper.includes('SECRETARIO')) {
-      return 'warn';
+      return 'accent'; // Usa mat-accent -> --accent-color
     } else if (roleUpper.includes('COORDENADOR_ATIVIDADE') || roleUpper.includes('COORDENADOR ATIVIDADE')) {
       return ''; // Retorna vazio para usar classe CSS customizada
     }

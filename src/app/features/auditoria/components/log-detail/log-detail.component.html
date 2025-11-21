@@ -1,0 +1,138 @@
+<div class="log-detail-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>{{ isAuditLog ? 'history' : 'event_note' }}</mat-icon>
+      Detalhes do Log
+    </h2>
+    <button mat-icon-button (click)="close()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <!-- Informações Gerais -->
+    <mat-card class="info-card">
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Data/Hora:</label>
+            <span>{{ formatDate(log.timestamp) }}</span>
+          </div>
+          <div class="info-item">
+            <label>Usuário:</label>
+            <span>{{ log.userEmail }}</span>
+          </div>
+          <div class="info-item" *ngIf="isAuditLog && auditLog">
+            <label>Ação:</label>
+            <mat-chip>{{ auditLog.action }}</mat-chip>
+          </div>
+          <div class="info-item" *ngIf="isActionLog && actionLog">
+            <label>Tipo:</label>
+            <mat-chip>{{ actionLog.actionType }}</mat-chip>
+          </div>
+          <div class="info-item" *ngIf="log.ipAddress">
+            <label>IP Address:</label>
+            <span>{{ log.ipAddress }}</span>
+          </div>
+          <div class="info-item" *ngIf="log.endpoint">
+            <label>Endpoint:</label>
+            <span>{{ log.endpoint }}</span>
+          </div>
+          <div class="info-item" *ngIf="isAuditLog && auditLog && auditLog.httpMethod">
+            <label>Método HTTP:</label>
+            <span>{{ auditLog.httpMethod }}</span>
+          </div>
+          <div class="info-item" *ngIf="isActionLog && actionLog">
+            <label>Status:</label>
+            <mat-chip [class]="actionLogSuccessClass">
+              {{ actionLogSuccess ? 'Sucesso' : 'Falha' }}
+            </mat-chip>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Informações Específicas de Audit Log -->
+    <mat-card *ngIf="isAuditLog && auditLog" class="info-card">
+      <mat-card-content>
+        <h3>Informações da Entidade</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Entidade:</label>
+            <span>{{ auditLog.entityName }}</span>
+          </div>
+          <div class="info-item">
+            <label>ID da Entidade:</label>
+            <span>{{ auditLog.entityId }}</span>
+          </div>
+          <div class="info-item" *ngIf="auditLog.description">
+            <label>Descrição:</label>
+            <span>{{ auditLog.description }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Valores Antigos e Novos (Audit Log) -->
+    <div *ngIf="isAuditLog && (oldValuesParsed || newValuesParsed)" class="values-comparison">
+      <mat-card *ngIf="oldValuesParsed" class="values-card">
+        <mat-card-header>
+          <mat-card-title>Valores Antigos</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <pre class="json-viewer">{{ formatJSON(oldValuesParsed) }}</pre>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card *ngIf="newValuesParsed" class="values-card">
+        <mat-card-header>
+          <mat-card-title>Valores Novos</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <pre class="json-viewer">{{ formatJSON(newValuesParsed) }}</pre>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Informações Específicas de Action Log -->
+    <mat-card *ngIf="isActionLog && actionLog" class="info-card">
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item" *ngIf="actionLog.description">
+            <label>Descrição:</label>
+            <span>{{ actionLog.description }}</span>
+          </div>
+          <div class="info-item" *ngIf="actionLog.errorMessage">
+            <label>Mensagem de Erro:</label>
+            <span class="error-message">{{ actionLog.errorMessage }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Metadata (Action Log) -->
+    <mat-card *ngIf="isActionLog && metadataParsed" class="info-card">
+      <mat-card-header>
+        <mat-card-title>Metadados</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <pre class="json-viewer">{{ formatJSON(metadataParsed) }}</pre>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- User Agent -->
+    <mat-card *ngIf="log.userAgent" class="info-card">
+      <mat-card-content>
+        <div class="info-item">
+          <label>User Agent:</label>
+          <span class="user-agent-text">{{ log.userAgent }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="close()">Fechar</button>
+  </mat-dialog-actions>
+</div>
+

@@ -80,7 +80,7 @@ export class FormCategoriaComponent implements OnInit {
         console.error('❌ Erro ao carregar categoria:', error);
         this.showMessage('Erro ao carregar tipo de atividade.', 'error');
         this.isLoading = false;
-        this.router.navigate(['/categorias']);
+        this.router.navigate(['/admin/categorias']);
       }
     });
   }
@@ -111,7 +111,7 @@ export class FormCategoriaComponent implements OnInit {
         console.log('✅ Tipo de atividade criado:', response);
         this.showMessage('Tipo de atividade criado com sucesso!', 'success');
         this.isSaving = false;
-        this.router.navigate(['/categorias']);
+        this.router.navigate(['/admin/categorias']);
       },
       error: (error) => {
         console.error('❌ Erro ao criar tipo de atividade:', error);
@@ -136,7 +136,7 @@ export class FormCategoriaComponent implements OnInit {
         console.log('✅ Tipo de atividade atualizado:', response);
         this.showMessage('Tipo de atividade atualizado com sucesso!', 'success');
         this.isSaving = false;
-        this.router.navigate(['/categorias']);
+        this.router.navigate(['/admin/categorias']);
       },
       error: (error) => {
         console.error('❌ Erro ao atualizar tipo de atividade:', error);
@@ -156,7 +156,7 @@ export class FormCategoriaComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/categorias']);
+    this.router.navigate(['/admin/categorias']);
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {

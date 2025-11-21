@@ -81,7 +81,7 @@ export class FormPessoaComponent implements OnInit {
         const message = extractApiMessage(error) || 'Erro ao carregar os dados da pessoa.';
         this.showMessage(message, 'error');
         this.isLoading = false;
-        this.router.navigate(['/pessoas']);
+        this.router.navigate(['/admin/pessoas']);
       }
     });
   }
@@ -104,7 +104,7 @@ export class FormPessoaComponent implements OnInit {
         next: () => {
           this.showMessage('Pessoa atualizada com sucesso!', 'success');
           this.isSaving = false;
-          this.router.navigate(['/pessoas']);
+          this.router.navigate(['/admin/pessoas']);
         },
         error: (error) => {
           console.error('❌ Erro ao atualizar pessoa:', error);
@@ -118,7 +118,7 @@ export class FormPessoaComponent implements OnInit {
         next: () => {
           this.showMessage('Pessoa cadastrada com sucesso!', 'success');
           this.isSaving = false;
-          this.router.navigate(['/pessoas']);
+          this.router.navigate(['/admin/pessoas']);
         },
         error: (error) => {
           console.error('❌ Erro ao cadastrar pessoa:', error);
@@ -131,7 +131,7 @@ export class FormPessoaComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/pessoas']);
+    this.router.navigate(['/admin/pessoas']);
   }
 
   clearCpfField(): void {

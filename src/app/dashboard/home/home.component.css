@@ -1,22 +1,7 @@
 /* ========================================
    🎨 VARIÁVEIS - PALETA MINIMAL TECH LIGHT+
+   Usa variáveis globais de src/styles/variables.css
    ======================================== */
-:host {
-  --primary-color: #3B82F6;
-  --secondary-color: #8B5CF6;
-  --accent-color: #6366F1;
-  --success-color: #10B981;
-  --warning-color: #F59E0B;
-  --error-color: #EF4444;
-
-  /* versão clara */
-  --bg-dark: #F8FAFC;     /* fundo principal */
-  --bg-darker: #F1F5F9;   /* seções contrastantes */
-  --card-bg: #FFFFFF;     /* cartões */
-  --text-light: #0F172A;  /* texto principal escuro */
-  --text-secondary: #475569; /* cinza frio */
-  --border-color: #CBD5E1;
-}
 
 
 /* ========================================
@@ -26,7 +11,7 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: linear-gradient(135deg, #3B82F6 0%, #6366F1 50%, #8B5CF6 100%) !important;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 50%, var(--secondary-color) 100%) !important;
   box-shadow:
     0 4px 20px rgba(59, 130, 246, 0.3),
     0 1px 3px rgba(0, 0, 0, 0.1),
@@ -87,9 +72,6 @@
 .header-logo {
   width: 48px;
   height: 48px;
-  background-image: url('/imagens/logo.png');
-  background-size: cover;
-  background-position: center;
   border-radius: 12px;
   box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.2),
@@ -97,6 +79,9 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .header-logo::before {
@@ -105,10 +90,10 @@
   inset: 0;
   border-radius: 12px;
   padding: 2px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  background: linear-gradient(135deg, color-mix(in srgb, white 30%, transparent), color-mix(in srgb, white 10%, transparent));
+  -webkit-mask: linear-gradient(white 0 0) content-box, linear-gradient(white 0 0);
   -webkit-mask-composite: xor;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(white 0 0) content-box, linear-gradient(white 0 0);
   mask-composite: exclude;
 }
 
@@ -130,6 +115,25 @@
 
 .header-logo:hover .logo-glow {
   opacity: 1;
+}
+
+/* Ícone do cap na toolbar */
+.header-logo .logo-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  z-index: 2;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.header-logo:hover .logo-icon {
+  transform: translate(-50%, -50%) scale(1.1);
 }
 
 .header-title {
@@ -216,7 +220,7 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: #10B981;
+  background: var(--success-color);
   border: 2px solid white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   animation: pulse 2s infinite;
@@ -253,6 +257,43 @@
   height: auto;
 }
 
+/* Sobrescrever regra global do styles.css que aplica cor verde aos botões */
+::ng-deep .user-menu-button.mat-mdc-button-base.mat-mdc-button:not(.mat-mdc-button-disabled),
+::ng-deep .user-menu-button.mat-mdc-button-base.mat-mdc-button:not(.mat-mdc-button-disabled):hover,
+::ng-deep .user-menu-button.mat-mdc-button-base.mat-mdc-button:not(.mat-mdc-button-disabled):focus {
+  color: white !important;
+  --mdc-text-button-label-text-color: white !important;
+  --mat-text-button-label-text-color: white !important;
+}
+
+/* Garantir que todos os textos do botão sejam brancos usando variáveis globais */
+::ng-deep .user-menu-button,
+::ng-deep .user-menu-button.mat-mdc-button,
+::ng-deep .user-menu-button.mat-button,
+::ng-deep .user-menu-button .mdc-button__label,
+::ng-deep .user-menu-button .mat-mdc-button-touch-target,
+::ng-deep .user-menu-button + .mat-mdc-button-touch-target,
+::ng-deep .user-info .mat-mdc-button-touch-target,
+::ng-deep .user-menu-button .user-name,
+::ng-deep .user-menu-button .user-role-badge,
+::ng-deep .user-menu-button .dropdown-icon,
+::ng-deep .user-menu-button mat-icon,
+::ng-deep .user-menu-button .mdc-button__label *,
+::ng-deep .user-menu-button .user-info-text,
+::ng-deep .user-menu-button .user-info-text * {
+  color: white !important;
+  --mdc-text-button-label-text-color: white !important;
+  --mat-text-button-label-text-color: white !important;
+}
+
+/* Sobrescrever variáveis CSS do Material Design para garantir cor branca */
+::ng-deep .user-menu-button.mat-mdc-button {
+  --mdc-text-button-label-text-color: white !important;
+  --mat-text-button-label-text-color: white !important;
+  --mdc-theme-primary: white !important;
+  color: white !important;
+}
+
 /* Ajustar o touch-target do Material para não interferir */
 ::ng-deep .user-menu-button .mat-mdc-button-touch-target,
 ::ng-deep .user-menu-button + .mat-mdc-button-touch-target,
@@ -281,6 +322,22 @@
 /* Ajustar o próprio botão para ter padding à direita */
 ::ng-deep .user-menu-button {
   padding-right: 24px !important;
+}
+
+/* Forçar cor branca em todos os estados e elementos do botão */
+::ng-deep .user-menu-button.mat-mdc-button:not([disabled]),
+::ng-deep .user-menu-button.mat-mdc-button:not([disabled]):hover,
+::ng-deep .user-menu-button.mat-mdc-button:not([disabled]):focus,
+::ng-deep .user-menu-button.mat-mdc-button:not([disabled]):active {
+  color: white !important;
+  --mdc-text-button-label-text-color: white !important;
+  --mat-text-button-label-text-color: white !important;
+}
+
+::ng-deep .user-menu-button.mat-mdc-button:not([disabled]) .mdc-button__label,
+::ng-deep .user-menu-button.mat-mdc-button:not([disabled]):hover .mdc-button__label,
+::ng-deep .user-menu-button.mat-mdc-button:not([disabled]):focus .mdc-button__label {
+  color: white !important;
 }
 
 .user-menu-button:hover {
@@ -361,7 +418,7 @@
   align-items: center;
   gap: 16px;
   padding: 20px;
-  background: linear-gradient(135deg, #3B82F6 0%, #6366F1 50%, #8B5CF6 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 50%, var(--secondary-color) 100%);
   color: white;
   position: relative;
 }
@@ -412,7 +469,7 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #10B981;
+  background: var(--success-color);
   border: 2px solid white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
@@ -497,7 +554,7 @@
    ======================================== */
 .sidenav {
   background-color: var(--bg-darker);
-  border-right: 1px solid #E2E8F0;
+  border-right: 1px solid var(--border-color);
   width: 280px;
   transition: width 0.3s ease, box-shadow 0.3s ease;
   box-shadow: var(--shadow-soft);
@@ -626,7 +683,7 @@
   right: 0;
   padding: 16px;
   background-color: rgba(241, 245, 249, 0.8);
-  border-top: 1px solid #E2E8F0;
+  border-top: 1px solid var(--border-color);
   text-align: center;
 }
 

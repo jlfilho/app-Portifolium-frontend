@@ -1,16 +1,4 @@
-:host {
-  --primary-color: #3B82F6;
-  --secondary-color: #8B5CF6;
-  --accent-color: #6366F1;
-  --error-color: #EF4444;
-  --text-dark: #0F172A;
-  --text-medium: #475569;
-  --text-light: #64748B;
-  --bg-hover: rgba(59, 130, 246, 0.08);
-  --border-color: #CBD5E1;
-  --card-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
-  --surface: #ffffff;
-}
+/* Usa variáveis globais de src/styles/variables.css */
 
 .container {
   max-width: 1200px;
@@ -96,12 +84,12 @@
 
 .unidades-table {
   width: 100%;
-  background: #ffffff;
+  background: var(--bg-card);
 }
 
 ::ng-deep .unidades-table .mat-mdc-header-cell {
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%) !important;
-  color: #ffffff !important;
+  color: white !important;
   font-weight: 600;
   font-size: 14px;
   letter-spacing: 0.6px;
@@ -113,14 +101,14 @@
 ::ng-deep .unidades-table .mat-mdc-header-cell .mat-sort-header-arrow,
 ::ng-deep .unidades-table thead tr th,
 ::ng-deep .unidades-table thead tr th * {
-  color: #ffffff !important;
+  color: white !important;
 }
 
 ::ng-deep .unidades-table .mat-mdc-cell {
   padding: 16px 12px;
   font-size: 14px;
   color: var(--text-dark);
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .table-row {

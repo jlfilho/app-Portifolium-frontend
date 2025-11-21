@@ -1,20 +1,7 @@
 /* ========================================
    🎨 PALETA "MINIMAL TECH LIGHT+"
+   Usa variáveis globais de src/styles/variables.css
    ======================================== */
-:host {
-  --primary-color: #3B82F6;
-  --secondary-color: #8B5CF6;
-  --accent-color: #6366F1;
-  --background-light: #F8FAFC;
-  --background-lighter: #F1F5F9;
-  --background-gradient: #E2E8F0;
-  --card-bg: #FFFFFF;
-  --text-primary: #0F172A;
-  --text-secondary: #475569;
-  --error-color: #EF4444;
-  --warning-color: #F59E0B;
-  --success-color: #10B981;
-}
 
 /* ========================================
    🌍 PÁGINA COMPLETA
@@ -97,6 +84,7 @@
   animation: slideUp 0.6s ease-out;
 }
 
+
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -132,11 +120,11 @@
 @keyframes pulse {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 8px 32px color-mix(in srgb, var(--primary-color) 30%, transparent);
   }
   50% {
     transform: scale(1.05);
-    box-shadow: 0 12px 40px rgba(59, 130, 246, 0.5);
+    box-shadow: 0 12px 40px color-mix(in srgb, var(--primary-color) 50%, transparent);
   }
 }
 
@@ -174,7 +162,7 @@
   gap: 12px;
   padding: 16px;
   margin-bottom: 24px;
-  background: rgba(245, 158, 11, 0.15);
+  background: color-mix(in srgb, var(--warning-color) 15%, transparent);
   border-left: 4px solid var(--warning-color);
   border-radius: 12px;
   animation: slideDown 0.4s ease-out;
@@ -222,8 +210,8 @@
 .login-card {
   background: var(--card-bg) !important;
   border-radius: 16px !important;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
-  border: 1px solid rgba(59, 130, 246, 0.1);
+  box-shadow: var(--shadow-xl), var(--shadow-md) !important;
+  border: 1px solid color-mix(in srgb, var(--primary-color) 10%, transparent);
   padding: 8px !important;
 }
 
@@ -283,7 +271,7 @@ form {
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  background: rgba(239, 68, 68, 0.15);
+  background: color-mix(in srgb, var(--error-color) 15%, transparent);
   border-left: 3px solid var(--error-color);
   border-radius: 8px;
   color: var(--error-color);
@@ -323,12 +311,12 @@ form {
 ::ng-deep .login-button.mat-mdc-raised-button:not([disabled]) {
   background: linear-gradient(135deg, var(--primary-color), var(--accent-color)) !important;
   color: white !important;
-  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4) !important;
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--primary-color) 40%, transparent) !important;
 }
 
 ::ng-deep .login-button.mat-mdc-raised-button:hover:not([disabled]) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.6) !important;
+  box-shadow: 0 8px 30px color-mix(in srgb, var(--primary-color) 60%, transparent) !important;
 }
 
 ::ng-deep .login-button.mat-mdc-raised-button:active:not([disabled]) {
@@ -357,11 +345,16 @@ form {
 }
 
 /* ========================================
-   🔑 RECUPERAÇÃO DE SENHA
+   🔑 RECUPERAÇÃO DE SENHA E VOLTAR
    ======================================== */
 .recovery-link {
   margin-top: 8px;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .recovery-button {
@@ -369,17 +362,19 @@ form {
   text-transform: none !important;
   color: var(--primary-color) !important;
   padding: 8px 16px !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .recovery-button mat-icon {
   font-size: 18px;
   width: 18px;
   height: 18px;
-  margin-right: 4px;
 }
 
 .recovery-button:hover {
-  background-color: rgba(59, 130, 246, 0.1) !important;
+  background-color: color-mix(in srgb, var(--primary-color) 10%, transparent) !important;
 }
 
 /* ========================================

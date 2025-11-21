@@ -267,7 +267,7 @@ export class CardsCursosComponent  implements OnInit {
 
   // Navegar para adicionar novo curso
   addCourse(): void {
-    this.router.navigate(['/cursos/novo']);
+    this.router.navigate(['/admin/cursos/novo']);
   }
 
   // Navegar para editar curso
@@ -276,7 +276,7 @@ export class CardsCursosComponent  implements OnInit {
       this.showMessage('Curso inválido selecionado. Tente novamente.', 'error');
       return;
     }
-    this.router.navigate(['/cursos/editar', cursoId]);
+    this.router.navigate(['/admin/cursos/editar', cursoId]);
   }
 
   // Navegar para a tela de gerenciar permissões (formulário)
@@ -287,7 +287,7 @@ export class CardsCursosComponent  implements OnInit {
       return;
     }
     const cursoId = curso.id;
-    this.router.navigate(['/cursos', cursoId, 'permissoes'], { state: { cursoNome: curso.nome } });
+    this.router.navigate(['/admin/cursos', cursoId, 'permissoes'], { state: { cursoNome: curso.nome } });
   }
 
   // Navegar para a tela de atividades do curso
@@ -298,7 +298,7 @@ export class CardsCursosComponent  implements OnInit {
       return;
     }
     const cursoId = curso.id;
-    this.router.navigate(['/atividades/curso', cursoId], { state: { cursoNome: curso.nome } });
+    this.router.navigate(['/admin/atividades/curso', cursoId], { state: { cursoNome: curso.nome } });
   }
 
   // Deletar curso com diálogo de confirmação

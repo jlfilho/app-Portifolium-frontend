@@ -127,11 +127,11 @@ export class ListaUnidadesAcademicasComponent implements OnInit, AfterViewInit {
   }
 
   addUnidade(): void {
-    this.router.navigate(['/unidades-academicas/novo']);
+    this.router.navigate(['/admin/unidades-academicas/novo']);
   }
 
   editUnidade(unidade: UnidadeAcademica): void {
-    this.router.navigate(['/unidades-academicas/editar', unidade.id], {
+    this.router.navigate(['/admin/unidades-academicas/editar', unidade.id], {
       state: { unidade }
     });
   }

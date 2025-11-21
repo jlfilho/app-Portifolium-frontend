@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 
 // Angular Material
 import { MatButtonModule } from '@angular/material/button';
@@ -21,6 +21,7 @@ import { RecuperarSenhaDialogComponent } from '../components/recuperar-senha-dia
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    RouterModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
@@ -76,7 +77,7 @@ export class LoginComponent implements OnInit {
       this.apiService.login(username, password).subscribe({
         next: () => {
           console.log('✅ Login bem-sucedido, redirecionando...');
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/admin']);
         },
         error: (err) => {
           console.error('❌ Erro no login:', err);

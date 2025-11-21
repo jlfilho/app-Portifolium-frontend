@@ -1,20 +1,7 @@
 /* ========================================
    🎨 PALETA "MINIMAL TECH LIGHT+"
+   Usa variáveis globais de src/styles/variables.css
    ======================================== */
-:host {
-  --primary-color: #3B82F6;
-  --secondary-color: #8B5CF6;
-  --accent-color: #6366F1;
-  --background-light: #F8FAFC;
-  --background-lighter: #F1F5F9;
-  --background-gradient: #E2E8F0;
-  --card-bg: #FFFFFF;
-  --text-primary: #0F172A;
-  --text-secondary: #475569;
-  --error-color: #EF4444;
-  --warning-color: #F59E0B;
-  --success-color: #10B981;
-}
 
 /* ========================================
    🌍 PÁGINA COMPLETA
@@ -129,7 +116,7 @@
   width: 64px;
   height: 64px;
   color: var(--primary-color);
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 10%, transparent), color-mix(in srgb, var(--secondary-color) 10%, transparent));
   border-radius: 50%;
   padding: 16px;
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
@@ -24,12 +24,16 @@ import { PublicNavigationService } from '../../services/public-navigation.servic
 import { UnidadeAcademica } from '../../../features/unidades-academicas/models/unidade-academica.model';
 import { Curso } from '../../../features/cursos/models/curso.model';
 
+// Components
+import { PublicHeaderComponent } from '../shared/public-header/public-header.component';
+
 @Component({
   selector: 'acadmanage-lista-cursos-publica',
   standalone: true,
   imports: [
     CommonModule,
     FormsModule,
+    RouterModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
@@ -40,7 +44,8 @@ import { Curso } from '../../../features/cursos/models/curso.model';
     MatChipsModule,
     MatDividerModule,
     MatRippleModule,
-    MatSelectModule
+    MatSelectModule,
+    PublicHeaderComponent
   ],
   templateUrl: './cursos-publicos.component.html',
   styleUrl: './cursos-publicos.component.css'

@@ -1654,7 +1654,7 @@ export class FormAtividadeComponent implements OnInit {
               this.isSaving = false;
 
               // Redirecionar para a lista de atividades do curso
-              this.router.navigate(['/atividades/curso', this.cursoId]);
+              this.router.navigate(['/admin/atividades/curso', this.cursoId]);
             },
             error: (uploadError) => {
               console.error('❌ Erro ao fazer upload da foto:', uploadError);
@@ -1662,14 +1662,14 @@ export class FormAtividadeComponent implements OnInit {
               this.isSaving = false;
 
               // Redirecionar mesmo com erro no upload
-              this.router.navigate(['/atividades/curso', this.cursoId]);
+              this.router.navigate(['/admin/atividades/curso', this.cursoId]);
             }
           });
         } else {
           // Sem imagem, apenas redirecionar
           this.showMessage('Atividade criada com sucesso!', 'success');
           this.isSaving = false;
-          this.router.navigate(['/atividades/curso', this.cursoId]);
+          this.router.navigate(['/admin/atividades/curso', this.cursoId]);
         }
       },
       error: (error) => {
@@ -1820,7 +1820,7 @@ export class FormAtividadeComponent implements OnInit {
     }
 
     if (this.cursoId) {
-      this.router.navigate(['/atividades/curso', this.cursoId], {
+      this.router.navigate(['/admin/atividades/curso', this.cursoId], {
         state: { cursoNome: this.cursoNome }
       });
       return;
@@ -1828,13 +1828,13 @@ export class FormAtividadeComponent implements OnInit {
 
     const state = history.state;
     if (state && state.cursoId) {
-      this.router.navigate(['/atividades/curso', state.cursoId], {
+      this.router.navigate(['/admin/atividades/curso', state.cursoId], {
         state: { cursoNome: state.cursoNome }
       });
       return;
     }
 
-    this.router.navigate(['/cursos']);
+    this.router.navigate(['/admin/cursos']);
   }
 
   private extractErrorMessage(error: any): string {

@@ -114,11 +114,11 @@ export class ListaTiposCursoComponent implements OnInit {
   }
 
   addTipo(): void {
-    this.router.navigate(['/tipos-curso/novo']);
+    this.router.navigate(['/admin/tipos-curso/novo']);
   }
 
   editTipo(tipo: TipoCurso): void {
-    this.router.navigate(['/tipos-curso/editar', tipo.id]);
+    this.router.navigate(['/admin/tipos-curso/editar', tipo.id]);
   }
 
   deleteTipo(tipo: TipoCurso): void {

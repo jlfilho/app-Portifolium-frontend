@@ -1,17 +1,7 @@
 /* ========================================
    🎨 VARIÁVEIS E PALETA - MINIMAL TECH LIGHT+
+   Usa variáveis globais de src/styles/variables.css
    ======================================== */
-:host {
-  --primary-color: #3B82F6;
-  --secondary-color: #8B5CF6;
-  --accent-color: #6366F1;
-  --error-color: #EF4444;
-  --text-dark: #0F172A;
-  --text-medium: #475569;
-  --text-light: #64748B;
-  --bg-hover: rgba(59, 130, 246, 0.1);
-  --border-color: #CBD5E1;
-}
 
 /* ========================================
    📦 CONTAINER PRINCIPAL
@@ -68,7 +58,7 @@ mat-divider {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
   padding: 24px;
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   animation: fadeIn 0.3s ease-out;
 }
 
@@ -143,7 +133,7 @@ mat-divider {
 
 .categorias-table {
   width: 100%;
-  background: #ffffff;
+  background: var(--bg-card);
 }
 
 /* Header da Tabela */
@@ -166,7 +156,7 @@ mat-divider {
 /* Células da Tabela */
 ::ng-deep .categorias-table .mat-mdc-cell {
   padding: 16px 12px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-color);
   font-size: 14px;
 }
 
@@ -249,7 +239,7 @@ mat-divider {
   font-size: 64px;
   width: 64px;
   height: 64px;
-  color: #ccc;
+  color: var(--text-light);
 }
 
 .no-data p {
@@ -283,7 +273,7 @@ mat-divider {
 }
 
 .categoria-card {
-  background: #ffffff;
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 16px;
@@ -381,7 +371,7 @@ mat-divider {
 }
 
 .table-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--bg-darker);
   border-radius: 4px;
 }
 

@@ -1,0 +1,80 @@
+<div class="entity-history-page">
+  <!-- Header -->
+  <div class="page-header">
+    <button mat-icon-button (click)="goBack()" class="back-button">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="header-content">
+      <h1>
+        <mat-icon>history</mat-icon>
+        Histórico da Entidade
+      </h1>
+      <p class="entity-info">
+        <strong>{{ entityName }}</strong> - ID: {{ entityId }}
+      </p>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- Loading -->
+  <div *ngIf="isDataLoading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Carregando histórico...</p>
+  </div>
+
+  <!-- Timeline -->
+  <div *ngIf="!isDataLoading" class="timeline-container">
+    <mat-card *ngIf="history.length === 0" class="empty-card">
+      <mat-card-content>
+        <div class="empty-state">
+          <mat-icon>history</mat-icon>
+          <p>Nenhum histórico encontrado para esta entidade</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div *ngIf="history.length > 0" class="timeline">
+      <div *ngFor="let log of history; let i = index" class="timeline-item">
+        <div class="timeline-marker" [class]="getActionBadgeClass(log.action)"></div>
+        <div class="timeline-content">
+          <mat-card class="history-card">
+            <mat-card-content>
+              <div class="history-header">
+                <div class="history-action">
+                  <mat-chip [class]="getActionBadgeClass(log.action)">
+                    {{ getActionLabel(log.action) }}
+                  </mat-chip>
+                  <span class="history-date">{{ formatDate(log.timestamp) }}</span>
+                </div>
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="viewDetails(log)"
+                  matTooltip="Ver detalhes">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+              </div>
+
+              <div class="history-details">
+                <div class="detail-item">
+                  <mat-icon>person</mat-icon>
+                  <span>{{ log.userEmail }}</span>
+                </div>
+                <div class="detail-item" *ngIf="log.description">
+                  <mat-icon>description</mat-icon>
+                  <span>{{ log.description }}</span>
+                </div>
+                <div class="detail-item" *ngIf="log.endpoint">
+                  <mat-icon>link</mat-icon>
+                  <span>{{ log.endpoint }}</span>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

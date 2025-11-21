@@ -20,6 +20,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { DashboardService } from '../services/dashboard.service';
 import { DashboardDTO, MetricaDTO, ChartData } from '../models/dashboard.dto';
 import { extractApiMessage } from '../../shared/utils/message.utils';
+import { COLORS, CATEGORIA_COLORS, METRIC_COLORS, ROLE_COLORS, STATUS_COLORS } from '../../shared/constants/colors.constants';
 
 interface StatCard {
   title: string;
@@ -80,24 +81,11 @@ export class GraficosComponent implements OnInit {
   // Cursos em Destaque
   topCursos: any[] = [];
 
-  // Cores para categorias
-  private categoriaColors: { [key: string]: string } = {
-    'Ensino': '#3B82F6',
-    'Pesquisa': '#10B981',
-    'Extensão': '#8B5CF6',
-    'Inovação': '#F59E0B',
-    'Outros': '#64748B'
-  };
+  // Cores para categorias (usando constantes centralizadas)
+  private categoriaColors: { [key: string]: string } = CATEGORIA_COLORS;
 
-  // Cores para métricas
-  private metricColors: string[] = [
-    '#3B82F6', // Total de Cursos
-    '#10B981', // Atividades Ativas
-    '#8B5CF6', // Usuários Cadastrados
-    '#06B6D4', // Pessoas Cadastradas
-    '#F59E0B', // Fontes Financiadoras
-    '#EF4444'  // Publicações
-  ];
+  // Cores para métricas (usando constantes centralizadas)
+  private metricColors: string[] = METRIC_COLORS;
 
   // Ícones para métricas
   private metricIcons: string[] = [
@@ -218,8 +206,8 @@ export class GraficosComponent implements OnInit {
     // Atividades por Status
     const status = this.dashboard.statusPublicacao;
     this.atividadesPorStatus = [
-      { label: 'Publicadas', value: status.publicadas, color: '#10B981' },
-      { label: 'Não Publicadas', value: status.naoPublicadas, color: '#64748B' }
+      { label: 'Publicadas', value: status.publicadas, color: COLORS.SUCCESS },
+      { label: 'Não Publicadas', value: status.naoPublicadas, color: COLORS.GRAY_500 }
     ];
 
     // Usuários por Role (apenas para admin)
@@ -301,18 +289,11 @@ export class GraficosComponent implements OnInit {
       return indexA - indexB;
     });
 
-    // Mapear para ChartData com cores específicas
-    const colorMap: { [key: string]: string } = {
-      'Administradores': '#3B82F6',      // Azul
-      'Gerentes': '#10B981',              // Verde
-      'Secretários': '#8B5CF6',           // Roxo
-      'Coordenador de atividades': '#10B981' // Verde (mesma cor de Gerentes)
-    };
-
+    // Mapear para ChartData com cores específicas (usando constantes centralizadas)
     this.usuariosPorRole = distribuicaoProcessada.map((item) => ({
       label: item.tipo,
       value: item.quantidade,
-      color: colorMap[item.tipo] || '#64748B'
+      color: ROLE_COLORS[item.tipo] || COLORS.GRAY_500
     }));
 
     // Log final para debug
@@ -323,7 +304,7 @@ export class GraficosComponent implements OnInit {
   private loadTopCursos(): void {
     if (!this.dashboard) return;
 
-    const colors = ['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B'];
+    const colors = [COLORS.PRIMARY, COLORS.SUCCESS, COLORS.SECONDARY, COLORS.ACCENT];
     this.topCursos = this.dashboard.cursosDestaque.map((curso, index) => ({
       id: index + 1,
       nome: curso.nome,
@@ -356,13 +337,7 @@ export class GraficosComponent implements OnInit {
   }
 
   getActivityColor(status: string): string {
-    const colors: any = {
-      'success': '#10B981',
-      'warning': '#F59E0B',
-      'error': '#EF4444',
-      'info': '#3B82F6'
-    };
-    return colors[status] || '#64748B';
+    return STATUS_COLORS[status] || COLORS.GRAY_500;
   }
 
   formatCurrency(value: number): string {

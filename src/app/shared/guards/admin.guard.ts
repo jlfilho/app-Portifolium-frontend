@@ -29,7 +29,7 @@ export const adminGuard: CanActivateFn = (route, state) => {
 
   // Não é admin, redirecionar
   console.warn('Acesso negado: Usuário não é ADMINISTRADOR');
-  router.navigate(['/dashboard']);
+  router.navigate(['/admin/dashboard']);
   return false;
 };
 

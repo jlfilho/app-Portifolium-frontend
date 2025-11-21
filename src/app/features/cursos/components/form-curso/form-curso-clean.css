@@ -2,12 +2,12 @@
    🎨 VARIÁVEIS E PALETA - MINIMAL TECH LIGHT+
    ======================================== */
 :host {
-  --gradient-primary: linear-gradient(90deg, #3B82F6, #8B5CF6);
-  --gradient-accent: linear-gradient(90deg, #6366F1, #8B5CF6);
-  --bg-actions: #F8FAFC;
-  --primary-color: #3B82F6;
-  --secondary-color: #8B5CF6;
-  --accent-color: #6366F1;
+  --gradient-primary: linear-gradient(90deg, #0F6A45, #33A36B);
+  --gradient-accent: linear-gradient(90deg, #64B687, #0F6A45);
+  --bg-actions: #E4F3EA;
+  --primary-color: #0F6A45;
+  --secondary-color: #33A36B;
+  --accent-color: #64B687;
   --success-color: #10B981;
   --error-color: #EF4444;
   --warning-color: #F59E0B;
@@ -156,7 +156,7 @@ form {
   align-items: start;
   gap: 12px;
   padding: 16px;
-  background: rgba(139, 92, 246, 0.1);
+  background: color-mix(in srgb, var(--secondary-color) 0.1);
   border-left: 4px solid var(--secondary-color);
   border-radius: 4px;
 }
@@ -267,6 +267,6 @@ button[color="primary"] {
 
 button[color="primary"]:hover:not(:disabled) {
   background: var(--gradient-accent) !important;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color) 0.4);
 }
 

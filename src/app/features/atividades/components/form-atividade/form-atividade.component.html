@@ -57,7 +57,7 @@
                  (input)="filtrarCoordenadores($any($event.target).value)"
                  placeholder="Digite para buscar coordenador...">
           <mat-icon matPrefix>person</mat-icon>
-          <mat-hint>O coordenador será automaticamente adicionado aos integrantes</mat-hint>
+          <mat-hint class="hint-small">O coordenador será automaticamente adicionado aos integrantes</mat-hint>
           <mat-autocomplete #coordenadorAuto="matAutocomplete"
                            (optionSelected)="onCoordenadorChange($event.option.value)">
             <mat-option *ngFor="let pessoa of coordenadoresFiltrados" [value]="pessoa.nome || pessoa.name">
@@ -85,7 +85,7 @@
           <mat-datepicker-toggle matSuffix [for]="pickerFim"></mat-datepicker-toggle>
           <mat-datepicker #pickerFim></mat-datepicker>
           <mat-icon matPrefix>event_available</mat-icon>
-          <mat-hint>Preencha apenas se a atividade tiver período (ex: de 15/03 a 20/03)</mat-hint>
+          <mat-hint class="hint-small">Preencha apenas se a atividade tiver período (ex: de 15/03 a 20/03)</mat-hint>
         </mat-form-field>
 
         <!-- Status de Publicação -->
@@ -144,7 +144,7 @@
             <mat-hint *ngIf="fontesFinanciadorasFiltradas.length === 0">
               Todas as fontes disponíveis já foram adicionadas
             </mat-hint>
-            <mat-hint *ngIf="fontesFinanciadorasFiltradas.length > 0">
+            <mat-hint *ngIf="fontesFinanciadorasFiltradas.length > 0" class="hint-small">
               Digite para filtrar a lista
             </mat-hint>
             <mat-autocomplete #fonteAuto="matAutocomplete"
@@ -221,7 +221,7 @@
             <mat-hint *ngIf="getPessoasDisponiveis().length === 0">
               Todas as pessoas disponíveis já foram adicionadas
             </mat-hint>
-            <mat-hint *ngIf="getPessoasDisponiveis().length > 0">
+            <mat-hint *ngIf="getPessoasDisponiveis().length > 0" class="hint-small">
               Digite para filtrar a lista
             </mat-hint>
             <mat-autocomplete #integranteAuto="matAutocomplete"
@@ -525,10 +525,10 @@
 
   <mat-card-actions align="end" *ngIf="!isLoading && !errorMessage">
     <button mat-stroked-button type="button" (click)="goBack()" [disabled]="isSaving">
-      <mat-icon>arrow_back</mat-icon>
-      Voltar
+      <mat-icon>close</mat-icon>
+      Cancelar
     </button>
-    <button mat-raised-button color="primary" type="button" (click)="onSubmit()" [disabled]="isSaving">
+    <button mat-raised-button color="primary" class="btn-primary" type="button" (click)="onSubmit()" [disabled]="isSaving">
       <mat-icon *ngIf="!isSaving">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
       <mat-progress-spinner *ngIf="isSaving" mode="indeterminate" diameter="20"></mat-progress-spinner>
       {{ isSaving ? 'Salvando...' : (isEditMode ? 'Atualizar' : 'Cadastrar') }}

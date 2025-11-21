@@ -146,12 +146,12 @@ export class ListaCategoriasComponent implements OnInit {
 
   addCategoria(): void {
     console.log('➕ Navegar para adicionar novo tipo de atividade');
-    this.router.navigate(['/categorias/novo']);
+    this.router.navigate(['/admin/categorias/novo']);
   }
 
   editCategoria(categoria: Categoria): void {
     console.log('✏️ Navegar para editar tipo de atividade:', categoria);
-    this.router.navigate(['/categorias/editar', categoria.id]);
+    this.router.navigate(['/admin/categorias/editar', categoria.id]);
   }
 
   deleteCategoria(categoria: Categoria): void {

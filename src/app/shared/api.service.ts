@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, interval } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, interval, of } from 'rxjs';
+import { tap, timeout, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment.development';
 import { AuthoritiesResponse } from '../features/usuarios/models/usuario.model';
@@ -68,11 +68,68 @@ export class ApiService {
     );
   }
 
+  /**
+   * Realiza logout do usuário, registrando a ação na auditoria
+   * Chama o endpoint POST /api/auth/logout antes de limpar os dados locais
+   */
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('authorities');
+    // Obter o token antes de remover
+    const token = this.getToken();
+
+    // Tentar chamar o endpoint de logout para registrar na auditoria
+    if (token) {
+      this.http.post(
+        `${this.baseUrl}/auth/logout`,
+        {},
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      ).pipe(
+        // Timeout de 3 segundos para não travar se o servidor estiver lento
+        timeout(3000),
+        catchError((error) => {
+          // Log do erro mas não interrompe o fluxo
+          console.warn('⚠️ Falha ao registrar logout na auditoria (continuando logout local):', error);
+          // Retorna um Observable vazio para continuar o fluxo
+          return of(null);
+        })
+      ).subscribe({
+        next: () => {
+          console.log('✅ Logout registrado na auditoria');
+        },
+        error: (error) => {
+          // Este bloco não deve ser executado devido ao catchError, mas mantido por segurança
+          console.warn('⚠️ Erro ao registrar logout na auditoria:', error);
+        },
+        complete: () => {
+          // Sempre executar limpeza após tentar chamar o endpoint
+          this.performLocalLogout();
+        }
+      });
+    } else {
+      // Se não houver token, executar logout local diretamente
+      console.log('🚪 Nenhum token encontrado, executando logout local');
+      this.performLocalLogout();
+    }
+  }
+
+  /**
+   * Limpa todos os dados de sessão armazenados localmente
+   */
+  private performLocalLogout(): void {
+    // Limpar todos os dados de sessão
+    if (this.isLocalStorageAvailable()) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('authorities');
+    }
+    
+    // Limpar dados do serviço
     this.tokenSubject.next(null);
     this.authoritiesSubject.next([]);
+    
+    console.log('✅ Logout local concluído');
   }
 
   getToken(): string | null {

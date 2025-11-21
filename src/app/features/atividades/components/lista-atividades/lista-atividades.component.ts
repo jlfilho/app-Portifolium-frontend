@@ -234,7 +234,7 @@ export class ListaAtividadesComponent implements OnInit {
   }
 
   back(): void {
-    this.router.navigate(['/cursos']);
+    this.router.navigate(['/admin/cursos']);
   }
 
   novaAtividade(): void {
@@ -244,7 +244,7 @@ export class ListaAtividadesComponent implements OnInit {
     }
     console.log('➕ Criando nova atividade para curso:', this.cursoId);
     // Navegar para o formulário de criação
-    this.router.navigate(['/atividades/nova', this.cursoId], {
+    this.router.navigate(['/admin/atividades/nova', this.cursoId], {
       state: {
         cursoId: this.cursoId,
         cursoNome: this.cursoNome
@@ -256,7 +256,7 @@ export class ListaAtividadesComponent implements OnInit {
     console.log('👁️ Visualizando atividade:', atividade);
 
     // Navegar para a página de visualização
-    this.router.navigate(['/atividades/visualizar', atividade.id], {
+    this.router.navigate(['/admin/atividades/visualizar', atividade.id], {
       state: {
         atividade: atividade,
         cursoId: this.cursoId,
@@ -277,7 +277,7 @@ export class ListaAtividadesComponent implements OnInit {
       );
       return;
     }
-    this.router.navigate(['/atividades/editar', atividade.id], {
+    this.router.navigate(['/admin/atividades/editar', atividade.id], {
       state: {
         atividade,
         cursoNome: this.cursoNome,

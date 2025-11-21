@@ -221,7 +221,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     }
 
     console.log('✏️ Navegando para edição da atividade:', this.atividadeId);
-    this.router.navigate(['/atividades/editar', this.atividadeId], {
+    this.router.navigate(['/admin/atividades/editar', this.atividadeId], {
       state: {
         atividade: this.atividade,
         cursoId: this.cursoId,
@@ -232,7 +232,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
 
   voltar(): void {
     console.log('🔙 Voltando para lista de atividades');
-    this.router.navigate(['/atividades/curso', this.cursoId], {
+    this.router.navigate(['/admin/atividades/curso', this.cursoId], {
       state: {
         cursoNome: this.cursoNome
       }

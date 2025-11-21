@@ -28,7 +28,19 @@ export const routes: Routes = [
     title: 'Visualizar Atividade'
   },
   {
+    path: 'sobre',
+    loadComponent: () => import('./public/components/sobre/sobre.component').then(m => m.SobreComponent),
+    title: 'Sobre'
+  },
+  // Rota default - redireciona para página pública
+  {
     path: '',
+    redirectTo: 'cursos-publicos',
+    pathMatch: 'full'
+  },
+  // Área administrativa
+  {
+    path: 'admin',
     loadComponent: () => import('./dashboard/home/home.component').then(m => m.HomeComponent),
     canActivate: [authGuard],
     children: [
@@ -60,6 +72,10 @@ export const routes: Routes = [
       {
         path: '',
         loadChildren: () => import('./features/pessoas/pessoas.routes').then(m => m.PESSOAS_ROUTES)
+      },
+      {
+        path: '',
+        loadChildren: () => import('./features/auditoria/auditoria.routes').then(m => m.AUDITORIA_ROUTES)
       }
     ]
   },

@@ -15,6 +15,7 @@
   <div class="header-brand">
     <div class="header-logo">
       <div class="logo-glow"></div>
+      <mat-icon class="logo-icon">school</mat-icon>
     </div>
     <div class="header-title">
       <strong>Portifólium</strong>
@@ -90,7 +91,7 @@
     <mat-nav-list class="nav-list">
       <a
         mat-list-item
-        routerLink="/dashboard"
+        routerLink="/admin/dashboard"
         routerLinkActive="active-link"
         [routerLinkActiveOptions]="{exact: true}"
         matRipple
@@ -102,7 +103,7 @@
 
       <a
         mat-list-item
-        routerLink="/cursos"
+        routerLink="/admin/cursos"
         routerLinkActive="active-link"
         matRipple
         class="nav-item">
@@ -113,7 +114,7 @@
 
       <a
         mat-list-item
-        routerLink="/categorias"
+        routerLink="/admin/categorias"
         routerLinkActive="active-link"
         matRipple
         class="nav-item"
@@ -125,7 +126,7 @@
 
       <a
         mat-list-item
-        routerLink="/tipos-curso"
+        routerLink="/admin/tipos-curso"
         routerLinkActive="active-link"
         matRipple
         class="nav-item"
@@ -137,7 +138,7 @@
 
       <a
         mat-list-item
-        routerLink="/unidades-academicas"
+        routerLink="/admin/unidades-academicas"
         routerLinkActive="active-link"
         matRipple
         class="nav-item"
@@ -149,7 +150,7 @@
 
       <a
         mat-list-item
-        routerLink="/usuarios"
+        routerLink="/admin/usuarios"
         routerLinkActive="active-link"
         matRipple
         class="nav-item"
@@ -161,7 +162,7 @@
 
       <a
         mat-list-item
-        routerLink="/pessoas"
+        routerLink="/admin/pessoas"
         routerLinkActive="active-link"
         matRipple
         class="nav-item"
@@ -171,7 +172,30 @@
         <div class="active-indicator" *ngIf="!isCollapsed"></div>
       </a>
 
+      <a
+        mat-list-item
+        routerLink="/admin/auditoria"
+        routerLinkActive="active-link"
+        matRipple
+        class="nav-item"
+        *ngIf="isAdmin()">
+        <mat-icon class="nav-icon">security</mat-icon>
+        <span class="nav-text" *ngIf="!isCollapsed">Auditoria</span>
+        <div class="active-indicator" *ngIf="!isCollapsed"></div>
+      </a>
+
       <mat-divider class="nav-divider"></mat-divider>
+
+      <a
+        mat-list-item
+        routerLink="/admin/sobre"
+        routerLinkActive="active-link"
+        matRipple
+        class="nav-item">
+        <mat-icon class="nav-icon">info</mat-icon>
+        <span class="nav-text" *ngIf="!isCollapsed">Sobre</span>
+        <div class="active-indicator" *ngIf="!isCollapsed"></div>
+      </a>
     </mat-nav-list>
 
     <!-- Footer da Sidebar -->

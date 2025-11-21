@@ -78,14 +78,14 @@
         type="button"
         (click)="onCancel()"
         [disabled]="isSaving">
-        <mat-icon>arrow_back</mat-icon>
-        Voltar
+        <mat-icon>close</mat-icon>
+        Cancelar
       </button>
 
       <button
         mat-raised-button
         color="primary"
-        class="submit-button"
+        class="btn-primary"
         type="submit"
         [disabled]="isSaving"
         (click)="onSubmit()">

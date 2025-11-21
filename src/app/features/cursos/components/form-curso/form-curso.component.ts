@@ -162,7 +162,7 @@ export class FormCursoComponent implements OnInit, OnDestroy {
 
         this.showMessage(message, 'error');
         this.isLoading = false;
-        this.router.navigate(['/cursos']);
+        this.router.navigate(['/admin/cursos']);
       }
     });
   }
@@ -189,7 +189,7 @@ export class FormCursoComponent implements OnInit, OnDestroy {
             'success'
           );
           this.isSaving = false;
-          this.router.navigate(['/cursos']);
+          this.router.navigate(['/admin/cursos']);
         },
         error: (error) => {
           console.error('Erro ao salvar curso:', error);
@@ -315,7 +315,7 @@ export class FormCursoComponent implements OnInit, OnDestroy {
   }
 
   onCancel(): void {
-    this.router.navigate(['/cursos']);
+    this.router.navigate(['/admin/cursos']);
   }
 
   onReset(): void {

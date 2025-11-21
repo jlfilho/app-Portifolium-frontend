@@ -2,16 +2,16 @@
   min-width: 500px;
   max-width: 700px;
   padding: 0;
-  background-color: white !important;
+  background-color: var(--bg-card) !important;
 }
 
 /* Forçar fundo branco em todo o dialog */
 ::ng-deep .cursos-dialog-panel .mat-mdc-dialog-container {
-  background-color: white !important;
+  background-color: var(--bg-card) !important;
 }
 
 ::ng-deep .cursos-dialog-panel .mat-mdc-dialog-surface {
-  background-color: white !important;
+  background-color: var(--bg-card) !important;
 }
 
 /* Header */
@@ -65,12 +65,12 @@
   padding: 24px;
   max-height: 500px;
   overflow-y: auto;
-  background-color: white !important;
+  background-color: var(--bg-card) !important;
 }
 
 /* Garantir fundo branco em todos os elementos */
 .cursos-list {
-  background-color: white !important;
+  background-color: var(--bg-card) !important;
 }
 
 /* Stats */
@@ -86,16 +86,16 @@
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background: #f8f9fa;
+  background: var(--bg-darker);
   border-radius: 12px;
-  border: 2px solid #e9ecef;
+  border: 2px solid var(--border-color);
   transition: all 0.3s ease;
 }
 
 .stat-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: #3B82F6;
+  border-color: var(--primary-color);
 }
 
 .stat-card mat-icon {
@@ -127,11 +127,11 @@
 
 /* Cores específicas para cada tipo de card */
 .stat-card-active .stat-label {
-  color: #10B981 !important; /* Verde esmeralda */
+  color: var(--success-color) !important;
 }
 
 .stat-card-inactive .stat-label {
-  color: #6B7280 !important; /* Cinza médio */
+  color: var(--text-medium) !important;
 }
 
 .stat-card-total .stat-label {
@@ -162,16 +162,16 @@
 
 /* Curso Item */
 ::ng-deep .curso-item {
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--border-color);
   padding: 16px 0 !important;
   height: auto !important;
   min-height: 72px;
   transition: background-color 0.2s ease;
-  background-color: white !important;
+  background-color: var(--bg-card) !important;
 }
 
 ::ng-deep .curso-item:hover {
-  background-color: #f8f9fa !important;
+  background-color: var(--bg-darker) !important;
 }
 
 ::ng-deep .curso-item:last-child {
@@ -180,7 +180,7 @@
 
 /* Fundo da lista branco */
 ::ng-deep mat-list {
-  background-color: white !important;
+  background-color: var(--bg-card) !important;
 }
 
 ::ng-deep .curso-item mat-icon[matListItemIcon] {
@@ -236,9 +236,9 @@
 ::ng-deep .status-chip[highlighted="true"],
 ::ng-deep .mat-mdc-chip.status-chip.mat-primary[highlighted="true"],
 ::ng-deep .mat-mdc-chip.status-chip.mat-primary {
-  --mdc-chip-elevated-container-color: #10B981 !important;
-  --mdc-chip-container-color: #10B981 !important;
-  background-color: #10B981 !important; /* Verde esmeralda */
+  --mdc-chip-elevated-container-color: var(--success-color) !important;
+  --mdc-chip-container-color: var(--success-color) !important;
+  background-color: var(--success-color) !important;
   color: white !important;
 }
 
@@ -251,7 +251,7 @@
 
 /* Chip Inativo - Cinza */
 ::ng-deep .status-chip:not([highlighted="true"]) {
-  background-color: #6B7280 !important; /* Cinza médio */
+  background-color: var(--text-medium) !important;
   color: white !important;
 }
 
@@ -269,13 +269,13 @@
   font-size: 64px;
   width: 64px;
   height: 64px;
-  color: #94A3B8;
+  color: var(--text-light);
   opacity: 0.5;
 }
 
 .no-cursos p {
   font-size: 16px;
-  color: #94A3B8;
+  color: var(--text-light);
   margin: 0;
   text-align: center;
 }
@@ -283,7 +283,7 @@
 /* Actions */
 mat-dialog-actions {
   padding: 16px 24px;
-  background: #f8f9fa !important;
+  background: var(--bg-darker) !important;
   margin: 0;
 }
 
@@ -295,11 +295,11 @@ mat-dialog-actions button {
 
 /* Garantir que o dialog tenha fundo branco */
 ::ng-deep mat-dialog-content {
-  background-color: white !important;
+  background-color: var(--bg-card) !important;
 }
 
 ::ng-deep .mat-mdc-dialog-content {
-  background-color: white !important;
+  background-color: var(--bg-card) !important;
 }
 
 /* Scrollbar */
@@ -308,11 +308,11 @@ mat-dialog-actions button {
 }
 
 .dialog-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--bg-darker);
 }
 
 .dialog-content::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #3B82F6 0%, #A78BFA 100%);
+  background: var(--gradient-primary);
   border-radius: 3px;
 }
 
@@ -349,63 +349,63 @@ mat-dialog-actions button {
 
 /* Overrides mais específicos para garantir cores dos chips */
 ::ng-deep mat-chip.status-chip[highlighted="true"] {
-  background-color: #10B981 !important; /* Verde esmeralda */
+  background-color: var(--success-color) !important;
   color: white !important;
 }
 
 ::ng-deep mat-chip.status-chip:not([highlighted="true"]) {
-  background-color: #6B7280 !important; /* Cinza médio */
+  background-color: var(--text-medium) !important;
   color: white !important;
 }
 
 ::ng-deep .mat-mdc-chip.status-chip[highlighted="true"] {
-  background-color: #10B981 !important; /* Verde esmeralda */
+  background-color: var(--success-color) !important;
   color: white !important;
 }
 
 ::ng-deep .mat-mdc-chip.status-chip:not([highlighted="true"]) {
-  background-color: #6B7280 !important; /* Cinza médio */
+  background-color: var(--text-medium) !important;
   color: white !important;
 }
 
 /* Overrides para todas as variações de chips */
 ::ng-deep mat-chip[highlighted] {
-  background-color: #10B981 !important; /* Verde esmeralda */
+  background-color: var(--success-color) !important;
   color: white !important;
 }
 
 ::ng-deep mat-chip:not([highlighted]) {
-  background-color: #6B7280 !important; /* Cinza médio */
+  background-color: var(--text-medium) !important;
   color: white !important;
 }
 
 ::ng-deep .mat-mdc-chip[highlighted] {
-  background-color: #10B981 !important; /* Verde esmeralda */
+  background-color: var(--success-color) !important;
   color: white !important;
 }
 
 ::ng-deep .mat-mdc-chip:not([highlighted]) {
-  background-color: #6B7280 !important; /* Cinza médio */
+  background-color: var(--text-medium) !important;
   color: white !important;
 }
 
 /* Overrides para propriedades CSS customizadas do Material */
 ::ng-deep .mat-mdc-chip.status-chip[highlighted="true"] {
-  --mdc-chip-elevated-container-color: #10B981 !important;
+  --mdc-chip-elevated-container-color: var(--success-color) !important;
   --mdc-chip-label-text-color: white !important;
 }
 
 ::ng-deep .mat-mdc-chip.status-chip:not([highlighted="true"]) {
-  --mdc-chip-elevated-container-color: #6B7280 !important;
+  --mdc-chip-elevated-container-color: var(--text-medium) !important;
   --mdc-chip-label-text-color: white !important;
 }
 
 ::ng-deep .mat-mdc-chip[highlighted] {
-  --mdc-chip-elevated-container-color: #10B981 !important;
+  --mdc-chip-elevated-container-color: var(--success-color) !important;
   --mdc-chip-label-text-color: white !important;
 }
 
 ::ng-deep .mat-mdc-chip:not([highlighted]) {
-  --mdc-chip-elevated-container-color: #6B7280 !important;
+  --mdc-chip-elevated-container-color: var(--text-medium) !important;
   --mdc-chip-label-text-color: white !important;
 }

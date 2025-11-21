@@ -139,12 +139,12 @@ export class ListaUsuariosComponent implements OnInit {
   }
 
   addUser(): void {
-    this.router.navigate(['/usuarios/novo']);
+    this.router.navigate(['/admin/usuarios/novo']);
   }
 
   editUser(usuario: Usuario): void {
     // Passa os dados do usuário via state para evitar nova requisição
-    this.router.navigate(['/usuarios/editar', usuario.id], {
+    this.router.navigate(['/admin/usuarios/editar', usuario.id], {
       state: { usuario: usuario }
     });
   }

@@ -79,7 +79,7 @@ export class FormUnidadeAcademicaComponent implements OnInit {
         const message = extractApiMessage(error) || 'Erro ao carregar unidade acadêmica.';
         this.showMessage(message, 'error');
         this.isLoading = false;
-        this.router.navigate(['/unidades-academicas']);
+        this.router.navigate(['/admin/unidades-academicas']);
       }
     });
   }
@@ -102,7 +102,7 @@ export class FormUnidadeAcademicaComponent implements OnInit {
         next: () => {
           this.showMessage('Unidade acadêmica atualizada com sucesso!', 'success');
           this.isSaving = false;
-          this.router.navigate(['/unidades-academicas']);
+          this.router.navigate(['/admin/unidades-academicas']);
         },
         error: (error) => {
           console.error('❌ Erro ao atualizar unidade acadêmica:', error);
@@ -116,7 +116,7 @@ export class FormUnidadeAcademicaComponent implements OnInit {
         next: () => {
           this.showMessage('Unidade acadêmica criada com sucesso!', 'success');
           this.isSaving = false;
-          this.router.navigate(['/unidades-academicas']);
+          this.router.navigate(['/admin/unidades-academicas']);
         },
         error: (error) => {
           console.error('❌ Erro ao criar unidade acadêmica:', error);
@@ -129,7 +129,7 @@ export class FormUnidadeAcademicaComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/unidades-academicas']);
+    this.router.navigate(['/admin/unidades-academicas']);
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {

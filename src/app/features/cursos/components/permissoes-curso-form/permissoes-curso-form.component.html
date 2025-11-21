@@ -9,8 +9,8 @@
     </div>
     <div class="app-section-header__actions">
       <button mat-stroked-button class="btn-cancel" (click)="back()">
-        <mat-icon>arrow_back</mat-icon>
-        Voltar
+        <mat-icon>close</mat-icon>
+        Cancelar
       </button>
     </div>
   </div>
@@ -107,7 +107,7 @@
               <span class="user-name">{{ p.usuarioNome }}</span>
               <mat-chip
                 class="badge-status"
-                [ngClass]="getRoleColor(p.permissao)"
+                [color]="getRoleColor(p.permissao)"
                 [class.coordenador-atividade]="isCoordenadorAtividade(p.permissao)">
                 <mat-icon class="role-icon">{{ getRoleIcon(p.permissao) }}</mat-icon>
                 {{ p.permissao }}

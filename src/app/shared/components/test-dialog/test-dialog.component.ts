@@ -36,14 +36,14 @@ import { MatIconModule } from '@angular/material/icon';
     }
 
     h2[mat-dialog-title] {
-      color: #0F172A !important;
+      color: var(--text-dark) !important;
       font-weight: 500 !important;
       font-size: 20px !important;
       margin: 0 0 16px 0 !important;
     }
 
     mat-dialog-content {
-      color: #475569 !important;
+      color: var(--text-medium) !important;
       font-size: 16px !important;
       line-height: 1.5 !important;
       margin: 0 0 24px 0 !important;

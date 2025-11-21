@@ -1,18 +1,5 @@
 :host {
-  --gradient-primary: linear-gradient(90deg, #3B82F6, #8B5CF6);
-  --gradient-accent: linear-gradient(90deg, #6366F1, #8B5CF6);
-  --bg-actions: #F8FAFC;
-  --primary-color: #3B82F6;
-  --secondary-color: #8B5CF6;
-  --accent-color: #6366F1;
-  --success-color: #10B981;
-  --error-color: #EF4444;
-  --warning-color: #F59E0B;
-  --text-dark: #0F172A;
-  --text-medium: #475569;
-  --text-light: #64748B;
-  --bg-hover: rgba(59, 130, 246, 0.1);
-  --border-color: #CBD5E1;
+  /* Usa variáveis globais de src/styles/variables.css */
 }
 
 .permissoes-container {
@@ -111,29 +98,83 @@ mat-card-content {
   height: 16px !important;
 }
 
+/* ========================================
+   🎨 MATERIAL OVERRIDES - Mesmo padrão da lista de usuários
+   ======================================== */
+/* Administrador: mat-warn -> --primary-color */
+::ng-deep .badge-status.mat-mdc-chip.mat-warn {
+  --mdc-chip-label-text-color: white !important;
+  --mdc-chip-elevated-container-color: var(--primary-color) !important;
+  --mdc-chip-container-color: var(--primary-color) !important;
+  background-color: var(--primary-color) !important;
+}
+
+::ng-deep .badge-status.mat-mdc-chip.mat-warn .mat-mdc-chip-action-label,
+::ng-deep .badge-status.mat-mdc-chip.mat-warn span,
+::ng-deep .badge-status.mat-mdc-chip.mat-warn .mat-icon,
+::ng-deep .badge-status.mat-mdc-chip.mat-warn .role-icon {
+  color: white !important;
+}
+
+/* Gerente: mat-primary -> --secondary-color */
+::ng-deep .badge-status.mat-mdc-chip.mat-primary {
+  --mdc-chip-label-text-color: white !important;
+  --mdc-chip-elevated-container-color: var(--secondary-color) !important;
+  --mdc-chip-container-color: var(--secondary-color) !important;
+  background-color: var(--secondary-color) !important;
+}
+
+::ng-deep .badge-status.mat-mdc-chip.mat-primary .mat-mdc-chip-action-label,
+::ng-deep .badge-status.mat-mdc-chip.mat-primary span,
+::ng-deep .badge-status.mat-mdc-chip.mat-primary .mat-icon,
+::ng-deep .badge-status.mat-mdc-chip.mat-primary .role-icon {
+  color: white !important;
+}
+
+/* Secretário: mat-accent -> --accent-color */
+::ng-deep .badge-status.mat-mdc-chip.mat-accent {
+  --mdc-chip-label-text-color: white !important;
+  --mdc-chip-elevated-container-color: var(--accent-color) !important;
+  --mdc-chip-container-color: var(--accent-color) !important;
+  background-color: var(--accent-color) !important;
+}
+
+::ng-deep .badge-status.mat-mdc-chip.mat-accent .mat-mdc-chip-action-label,
+::ng-deep .badge-status.mat-mdc-chip.mat-accent span,
+::ng-deep .badge-status.mat-mdc-chip.mat-accent .mat-icon,
+::ng-deep .badge-status.mat-mdc-chip.mat-accent .role-icon {
+  color: white !important;
+}
+
+/* Coordenador de Atividade: coordenador-atividade -> --accent-color-light */
+::ng-deep .badge-status.mat-mdc-chip.coordenador-atividade {
+  --mdc-chip-label-text-color: white !important;
+  --mdc-chip-elevated-container-color: var(--accent-color-light) !important;
+  --mdc-chip-container-color: var(--accent-color-light) !important;
+  background-color: var(--accent-color-light) !important;
+}
+
+::ng-deep .badge-status.mat-mdc-chip.coordenador-atividade .mat-mdc-chip-action-label,
+::ng-deep .badge-status.mat-mdc-chip.coordenador-atividade span,
+::ng-deep .badge-status.mat-mdc-chip.coordenador-atividade .mat-icon,
+::ng-deep .badge-status.mat-mdc-chip.coordenador-atividade .role-icon {
+  color: white !important;
+}
+
+/* Fallback para chips sem classe Material (caso existam) */
 .badge-status.error {
-  background: rgba(239, 68, 68, 0.15) !important;
-  color: var(--error-color) !important;
+  background: var(--primary-color) !important;
+  color: white !important;
 }
 
 .badge-status.success {
-  background: rgba(16, 185, 129, 0.12) !important;
-  color: var(--success-color) !important;
+  background: var(--secondary-color) !important;
+  color: white !important;
 }
 
 .badge-status.warn {
-  background: rgba(245, 158, 11, 0.15) !important;
-  color: var(--warning-color) !important;
-}
-
-.badge-status.coordenador-atividade {
-  background: rgba(16, 185, 129, 0.15) !important;
-  color: var(--success-color) !important;
-}
-
-.badge-status.coordenador-atividade .role-icon,
-.badge-status.coordenador-atividade mat-icon {
-  color: var(--success-color) !important;
+  background: var(--accent-color) !important;
+  color: white !important;
 }
 
 .user-id {

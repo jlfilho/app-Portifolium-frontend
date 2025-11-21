@@ -1,7 +1,4 @@
-:host {
-  --header-gradient-start: var(--primary-color, #3f51b5);
-  --header-gradient-end: var(--secondary-color, #00897b);
-}
+/* Usa variáveis globais de src/styles/variables.css */
 
 /* Ocultar mat-mdc-button-touch-target */
 ::ng-deep .mat-mdc-button-touch-target {
@@ -36,8 +33,8 @@
   font-size: 40px;
   width: 40px;
   height: 40px;
-  background: linear-gradient(120deg, var(--header-gradient-start), var(--header-gradient-end));
-  color: #fff;
+  background: var(--gradient-primary);
+  color: white;
   border-radius: 12px;
   padding: 8px;
 }
@@ -46,12 +43,12 @@
   margin: 0;
   font-size: 24px;
   font-weight: 600;
-  color: var(--text-primary, #1e293b);
+  color: var(--text-primary);
 }
 
 .title-group p {
   margin: 4px 0 0;
-  color: var(--text-secondary, #475569);
+  color: var(--text-secondary);
 }
 
 .actions {
@@ -69,9 +66,18 @@
   height: 40px;
 }
 
+.import-button {
+  color: var(--primary-color) !important;
+}
+
+.import-button .mdc-button__label {
+  color: var(--primary-color) !important;
+}
+
 .import-button mat-icon,
 .btn-primary mat-icon {
   margin-right: 6px;
+  color: var(--primary-color) !important;
 }
 
 .file-input {
@@ -146,7 +152,7 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  color: var(--text-secondary, #475569);
+  color: var(--text-secondary);
   padding: 40px 0;
 }
 
@@ -158,7 +164,7 @@
   text-align: center;
   gap: 12px;
   padding: 48px 16px 40px;
-  color: var(--text-secondary, #475569);
+  color: var(--text-secondary);
 }
 
 .empty-state mat-icon {
@@ -170,24 +176,24 @@
 
 .empty-hint {
   font-size: 14px;
-  color: var(--text-tertiary, #64748b);
+  color: var(--text-light);
 }
 
 .table-container {
   overflow-x: auto;
   border-radius: 8px;
-  border: 1px solid var(--border-color, #CBD5E1);
+  border: 1px solid var(--border-color);
   display: block;
 }
 
 .pessoas-table {
   width: 100%;
   border-spacing: 0;
-  background: #ffffff;
+  background: var(--bg-card);
 }
 
 ::ng-deep .pessoas-container .pessoas-table .mat-mdc-header-row {
-  background: linear-gradient(120deg, var(--header-gradient-start), var(--header-gradient-end));
+  background: var(--gradient-primary);
 }
 
 ::ng-deep .pessoas-container .pessoas-table .mat-mdc-header-row:first-child .mat-mdc-header-cell:first-child {
@@ -199,12 +205,12 @@
 }
 
 ::ng-deep .pessoas-container .pessoas-table .mat-mdc-header-cell {
-  color: #fff;
+  color: white;
   font-weight: 600;
 }
 
 ::ng-deep .pessoas-container .pessoas-table .mat-mdc-cell {
-  color: var(--text-primary, #1e293b);
+  color: var(--text-primary);
 }
 
 ::ng-deep .pessoas-container .pessoas-table .mat-mdc-row:last-child .mat-mdc-cell:first-child {
@@ -246,11 +252,11 @@
 }
 
 .usuario-icon.possui-usuario {
-  color: #22c55e;
+  color: var(--success-color);
 }
 
 .usuario-icon.sem-usuario {
-  color: #ef4444;
+  color: var(--info-color);
 }
 
 .usuario-cell mat-icon:hover {

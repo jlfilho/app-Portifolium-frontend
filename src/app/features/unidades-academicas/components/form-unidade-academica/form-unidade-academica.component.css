@@ -1,11 +1,4 @@
-:host {
-  --primary-color: #3B82F6;
-  --secondary-color: #8B5CF6;
-  --accent-color: #6366F1;
-  --surface: #ffffff;
-  --text-dark: #0F172A;
-  --text-medium: #475569;
-}
+/* Usa variáveis globais de src/styles/variables.css */
 
 .form-container {
   max-width: 720px;
@@ -19,22 +12,22 @@
   background: var(--surface);
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.15);
+  box-shadow: 0 24px 70px color-mix(in srgb, var(--text-dark) 15%, transparent);
 }
 
 mat-card-header {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(99, 102, 241, 0.95) 100%);
-  color: #ffffff;
+  background: var(--primary-button-gradient);
+  color: white;
   padding: 28px 32px;
 }
 
 .form-avatar {
-  background: rgba(255, 255, 255, 0.18);
+  background: color-mix(in srgb, white 18%, transparent);
   border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: white;
 }
 
 mat-card-title {
@@ -44,12 +37,12 @@ mat-card-title {
 
 mat-card-subtitle {
   font-size: 15px;
-  color: rgba(255, 255, 255, 0.85);
+  color: color-mix(in srgb, white 85%, transparent);
 }
 
 mat-card-content {
   padding: 32px;
-  background: linear-gradient(180deg, rgba(241, 245, 255, 0.9) 0%, #ffffff 100%);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-darker) 90%, transparent) 0%, var(--bg-card) 100%);
 }
 
 .form-grid {
@@ -61,19 +54,19 @@ mat-card-content {
 .form-actions {
   margin-top: 28px;
   padding-top: 20px;
-  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  border-top: 1px solid color-mix(in srgb, var(--text-light) 20%, transparent);
   display: flex;
   justify-content: flex-end;
   gap: 12px;
 }
 
 .cancel-button {
-  border-color: rgba(59, 130, 246, 0.35);
+  border-color: color-mix(in srgb, var(--primary-color) 35%, transparent);
   color: var(--primary-color);
 }
 
 .cancel-button:hover {
-  background: rgba(59, 130, 246, 0.08);
+  background: color-mix(in srgb, var(--primary-color) 8%, transparent);
 }
 
 .submit-button {

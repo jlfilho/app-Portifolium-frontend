@@ -32,11 +32,11 @@
 
         <div class="form-actions">
           <button mat-stroked-button type="button" class="cancel-button" (click)="onCancel()">
-            <mat-icon>arrow_back</mat-icon>
-            Voltar
+            <mat-icon>close</mat-icon>
+            Cancelar
           </button>
 
-          <button mat-raised-button color="primary" class="submit-button" type="submit" [disabled]="isSaving">
+          <button mat-raised-button color="primary" class="btn-primary" type="submit" [disabled]="isSaving">
             <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
             {{ isEditMode ? 'Atualizar' : 'Cadastrar' }}
             <mat-progress-spinner

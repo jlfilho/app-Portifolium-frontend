@@ -1,0 +1,29 @@
+<div class="auditoria-page">
+  <div class="page-header">
+    <h1>
+      <mat-icon>security</mat-icon>
+      Auditoria do Sistema
+    </h1>
+    <p class="page-subtitle">Visualize e consulte logs de auditoria e ações do sistema</p>
+  </div>
+
+  <mat-card class="tabs-card">
+    <mat-tab-group [(selectedIndex)]="selectedTab">
+      <mat-tab label="Logs de Auditoria">
+        <div class="tab-content">
+          <app-audit-log-list></app-audit-log-list>
+        </div>
+      </mat-tab>
+      <mat-tab label="Logs de Ação">
+        <div class="tab-content">
+          <app-action-log-list></app-action-log-list>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card>
+
+  <mat-card class="export-card">
+    <app-log-export></app-log-export>
+  </mat-card>
+</div>
+

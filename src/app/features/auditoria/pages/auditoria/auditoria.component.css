@@ -1,0 +1,83 @@
+.auditoria-page {
+  padding: 24px;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.page-subtitle {
+  margin: 0;
+  color: var(--text-medium);
+  font-size: 14px;
+}
+
+.tabs-card {
+  background: transparent;
+  box-shadow: none;
+}
+
+.export-card {
+  margin-top: 24px;
+  background: transparent;
+  box-shadow: none;
+  border: none;
+}
+
+::ng-deep .mat-mdc-tab-group {
+  background: var(--bg-card);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --mdc-tab-indicator-active-indicator-color: var(--primary-color) !important;
+}
+
+/* Estilos para os textos das abas */
+::ng-deep .mat-mdc-tab-group .mat-mdc-tab .mdc-tab__text-label {
+  color: var(--text-medium) !important;
+  font-weight: 500;
+}
+
+::ng-deep .mat-mdc-tab-group .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+  color: var(--primary-color) !important;
+  font-weight: 600;
+}
+
+::ng-deep .mat-mdc-tab-group .mat-mdc-tab:not(.mdc-tab--active) .mdc-tab__text-label {
+  color: var(--text-medium) !important;
+}
+
+::ng-deep .mat-mdc-tab-group .mat-mdc-tab:hover:not(.mdc-tab--active) .mdc-tab__text-label {
+  color: var(--primary-color) !important;
+}
+
+.tab-content {
+  padding: 24px;
+}
+
+::ng-deep .mat-mdc-tab-body-wrapper {
+  padding: 0;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .auditoria-page {
+    padding: 16px;
+  }
+
+  .page-header h1 {
+    font-size: 24px;
+  }
+}
+

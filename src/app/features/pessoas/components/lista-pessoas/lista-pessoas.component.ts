@@ -172,7 +172,7 @@ export class ListaPessoasComponent implements OnInit, OnDestroy {
       this.showMessage('Somente administradores, gerentes ou secretários podem cadastrar pessoas.', 'error');
       return;
     }
-    this.router.navigate(['/pessoas/novo']);
+    this.router.navigate(['/admin/pessoas/novo']);
   }
 
   editPessoa(pessoa: Pessoa): void {
@@ -180,7 +180,7 @@ export class ListaPessoasComponent implements OnInit, OnDestroy {
       this.showMessage('Somente administradores podem editar pessoas.', 'error');
       return;
     }
-    this.router.navigate(['/pessoas/editar', pessoa.id]);
+    this.router.navigate(['/admin/pessoas/editar', pessoa.id]);
   }
 
   deletePessoa(pessoa: Pessoa): void {

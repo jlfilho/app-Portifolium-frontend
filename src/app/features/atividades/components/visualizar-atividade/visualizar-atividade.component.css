@@ -441,15 +441,16 @@
 }
 
 .fonte-chip {
-  background-color: var(--success-color) !important;
-  color: white !important;
+  background: color-mix(in srgb, var(--primary-color) 10%, transparent) !important;
+  color: var(--primary-color) !important;
+  border: 1px solid color-mix(in srgb, var(--primary-color) 20%, transparent) !important;
   font-weight: 500;
   height: 40px;
   font-size: 14px;
 }
 
 .fonte-chip mat-icon {
-  color: white !important;
+  color: var(--primary-color) !important;
 }
 
 /* ===== INTEGRANTES ===== */
@@ -514,17 +515,31 @@
 }
 
 .papel-chip {
-  color: white !important;
+  --mdc-chip-label-text-color: var(--md-sys-color-on-secondary) !important;
+  --mat-chip-label-text-color: var(--md-sys-color-on-secondary) !important;
+  color: var(--md-sys-color-on-secondary) !important;
   font-weight: 500;
   height: 36px;
   font-size: 14px;
 }
 
 .papel-chip mat-icon {
-  color: white !important;
+  color: var(--md-sys-color-on-secondary) !important;
   font-size: 20px;
   width: 20px;
   height: 20px;
+}
+
+/* Garantir que o texto do chip use a variável */
+.papel-chip .mdc-chip__text-label,
+.papel-chip .mat-mdc-chip-action-label,
+.papel-chip .mdc-evolution-chip__text-label,
+:host ::ng-deep .papel-chip .mdc-chip__text-label,
+:host ::ng-deep .papel-chip .mat-mdc-chip-action-label,
+:host ::ng-deep .papel-chip .mdc-evolution-chip__text-label {
+  color: var(--md-sys-color-on-secondary) !important;
+  --mdc-chip-label-text-color: var(--md-sys-color-on-secondary) !important;
+  --mat-chip-label-text-color: var(--md-sys-color-on-secondary) !important;
 }
 
 /* ===== EMPTY STATE ===== */
@@ -1182,6 +1197,69 @@ mat-divider {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+/* Tamanho do ícone dentro do botão */
+.btn-add-first mat-icon,
+:host ::ng-deep .btn-add-first.mat-mdc-raised-button mat-icon,
+:host ::ng-deep .empty-section .btn-add-first.mat-mdc-raised-button mat-icon {
+  font-size: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+  line-height: 20px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Garantir que o botão tenha cor verde quando habilitado */
+:host ::ng-deep .btn-add-first.mat-mdc-raised-button.mat-primary:not([disabled]),
+:host ::ng-deep .empty-section .btn-add-first.mat-mdc-raised-button.mat-primary:not([disabled]) {
+  --mdc-filled-button-container-color: var(--primary-color) !important;
+  --mdc-filled-button-label-text-color: var(--md-sys-color-on-secondary) !important;
+  --mat-filled-button-state-layer-color: var(--md-sys-color-on-secondary) !important;
+  background: var(--primary-button-gradient) !important;
+  background-color: var(--primary-color) !important;
+  color: var(--md-sys-color-on-secondary) !important;
+  box-shadow: var(--shadow-primary) !important;
+  opacity: 1 !important;
+}
+
+:host ::ng-deep .btn-add-first.mat-mdc-raised-button.mat-primary:not([disabled]) .mdc-button__label,
+:host ::ng-deep .btn-add-first.mat-mdc-raised-button.mat-primary:not([disabled]) mat-icon,
+:host ::ng-deep .empty-section .btn-add-first.mat-mdc-raised-button.mat-primary:not([disabled]) .mdc-button__label,
+:host ::ng-deep .empty-section .btn-add-first.mat-mdc-raised-button.mat-primary:not([disabled]) mat-icon,
+:host ::ng-deep .btn-add-first.mat-mdc-raised-button.mat-primary:not([disabled]) .mdc-button__label *,
+:host ::ng-deep .empty-section .btn-add-first.mat-mdc-raised-button.mat-primary:not([disabled]) .mdc-button__label * {
+  color: var(--md-sys-color-on-secondary) !important;
+  opacity: 1 !important;
+}
+
+:host ::ng-deep .btn-add-first.mat-mdc-raised-button.mat-primary:not([disabled]):hover,
+:host ::ng-deep .empty-section .btn-add-first.mat-mdc-raised-button.mat-primary:not([disabled]):hover {
+  --mdc-filled-button-hover-state-layer-color: rgba(255, 255, 255, 0.08) !important;
+  --mdc-filled-button-hover-label-text-color: var(--md-sys-color-on-secondary) !important;
+  background: var(--gradient-accent) !important;
+  background-color: var(--secondary-color) !important;
+  box-shadow: var(--shadow-accent) !important;
+  opacity: 1 !important;
+  color: var(--md-sys-color-on-secondary) !important;
+}
+
+/* Garantir que o botão dentro de empty-section tenha cor verde */
+.empty-section .btn-add-first.mat-mdc-raised-button.mat-primary:not([disabled]) {
+  --mdc-filled-button-container-color: var(--primary-color) !important;
+  --mdc-filled-button-label-text-color: var(--md-sys-color-on-secondary) !important;
+  background-color: var(--primary-color) !important;
+  color: var(--md-sys-color-on-secondary) !important;
+  opacity: 1 !important;
+}
+
+.empty-section .btn-add-first.mat-mdc-raised-button.mat-primary:not([disabled]) .mdc-button__label,
+.empty-section .btn-add-first.mat-mdc-raised-button.mat-primary:not([disabled]) mat-icon,
+.empty-section .btn-add-first.mat-mdc-raised-button.mat-primary:not([disabled]) span {
+  color: #FFFFFF !important;
+  opacity: 1 !important;
 }
 
 /* ===== RESPONSIVE ===== */

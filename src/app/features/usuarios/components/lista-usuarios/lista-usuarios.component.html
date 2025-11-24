@@ -86,7 +86,12 @@
               <mat-chip 
                 [color]="getRoleColor(usuario.role)" 
                 [class.coordenador-atividade]="isCoordenadorAtividade(usuario.role)"
-                class="role-chip">
+                [class.role-administrador]="isAdministrador(usuario.role)"
+                [class.role-gerente]="isGerente(usuario.role)"
+                [class.role-secretario]="isSecretario(usuario.role)"
+                class="role-chip"
+                [matTooltip]="usuario.role"
+                [matTooltipClass]="'role-tooltip-' + getRoleTooltipClass(usuario.role)">
                 <mat-icon class="role-icon">{{ getRoleIcon(usuario.role) }}</mat-icon>
                 {{ usuario.role }}
               </mat-chip>
@@ -188,7 +193,12 @@
                 <mat-chip 
                   [color]="getRoleColor(usuario.role)" 
                   [class.coordenador-atividade]="isCoordenadorAtividade(usuario.role)"
-                  class="role-chip">
+                  [class.role-administrador]="isAdministrador(usuario.role)"
+                  [class.role-gerente]="isGerente(usuario.role)"
+                  [class.role-secretario]="isSecretario(usuario.role)"
+                  class="role-chip"
+                  [matTooltip]="usuario.role"
+                  [matTooltipClass]="'role-tooltip-' + getRoleTooltipClass(usuario.role)">
                   <mat-icon class="role-icon">{{ getRoleIcon(usuario.role) }}</mat-icon>
                   {{ usuario.role }}
                 </mat-chip>

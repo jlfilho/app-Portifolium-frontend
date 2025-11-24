@@ -36,7 +36,7 @@
   font-size: 48px;
   width: 48px;
   height: 48px;
-  color: white;
+  color: var(--md-sys-color-on-secondary) !important;
 }
 
 .header-text {
@@ -47,17 +47,33 @@
   margin: 0;
   font-size: 24px;
   font-weight: 600;
-  color: white;
+  color: var(--md-sys-color-on-secondary) !important;
 }
 
 .subtitle {
   margin: 4px 0 0 0;
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--md-sys-color-on-secondary) !important;
+  opacity: 0.9;
+}
+
+/* Garantir que o subtitle não fique lilás */
+.header-text .subtitle,
+.dialog-header .subtitle,
+.subtitle p,
+p.subtitle {
+  color: var(--md-sys-color-on-secondary) !important;
+  --mat-icon-color: var(--md-sys-color-on-secondary) !important;
+}
+
+:host ::ng-deep .subtitle,
+:host ::ng-deep .header-text .subtitle,
+:host ::ng-deep .dialog-header .subtitle {
+  color: var(--md-sys-color-on-secondary) !important;
 }
 
 .close-button {
-  color: white !important;
+  color: var(--md-sys-color-on-secondary) !important;
 }
 
 /* Content */
@@ -291,6 +307,25 @@ mat-dialog-actions button {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+/* Botão Fechar - Garantir cor branca */
+:host ::ng-deep mat-dialog-actions button[mat-raised-button][color="primary"] {
+  --mdc-filled-button-container-color: var(--primary-color) !important;
+  --mdc-filled-button-label-text-color: var(--md-sys-color-on-secondary) !important;
+  --mat-filled-button-state-layer-color: var(--md-sys-color-on-secondary) !important;
+  background-color: var(--primary-color) !important;
+  color: var(--md-sys-color-on-secondary) !important;
+}
+
+:host ::ng-deep mat-dialog-actions button[mat-raised-button][color="primary"] .mdc-button__label,
+:host ::ng-deep mat-dialog-actions button[mat-raised-button][color="primary"] mat-icon {
+  color: var(--md-sys-color-on-secondary) !important;
+}
+
+:host ::ng-deep mat-dialog-actions button[mat-raised-button][color="primary"]:hover {
+  background-color: var(--secondary-color) !important;
+  --mdc-filled-button-container-color: var(--secondary-color) !important;
 }
 
 /* Garantir que o dialog tenha fundo branco */

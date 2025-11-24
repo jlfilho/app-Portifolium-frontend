@@ -1,6 +1,8 @@
-.sobre-page {
-  min-height: calc(100vh - 64px);
-  background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-content) 100%);
+/* ===== CONTAINER ===== */
+.page-container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+  padding-bottom: 60px;
 }
 
 /* Hero Section */
@@ -72,13 +74,17 @@
 .content-section {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 48px 24px;
+  padding: 0 24px 48px 24px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .info-card {
   margin-bottom: 32px;
   border-radius: 12px;
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
 }
 
 .info-card mat-card-header {
@@ -125,14 +131,16 @@
   display: flex;
   gap: 16px;
   padding: 20px;
-  background: var(--bg-darker);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   transition: all 0.3s ease;
 }
 
 .feature-item:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary-color);
 }
 
 .feature-item mat-icon {
@@ -159,8 +167,8 @@
 
 /* Developer Card */
 .developer-card {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 5%, transparent) 0%, color-mix(in srgb, var(--secondary-color) 5%, transparent) 100%);
-  border: 2px solid rgba(59, 130, 246, 0.1);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
 }
 
 .developer-info {
@@ -178,7 +186,7 @@
   width: 64px;
   height: 64px;
   color: var(--primary-color);
-  background: rgba(59, 130, 246, 0.1);
+  background: color-mix(in srgb, var(--primary-color) 12%, transparent);
   border-radius: 16px;
   padding: 16px;
 }
@@ -244,9 +252,9 @@
 
 .tech-chip:hover {
   background: color-mix(in srgb, var(--primary-color) 15%, transparent) !important;
-  border-color: color-mix(in srgb, var(--primary-color) 30%, transparent) !important;
+  border-color: var(--primary-color) !important;
   transform: translateY(-2px);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .tech-chip mat-icon {

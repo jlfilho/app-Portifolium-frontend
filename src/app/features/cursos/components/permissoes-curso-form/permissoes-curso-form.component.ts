@@ -347,6 +347,35 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
     return roleUpper.includes('COORDENADOR_ATIVIDADE') || roleUpper.includes('COORDENADOR ATIVIDADE');
   }
 
+  isAdministrador(role: string): boolean {
+    const roleUpper = role.toUpperCase();
+    return roleUpper.includes('ADMINISTRADOR');
+  }
+
+  isGerente(role: string): boolean {
+    const roleUpper = role.toUpperCase();
+    return roleUpper.includes('GERENTE');
+  }
+
+  isSecretario(role: string): boolean {
+    const roleUpper = role.toUpperCase();
+    return roleUpper.includes('SECRETARIO');
+  }
+
+  getRoleTooltipClass(role: string): string {
+    const roleUpper = role.toUpperCase();
+    if (roleUpper.includes('ADMINISTRADOR')) {
+      return 'administrador';
+    } else if (roleUpper.includes('GERENTE')) {
+      return 'gerente';
+    } else if (roleUpper.includes('SECRETARIO')) {
+      return 'secretario';
+    } else if (roleUpper.includes('COORDENADOR_ATIVIDADE') || roleUpper.includes('COORDENADOR ATIVIDADE')) {
+      return 'coordenador-atividade';
+    }
+    return 'default';
+  }
+
   getRoleIcon(role: string): string {
     const roleUpper = role.toUpperCase();
     if (roleUpper.includes('ADMINISTRADOR')) {

@@ -143,9 +143,13 @@
           </div>
 
           <mat-card-content>
-            <!-- Título e Status -->
+            <!-- Título -->
             <div class="card-header">
               <h3 class="atividade-nome">{{ atividade.nome }}</h3>
+            </div>
+
+            <!-- Status -->
+            <div class="card-status">
               <mat-chip
                 [class.chip-publicada]="atividade.statusPublicacao"
                 [class.chip-nao-publicada]="!atividade.statusPublicacao"

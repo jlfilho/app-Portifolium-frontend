@@ -23,10 +23,6 @@
         <button mat-icon-button class="hero-back" (click)="voltarParaCursos()" matTooltip="Voltar para cursos públicos">
           <mat-icon>arrow_back</mat-icon>
         </button>
-        <button mat-stroked-button color="primary" (click)="voltarParaAtividades()">
-          <mat-icon>arrow_back</mat-icon>
-          Atividades do curso
-        </button>
       </div>
 
       <span class="hero-chip">{{ atividade.categoria.nome }}</span>
@@ -93,6 +89,14 @@
           </div>
 
           <div class="summary-item">
+            <mat-icon>person</mat-icon>
+            <div>
+              <span class="label">Coordenador</span>
+              <span class="value">{{ atividade.coordenador || 'Não informado' }}</span>
+            </div>
+          </div>
+
+          <div class="summary-item">
             <mat-icon>school</mat-icon>
             <div>
               <span class="label">Curso</span>
@@ -133,10 +137,6 @@
         <div class="details-item">
           <span class="label">Público Alvo</span>
           <p>{{ atividade.publicoAlvo || 'Não informado' }}</p>
-        </div>
-        <div class="details-item">
-          <span class="label">Coordenador</span>
-          <p>{{ atividade.coordenador || 'Não informado' }}</p>
         </div>
       </div>
     </mat-card>

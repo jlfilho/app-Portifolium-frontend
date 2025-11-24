@@ -361,6 +361,24 @@ export class FormCursoComponent implements OnInit, OnDestroy {
   get tipoId() { return this.cursoForm.get('tipoId'); }
   get unidadeAcademicaId() { return this.cursoForm.get('unidadeAcademicaId'); }
 
+  // Verificar se o formulário está válido
+  isFormValid(): boolean {
+    // Verificar se os campos obrigatórios estão preenchidos
+    const nomeValido = !!(this.nome?.valid && this.nome?.value?.trim().length >= 3);
+    const tipoValido = !!(this.tipoId?.valid && this.tipoId?.value !== null && this.tipoId?.value !== undefined);
+    // Verificar se a unidade acadêmica foi selecionada (tanto pela propriedade quanto pelo form control)
+    const unidadeValida = (this.selectedUnidadeAcademica !== null && this.selectedUnidadeAcademica !== undefined) || 
+                          !!(this.unidadeAcademicaId?.value !== null && this.unidadeAcademicaId?.value !== undefined);
+    
+    // Se a unidade foi selecionada mas o form control não foi atualizado, atualizar agora
+    if (this.selectedUnidadeAcademica && !this.unidadeAcademicaId?.value) {
+      this.unidadeAcademicaId?.setValue(this.selectedUnidadeAcademica.id);
+      this.unidadeAcademicaId?.updateValueAndValidity();
+    }
+    
+    return nomeValido && tipoValido && unidadeValida;
+  }
+
   private loadTiposCurso(): void {
     this.isLoadingTipos = true;
     this.tiposCursoService.getFirstPageAsList(100, undefined, 'nome', 'ASC').subscribe({

@@ -108,7 +108,12 @@
               <mat-chip
                 class="badge-status"
                 [color]="getRoleColor(p.permissao)"
-                [class.coordenador-atividade]="isCoordenadorAtividade(p.permissao)">
+                [class.coordenador-atividade]="isCoordenadorAtividade(p.permissao)"
+                [class.role-administrador]="isAdministrador(p.permissao)"
+                [class.role-gerente]="isGerente(p.permissao)"
+                [class.role-secretario]="isSecretario(p.permissao)"
+                [matTooltip]="p.permissao"
+                [matTooltipClass]="'role-tooltip-' + getRoleTooltipClass(p.permissao)">
                 <mat-icon class="role-icon">{{ getRoleIcon(p.permissao) }}</mat-icon>
                 {{ p.permissao }}
               </mat-chip>

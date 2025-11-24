@@ -230,10 +230,13 @@ mat-card-content {
 /* Imagem do Card */
 .card-image {
   width: 100%;
-  height: auto;
+  height: 200px;
+  min-height: 200px;
   max-height: 200px;
   object-fit: cover;
+  object-position: center;
   display: block;
+  background-color: var(--bg-darker);
 }
 
 .card-image-placeholder {
@@ -262,11 +265,7 @@ mat-card-content {
 
 /* Header do Card */
 .card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
-  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .atividade-nome {
@@ -274,8 +273,23 @@ mat-card-content {
   font-weight: 600;
   color: var(--text-dark);
   margin: 0;
-  line-height: 1.3;
-  flex: 1;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  word-break: break-word;
+  min-height: 50px;
+  max-height: 50px;
+}
+
+/* Status abaixo do nome */
+.card-status {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
 }
 
 /* Status Chips */
@@ -284,11 +298,13 @@ mat-card-content {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 10px;
-  height: auto;
-  font-size: 11px;
+  padding: 4px 12px;
+  height: 24px;
+  font-size: 12px;
   border-radius: 12px;
   flex-shrink: 0;
+  white-space: nowrap;
+  overflow: visible;
 }
 
 .chip-publicada {

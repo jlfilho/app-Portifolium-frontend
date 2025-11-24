@@ -4,14 +4,14 @@
 /* ===== CONTAINER ===== */
 .page-container {
   min-height: 100vh;
-  background: var(--primary-button-gradient);
+  background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
   padding-bottom: 60px;
 }
 
 /* ===== HERO SECTION ===== */
 .hero-section {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 0.95) 0%, color-mix(in srgb, var(--secondary-color) 0.95) 100%);
-  padding: 40px 24px 50px;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  padding: 40px 24px 80px;
   position: relative;
   overflow: hidden;
 }
@@ -103,11 +103,14 @@
   color: rgba(255, 255, 255, 0.9);
   margin: 0;
   font-weight: 400;
+  padding-bottom: 20px;
+  position: relative;
+  z-index: 2;
 }
 
 .course-summary {
   max-width: 1200px;
-  margin: -60px auto 40px;
+  margin: -40px auto 40px;
   padding: 0 24px;
   position: relative;
   z-index: 12;
@@ -117,9 +120,10 @@
   display: flex;
   align-items: stretch;
   gap: 24px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(236, 240, 255, 0.95) 100%);
+  background: var(--bg-card);
   border-radius: 28px;
-  box-shadow: 0 24px 60px rgba(17, 24, 39, 0.25);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-color);
   overflow: hidden;
   position: relative;
   isolation: isolate;
@@ -157,11 +161,11 @@
   width: 56px;
   height: 56px;
   border-radius: 18px;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 0.2), color-mix(in srgb, var(--secondary-color) 0.25));
+  background: color-mix(in srgb, var(--primary-color) 12%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--primary);
+  color: var(--primary-color);
   font-size: 28px;
 }
 
@@ -187,13 +191,13 @@
 }
 
 .summary-chip {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
-  color: white !important;
+  background: var(--gradient-primary) !important;
+  color: var(--md-sys-color-on-primary) !important;
   font-weight: 600;
   letter-spacing: 0.4px;
   padding: 0 12px;
   border-radius: 16px;
-  box-shadow: 0 6px 16px color-mix(in srgb, var(--primary-color) 0.35);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .summary-description {
@@ -254,13 +258,14 @@
 
 .search-field {
   width: 100%;
-  background: white;
+  background: var(--bg-card);
   border-radius: 50px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-color);
 }
 
 ::ng-deep .search-field .mat-mdc-form-field-flex {
-  background: white;
+  background: var(--bg-card);
   border-radius: 50px;
   padding: 4px 24px;
   height: 48px;
@@ -285,6 +290,65 @@
   min-height: auto;
 }
 
+/* Ajustar posicionamento do ícone e do texto para não sobrepor */
+::ng-deep .search-field .mat-mdc-form-field-icon-prefix {
+  margin-right: 12px;
+  margin-left: 0;
+  color: var(--text-medium);
+}
+
+::ng-deep .search-field .mat-mdc-form-field-label-wrapper {
+  padding-left: 40px !important; /* Espaço para o ícone (24px ícone + 12px margin + 4px extra) */
+}
+
+::ng-deep .search-field .mat-mdc-form-field-label {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+::ng-deep .search-field .mat-mdc-text-field-wrapper .mat-mdc-form-field-flex {
+  align-items: center;
+  position: relative;
+}
+
+::ng-deep .search-field input.mat-mdc-input-element {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Garantir que o label flutuante não fique sobreposto */
+::ng-deep .search-field.mat-form-field-appearance-outline .mat-mdc-form-field-label {
+  left: 40px !important; /* Alinha com o início do input após o ícone */
+  width: auto !important;
+}
+
+::ng-deep .search-field.mat-form-field-appearance-outline .mat-mdc-form-field-label-wrapper {
+  left: 0 !important;
+  padding-left: 40px !important; /* Espaço para o ícone */
+}
+
+/* Quando o label está flutuante (focado ou com valor) */
+::ng-deep .search-field.mat-form-field-appearance-outline.mat-focused .mat-mdc-form-field-label,
+::ng-deep .search-field.mat-form-field-appearance-outline.mat-form-field-has-label .mat-mdc-form-field-label-wrapper .mat-mdc-floating-label {
+  left: 0 !important;
+  transform: translateY(-28px) scale(0.75) !important;
+  padding-left: 0 !important;
+}
+
+/* Garantir que o input tenha espaço após o ícone */
+::ng-deep .search-field .mat-mdc-form-field-infix {
+  padding-left: 0 !important;
+}
+
+/* Ajustar o outline para não sobrepor o ícone */
+::ng-deep .search-field .mdc-notched-outline__leading {
+  border-radius: 50px 0 0 50px;
+}
+
+::ng-deep .search-field .mdc-notched-outline__notch {
+  padding-left: 40px !important; /* Espaço para o ícone */
+}
+
 /* Results Info */
 .results-info {
   display: flex;
@@ -293,27 +357,28 @@
   gap: 8px;
   margin-top: 16px;
   padding: 12px 20px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--bg-darker);
   border-radius: 24px;
   color: var(--text-dark);
   font-size: 15px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
 }
 
 .results-info mat-icon {
-  color: var(--primary);
+  color: var(--primary-color);
   font-size: 20px;
   width: 20px;
   height: 20px;
 }
 
 .results-info strong {
-  color: var(--primary);
+  color: var(--primary-color);
   font-weight: 600;
 }
 
 .search-highlight {
-  color: var(--primary);
+  color: var(--primary-color);
   font-weight: 600;
 }
 
@@ -346,12 +411,13 @@
 
 /* ===== ATIVIDADE CARD ===== */
 .atividade-card {
-  background: white;
+  background: var(--bg-card);
   border-radius: 16px;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -360,7 +426,8 @@
 
 .atividade-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  border-color: var(--primary-color);
 }
 
 .atividade-card::before {
@@ -370,7 +437,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+  background: var(--gradient-primary);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -382,9 +449,14 @@
 /* Card Header Image */
 .card-header-image {
   height: 220px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  min-height: 220px;
+  max-height: 220px;
+  background: var(--gradient-primary);
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Efeito decorativo quando NÃO tem imagem */
@@ -417,9 +489,12 @@
 .atividade-image {
   width: 100%;
   height: 100%;
+  min-height: 220px;
   object-fit: cover;
+  object-position: center;
   display: block;
   transition: transform 0.3s ease;
+  background-color: var(--bg-darker);
 }
 
 .atividade-card:hover .atividade-image {
@@ -465,7 +540,7 @@
 }
 
 .info-item mat-icon {
-  color: var(--primary);
+  color: var(--primary-color);
   font-size: 22px;
   width: 22px;
   height: 22px;
@@ -497,14 +572,15 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background-color: var(--bg-light);
+  background-color: var(--bg-darker);
   border-radius: 8px;
   font-size: 13px;
   color: var(--text-dark);
+  border: 1px solid var(--border-color);
 }
 
 .info-badge mat-icon {
-  color: var(--primary);
+  color: var(--primary-color);
   font-size: 18px;
   width: 18px;
   height: 18px;
@@ -526,15 +602,44 @@
   gap: 8px;
 }
 
+/* Garantir que o botão tenha fundo verde e texto branco */
+::ng-deep .btn-view-full.mat-mdc-raised-button.mat-primary {
+  background: var(--primary-button-gradient) !important;
+  background-color: var(--primary-color) !important;
+  color: white !important;
+  box-shadow: var(--shadow-primary) !important;
+  border: none !important;
+}
+
+::ng-deep .btn-view-full.mat-mdc-raised-button.mat-primary .mdc-button__label,
+::ng-deep .btn-view-full.mat-mdc-raised-button.mat-primary mat-icon,
+::ng-deep .btn-view-full.mat-mdc-raised-button.mat-primary .mdc-button__label * {
+  color: white !important;
+}
+
+::ng-deep .btn-view-full.mat-mdc-raised-button.mat-primary:hover:not([disabled]) {
+  background: var(--gradient-accent) !important;
+  background-color: var(--secondary-color) !important;
+  box-shadow: var(--shadow-accent) !important;
+  color: white !important;
+}
+
+::ng-deep .btn-view-full.mat-mdc-raised-button.mat-primary:hover:not([disabled]) .mdc-button__label,
+::ng-deep .btn-view-full.mat-mdc-raised-button.mat-primary:hover:not([disabled]) mat-icon,
+::ng-deep .btn-view-full.mat-mdc-raised-button.mat-primary:hover:not([disabled]) .mdc-button__label * {
+  color: white !important;
+}
+
 /* ===== EMPTY STATE ===== */
 .empty-state {
   text-align: center;
   padding: 80px 24px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--bg-card);
   border-radius: 16px;
   max-width: 600px;
   margin: 0 auto;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
 }
 
 .empty-icon {
@@ -561,7 +666,7 @@
 }
 
 .empty-state strong {
-  color: var(--primary);
+  color: var(--primary-color);
 }
 
 .empty-state button {
@@ -575,9 +680,10 @@
 .paginator {
   max-width: 1400px;
   margin: 40px auto 0;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--bg-card);
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
 }
 
 ::ng-deep .paginator .mat-mdc-paginator-container {

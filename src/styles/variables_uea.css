@@ -1,171 +1,172 @@
 /* ============================================
-   PALETA DE CORES - MINIMAL TECH LIGHT+
+   PALETA DE CORES – TEMA UEA (Verde Institucional Moderno)
+   Compatível com Angular Material v16–v19 (M3)
    ============================================ */
 
-:root {
-  /* ============================================
-     VARIÁVEIS DO MATERIAL DESIGN SYSTEM
-     (Angular Material v15+ usa estas variáveis)
-     ============================================ */
-  
-  /* Primary Colors */
-  --md-sys-color-primary: #3B82F6;
-  --md-sys-color-on-primary: #FFFFFF;
-  --md-sys-color-primary-container: #E3F2FD;
-  --md-sys-color-on-primary-container: #0D47A1;
-  
-  /* Secondary Colors */
-  --md-sys-color-secondary: #8B5CF6;
-  --md-sys-color-on-secondary: #FFFFFF;
-  --md-sys-color-secondary-container: #F3E5F5;
-  --md-sys-color-on-secondary-container: #4A148C;
-  
-  /* Tertiary/Accent Colors */
-  --md-sys-color-tertiary: #6366F1;
-  --md-sys-color-on-tertiary: #FFFFFF;
-  --md-sys-color-tertiary-container: #E8EAF6;
-  --md-sys-color-on-tertiary-container: #1A237E;
-  
-  /* Error Colors */
-  --md-sys-color-error: #EF4444;
-  --md-sys-color-on-error: #FFFFFF;
-  --md-sys-color-error-container: #FFEBEE;
-  --md-sys-color-on-error-container: #B71C1C;
-  
-  /* Surface Colors */
-  --md-sys-color-surface: #FFFFFF;
-  --md-sys-color-on-surface: #1E293B;
-  --md-sys-color-surface-variant: #FFFFFF;
-  --md-sys-color-on-surface-variant: #475569;
-  
-  /* Background Colors */
-  --md-sys-color-background: #F8FAF9;
-  --md-sys-color-on-background: #1E293B;
-  
-  /* Outline Colors */
-  --md-sys-color-outline: #CBD5E1;
-  --md-sys-color-outline-variant: #E2E8F0;
-  
-  /* Shadow Colors */
-  --md-sys-color-shadow: rgba(0, 0, 0, 0.1);
-  --md-sys-color-scrim: rgba(0, 0, 0, 0.6);
-  
-  /* Inverse Colors */
-  --md-sys-color-inverse-surface: #1E293B;
-  --md-sys-color-inverse-on-surface: #FFFFFF;
-  --md-sys-color-inverse-primary: #90CAF9;
-  
-  /* ============================================
-     VARIÁVEIS CUSTOMIZADAS DO PROJETO
-     (Mantidas para compatibilidade)
-     ============================================ */
-  
-  /* Cores Primárias */
-  --primary-color: #3B82F6;           /* Azul principal */
-  --secondary-color: #8B5CF6;         /* Lilás suave */
-  --accent-color: #6366F1;            /* Azul-violeta */
-  --accent-color-light: #A78BFA;      /* Lilás claro */
+   :root {
+    /* ============================================
+       MATERIAL SYSTEM VARIABLES (M3)
+    ============================================ */
 
-  /* Backgrounds */
-  --bg-dark: #F8FAFC;                 /* Fundo principal (branco levemente azulado) */
-  --bg-darker: #F1F5F9;              /* Painel lateral/navbar */
-  --bg-card: #FFFFFF;                 /* Card background */
-  --bg-content: #F8FAFC;              /* Fundo de conteúdo */
-  --bg-actions: #F1F5F9;             /* Fundo de ações */
-  --bg-hover: rgba(59, 130, 246, 0.1); /* Hover sutil */
+    /* === PRIMARY (VERDE UEA) === */
+    --md-sys-color-primary: #0E8F47;                  /* Verde institucional moderado */
+    --md-sys-color-on-primary: #FFFFFF;
+    --md-sys-color-primary-container: #D9F3E4;        /* Verde bem suave (container) */
+    --md-sys-color-on-primary-container: #0A6633;     /* Verde mais escuro para texto */
 
-  /* Texto */
-  --text-primary: #1E293B;            /* Texto principal (azul-acinzentado) */
-  --text-secondary: #475569;          /* Texto secundário (cinza frio) */
-  --text-dark: #0F172A;               /* Texto em fundo claro */
-  --text-medium: #64748B;             /* Cinza médio */
-  --text-light: #94A3B8;              /* Texto em estados desativados/descrições */
+    /* === SECONDARY (VERDE SUAVE) === */
+    --md-sys-color-secondary: #5CC080;                /* Verde suave (accent verde) */
+    --md-sys-color-on-secondary: #00391A;
+    --md-sys-color-secondary-container: #E3F8EE;
+    --md-sys-color-on-secondary-container: #0E8F47;
 
-  /* Bordas */
-  --border-color: #CBD5E1;            /* Bordas/linhas (cinza claro) */
+    /* === TERTIARY (AZUL-PETRÓLEO COMPLEMENTAR) === */
+    --md-sys-color-tertiary: #3AAFA9;                 /* Azul-petróleo complementar */
+    --md-sys-color-on-tertiary: #003236;
+    --md-sys-color-tertiary-container: #DDF5F4;
+    --md-sys-color-on-tertiary-container: #024446;
 
-  /* Gradientes */
-  --gradient-primary: linear-gradient(90deg, #3B82F6 0%, #8B5CF6 100%);
-  --gradient-secondary: linear-gradient(90deg, #8B5CF6 0%, #6366F1 100%);
-  --gradient-accent: linear-gradient(90deg, #6366F1 0%, #3B82F6 100%);
-  --gradient-hover: linear-gradient(90deg, #3B82F6, #8B5CF6);
-  --card-header-gradient: var(--gradient-primary);
-  --primary-button-gradient: var(--gradient-primary);
-  --secondary-button-gradient: linear-gradient(90deg, rgba(59,130,246,0.85) 0%, rgba(99,102,241,0.85) 100%);
-  --chip-gradient: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
-  --chip-background: rgba(59, 130, 246, 0.12);
-  --chip-text-color: #1e293b;
+    /* === ERROR === */
+    --md-sys-color-error: #D32F2F;
+    --md-sys-color-on-error: #FFFFFF;
+    --md-sys-color-error-container: #FDECEA;
+    --md-sys-color-on-error-container: #8A1C1C;
 
-  /* Estados */
-  --success-color: #22C55E;           /* Verde esmeralda */
-  --error-color: #EF4444;             /* Vermelho consistente */
-  --warning-color: #F59E0B;           /* Laranja quente */
-  --info-color: #3B82F6;              /* Azul principal */
+    /* === SURFACE / BACKGROUND === */
+    --md-sys-color-surface: #FFFFFF;
+    --md-sys-color-on-surface: #1E293B;
+    --md-sys-color-surface-variant: #F6F8F7;
+    --md-sys-color-on-surface-variant: #475569;
 
-  /* Sombras */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
-  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-primary: 0 4px 12px rgba(59, 130, 246, 0.4);
-  --shadow-accent: 0 4px 16px rgba(99, 102, 241, 0.4);
+    --md-sys-color-background: #F6F8F7;              /* Fundo geral mais claro */
+    --md-sys-color-on-background: #1E293B;
 
-  /* Bordas */
-  --border-radius-sm: 4px;
-  --border-radius-md: 8px;
-  --border-radius-lg: 12px;
-  --border-radius-xl: 16px;
-  --border-radius-full: 9999px;
+    /* === OUTLINE === */
+    --md-sys-color-outline: #CBD5E1;
+    --md-sys-color-outline-variant: #E2E8F0;
 
-  /* Transições */
-  --transition-fast: 0.15s ease;
-  --transition-base: 0.2s ease;
-  --transition-slow: 0.3s ease;
+    /* === SHADOWS === */
+    --md-sys-color-shadow: rgba(0, 0, 0, 0.08);
+    --md-sys-color-scrim: rgba(0, 0, 0, 0.6);
 
-  /* Espaçamentos */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  --spacing-2xl: 48px;
+    /* === INVERSE === */
+    --md-sys-color-inverse-surface: #1E293B;
+    --md-sys-color-inverse-on-surface: #FFFFFF;
+    --md-sys-color-inverse-primary: #62C586;
 
-  /* Tipografia */
-  --font-family-base: 'Roboto', Arial, sans-serif;
-  --font-weight-regular: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
+    /* ============================================
+       VARIÁVEIS CUSTOMIZADAS DO PROJETO
+    ============================================ */
 
-  --font-size-h1: 2.5rem;   /* 40px */
-  --font-size-h2: 2rem;     /* 32px */
-  --font-size-h3: 1.5rem;   /* 24px */
-  --font-size-h4: 1.25rem;  /* 20px */
-  --font-size-body: 1rem;   /* 16px */
-  --font-size-small: 0.875rem; /* 14px */
-  --font-size-caption: 0.75rem; /* 12px */
+    /* Paleta principal */
+    --primary-color: #0E8F47;        /* Verde principal */
+    --secondary-color: #5CC080;      /* Verde suave */
+    --accent-color: #3AAFA9;         /* Azul-petróleo complementar */
 
-  --line-height-h1: 1.2;
-  --line-height-h2: 1.25;
-  --line-height-h3: 1.3;
-  --line-height-body: 1.6;
-  --line-height-small: 1.4;
+    --accent-color-light: #D9F3E4;   /* Verde bem claro */
 
-  /* Larguras padrão */
-  --page-max-width: 1200px;
-  --page-max-width-wide: 1400px;
-  --card-max-width: 960px;
-  --card-max-width-narrow: 640px;
+    /* Backgrounds */
+    --bg-dark: #F6F8F7;              /* Fundo da página */
+    --bg-darker: #EDF1EF;            /* Faixas, barras, containers */
+    --bg-card: #FFFFFF;
+    --bg-content: #F6F8F7;
+    --bg-actions: #EDF1EF;
+    --bg-hover: rgba(14, 143, 71, 0.06); /* hover verde bem suave */
 
-  /* Breakpoints Responsivos */
-  --breakpoint-xs: 480px;   /* Mobile pequeno */
-  --breakpoint-sm: 600px;   /* Mobile */
-  --breakpoint-md: 768px;   /* Tablet */
-  --breakpoint-lg: 1024px;  /* Desktop pequeno */
-  --breakpoint-xl: 1200px;  /* Desktop */
-  --breakpoint-2xl: 1400px; /* Desktop grande */
-}
+    /* Texto */
+    --text-primary: #1E293B;
+    --text-secondary: #475569;
+    --text-dark: #0F172A;
+    --text-medium: #64748B;
+    --text-light: #94A3B8;
+
+    /* Bordas */
+    --border-color: #CBD5E1;
+
+    /* Gradientes */
+    --gradient-primary: linear-gradient(90deg, #0E8F47 0%, #5CC080 100%);
+    --gradient-secondary: linear-gradient(90deg, #5CC080 0%, #3AAFA9 100%);
+    --gradient-accent: linear-gradient(90deg, #3AAFA9 0%, #0E8F47 100%);
+    --gradient-hover: var(--gradient-accent);
+
+    --card-header-gradient: var(--gradient-primary);
+    --primary-button-gradient: var(--gradient-primary);
+    --secondary-button-gradient: var(--gradient-secondary);
+
+    --chip-gradient: linear-gradient(135deg, #0E8F47 0%, #5CC080 100%);
+    --chip-background: rgba(14, 143, 71, 0.08);
+    --chip-text-color: #0F172A;
+
+    /* Estados */
+    --success-color: #22C55E;
+    --error-color: #EF4444;
+    --warning-color: #F59E0B;
+    --info-color: #0E8F47;
+
+    /* Sombras */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.14);
+
+    --shadow-primary: 0 4px 12px rgba(14, 143, 71, 0.35);
+    --shadow-accent: 0 4px 16px rgba(58, 175, 169, 0.35);
+
+    /* Bordas */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --border-radius-xl: 16px;
+    --border-radius-full: 9999px;
+
+    /* Transições */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.2s ease;
+    --transition-slow: 0.3s ease;
+
+    /* Espaçamentos */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-2xl: 48px;
+
+    /* Tipografia */
+    --font-family-base: 'Roboto', Arial, sans-serif;
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    --font-size-h1: 2.5rem;
+    --font-size-h2: 2rem;
+    --font-size-h3: 1.5rem;
+    --font-size-h4: 1.25rem;
+    --font-size-body: 1rem;
+    --font-size-small: 0.875rem;
+    --font-size-caption: 0.75rem;
+
+    --line-height-h1: 1.2;
+    --line-height-h2: 1.25;
+    --line-height-h3: 1.3;
+    --line-height-body: 1.6;
+    --line-height-small: 1.4;
+
+    /* Larguras padrão */
+    --page-max-width: 1200px;
+    --page-max-width-wide: 1400px;
+    --card-max-width: 960px;
+    --card-max-width-narrow: 640px;
+
+    /* Breakpoints */
+    --breakpoint-xs: 480px;
+    --breakpoint-sm: 600px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 1024px;
+    --breakpoint-xl: 1200px;
+    --breakpoint-2xl: 1400px;
+  }
 
 /* ============================================
    CLASSES UTILITÁRIAS

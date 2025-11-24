@@ -476,6 +476,41 @@ mat-divider {
   gap: 8px;
 }
 
+/* Garantir que o botão "Confirmar Imagem" tenha cor verde quando habilitado */
+.action-buttons button[mat-raised-button][color="primary"]:not([disabled]),
+.action-buttons button[mat-raised-button][color="primary"]:not(.mat-mdc-button-disabled) {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+  opacity: 1 !important;
+}
+
+.action-buttons button[mat-raised-button][color="primary"]:not([disabled]) .mdc-button__label,
+.action-buttons button[mat-raised-button][color="primary"]:not([disabled]) mat-icon,
+.action-buttons button[mat-raised-button][color="primary"]:not(.mat-mdc-button-disabled) .mdc-button__label,
+.action-buttons button[mat-raised-button][color="primary"]:not(.mat-mdc-button-disabled) mat-icon {
+  color: white !important;
+  opacity: 1 !important;
+}
+
+.action-buttons button[mat-raised-button][color="primary"]:not([disabled]):hover,
+.action-buttons button[mat-raised-button][color="primary"]:not(.mat-mdc-button-disabled):hover {
+  background-color: var(--secondary-color) !important;
+  opacity: 1 !important;
+}
+
+/* Garantir que o botão não fique apagado quando habilitado */
+::ng-deep .action-buttons button[mat-raised-button][color="primary"]:not([disabled]) {
+  --mdc-filled-button-container-color: var(--primary-color) !important;
+  --mdc-filled-button-label-text-color: white !important;
+  opacity: 1 !important;
+}
+
+::ng-deep .action-buttons button[mat-raised-button][color="primary"]:not([disabled]) .mdc-button__label,
+::ng-deep .action-buttons button[mat-raised-button][color="primary"]:not([disabled]) mat-icon {
+  color: white !important;
+  opacity: 1 !important;
+}
+
 /* Upload Hint */
 .upload-hint {
   display: flex;
@@ -623,12 +658,13 @@ mat-divider {
 .fonte-chip {
   font-size: 14px;
   font-weight: 500;
-  background-color: var(--success-color) !important;
-  color: white !important;
+  background: color-mix(in srgb, var(--primary-color) 10%, transparent) !important;
+  color: var(--primary-color) !important;
+  border: 1px solid color-mix(in srgb, var(--primary-color) 20%, transparent) !important;
 }
 
 .fonte-chip mat-icon {
-  color: white !important;
+  color: var(--primary-color) !important;
 }
 
 /* Empty State */

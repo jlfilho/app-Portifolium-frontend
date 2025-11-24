@@ -642,6 +642,67 @@
   color: white !important;
 }
 
+/* Estados de focus e active para nav-item - Garantir cor verde */
+::ng-deep .nav-item:focus,
+::ng-deep .nav-item:focus-visible,
+::ng-deep .nav-item.mat-focused {
+  background-color: color-mix(in srgb, var(--primary-color) 8%, transparent) !important;
+  color: var(--primary-color) !important;
+}
+
+::ng-deep .nav-item:focus .mdc-list-item__primary-text,
+::ng-deep .nav-item:focus-visible .mdc-list-item__primary-text,
+::ng-deep .nav-item.mat-focused .mdc-list-item__primary-text {
+  color: var(--primary-color) !important;
+}
+
+::ng-deep .nav-item:focus .mat-icon,
+::ng-deep .nav-item:focus-visible .mat-icon,
+::ng-deep .nav-item.mat-focused .mat-icon {
+  color: var(--primary-color) !important;
+}
+
+::ng-deep .nav-item:active,
+::ng-deep .nav-item:focus:active,
+::ng-deep .nav-item.mat-focused:active {
+  background-color: color-mix(in srgb, var(--primary-color) 12%, transparent) !important;
+  color: var(--primary-color) !important;
+}
+
+::ng-deep .nav-item:active .mdc-list-item__primary-text,
+::ng-deep .nav-item:focus:active .mdc-list-item__primary-text,
+::ng-deep .nav-item.mat-focused:active .mdc-list-item__primary-text {
+  color: var(--primary-color) !important;
+}
+
+::ng-deep .nav-item:active .mat-icon,
+::ng-deep .nav-item:focus:active .mat-icon,
+::ng-deep .nav-item.mat-focused:active .mat-icon {
+  color: var(--primary-color) !important;
+}
+
+/* Ripple effect para nav-item - Garantir cor verde */
+::ng-deep .nav-item .mat-ripple-element {
+  background-color: color-mix(in srgb, var(--primary-color) 12%, transparent) !important;
+}
+
+/* State layers para nav-item */
+::ng-deep .nav-item::before {
+  background-color: transparent !important;
+}
+
+::ng-deep .nav-item:focus::before,
+::ng-deep .nav-item:focus-visible::before,
+::ng-deep .nav-item.mat-focused::before {
+  background-color: color-mix(in srgb, var(--primary-color) 8%, transparent) !important;
+}
+
+::ng-deep .nav-item:active::before,
+::ng-deep .nav-item:focus:active::before,
+::ng-deep .nav-item.mat-focused:active::before {
+  background-color: color-mix(in srgb, var(--primary-color) 12%, transparent) !important;
+}
+
 /* Texto de Navegação */
 .nav-text {
   font-size: 14px;

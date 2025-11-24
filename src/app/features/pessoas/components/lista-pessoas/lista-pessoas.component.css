@@ -30,13 +30,10 @@
 }
 
 .title-group mat-icon {
-  font-size: 40px;
-  width: 40px;
-  height: 40px;
-  background: var(--gradient-primary);
-  color: white;
-  border-radius: 12px;
-  padding: 8px;
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: var(--primary-color);
 }
 
 .title-group h1 {

@@ -279,6 +279,23 @@ button:active:not(:disabled) {
   transform: translateY(0);
 }
 
+/* Garantir que botões mat-button usem cor verde quando clicados */
+::ng-deep mat-card-actions button[mat-button]:active:not([disabled]),
+::ng-deep mat-card-actions button[mat-button]:focus:active:not([disabled]) {
+  color: var(--primary-color) !important;
+}
+
+::ng-deep mat-card-actions button[mat-button]:active:not([disabled]) .mdc-button__label,
+::ng-deep mat-card-actions button[mat-button]:focus:active:not([disabled]) .mdc-button__label,
+::ng-deep mat-card-actions button[mat-button]:active:not([disabled]) mat-icon,
+::ng-deep mat-card-actions button[mat-button]:focus:active:not([disabled]) mat-icon,
+::ng-deep mat-card-actions button[mat-button]:active:not([disabled]) .mat-icon,
+::ng-deep mat-card-actions button[mat-button]:focus:active:not([disabled]) .mat-icon,
+::ng-deep mat-card-actions button[mat-button]:active:not([disabled]) span,
+::ng-deep mat-card-actions button[mat-button]:focus:active:not([disabled]) span {
+  color: var(--primary-color) !important;
+}
+
 /* Material Overrides - Chips */
 ::ng-deep .mat-mdc-chip.mat-warn {
   --mdc-chip-elevated-container-color: var(--error-color) !important;

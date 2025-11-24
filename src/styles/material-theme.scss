@@ -1,16 +1,44 @@
-// Tema Material simplificado - usando apenas variáveis CSS
-// As cores são controladas via variáveis globais em styles.css
+// ============================================
+// TEMA ANGULAR MATERIAL v19 - CSS Variables
+// ============================================
+// Método oficial e recomendado para Angular Material v19
+// Usando CSS Variables com use-system-vars: true
 
+@use '@angular/material' as mat;
+
+// Incluir o core do Material
+@include mat.core();
+
+// ============================================
+// DEFINIR TEMA COM CSS VARIABLES
+// ============================================
+// Define o tema usando CSS Variables do Material Design System
+// As variáveis --md-sys-color-* definidas em variables.css serão
+// automaticamente lidas pelo Material Design System
+$my-theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    use-system-variables: true, // Usar CSS variables
+  ),
+  typography: (
+    use-system-variables: true,
+  ),
+  density: (
+    scale: 0,
+  ),
+));
+
+// ============================================
+// APLICAR TEMA
+// ============================================
 :root {
-  // Sobrescrever cores específicas usando variáveis CSS globais
-  --mdc-theme-primary: var(--primary-color) !important;
-  --mdc-theme-secondary: var(--secondary-color) !important;
-  --mdc-theme-surface: var(--bg-card) !important;
-  --mdc-theme-background: var(--bg-dark) !important;
-  --mdc-theme-on-primary: #FFFFFF !important;
-  --mdc-theme-on-secondary: #FFFFFF !important;
-  --mdc-theme-on-surface: var(--text-dark) !important;
-  --mdc-theme-on-background: var(--text-dark) !important;
-  --mdc-theme-error: var(--error-color) !important;
-  --mdc-theme-on-error: #FFFFFF !important;
+  // Aplica o tema em todos os componentes
+  @include mat.all-component-themes($my-theme);
+
+  // Aplica hierarquia de tipografia (precisa do $theme)
+  @include mat.typography-hierarchy($my-theme);
+
+  // Se estiver usando system vars:
+  @include mat.system-level-colors($my-theme);
+  @include mat.system-level-typography($my-theme);
 }

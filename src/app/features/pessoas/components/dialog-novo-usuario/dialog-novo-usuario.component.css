@@ -51,6 +51,29 @@ mat-form-field.mat-focused .mdc-notched-outline__trailing {
   color: white;
 }
 
+.dialog-actions button[color="primary"][mat-raised-button] {
+  --mdc-filled-button-container-color: var(--primary-color) !important;
+  --mdc-filled-button-label-text-color: var(--md-sys-color-on-secondary) !important;
+  --mat-filled-button-state-layer-color: var(--md-sys-color-on-secondary) !important;
+  background: linear-gradient(120deg, var(--primary-color), var(--secondary-color)) !important;
+  background-color: var(--primary-color) !important;
+  color: var(--md-sys-color-on-secondary) !important;
+}
+
+.dialog-actions button[color="primary"][mat-raised-button] .mdc-button__label,
+.dialog-actions button[color="primary"][mat-raised-button] mat-icon,
+:host ::ng-deep .dialog-actions button[color="primary"][mat-raised-button] .mdc-button__label,
+:host ::ng-deep .dialog-actions button[color="primary"][mat-raised-button] mat-icon,
+:host ::ng-deep .dialog-actions button[color="primary"][mat-raised-button] .mdc-button__label * {
+  color: var(--md-sys-color-on-secondary) !important;
+}
+
+.dialog-actions button[color="primary"][mat-raised-button]:hover {
+  background: linear-gradient(120deg, var(--secondary-color), var(--accent-color)) !important;
+  background-color: var(--secondary-color) !important;
+  color: var(--md-sys-color-on-secondary) !important;
+}
+
 .dialog-actions button[color="primary"][mat-stroked-button] {
   background: transparent;
   color: var(--primary-color) !important;
@@ -63,6 +86,7 @@ mat-form-field.mat-focused .mdc-notched-outline__trailing {
 
 .dialog-actions button[color="primary"][mat-raised-button] mat-icon {
   margin-right: 6px;
+  color: var(--md-sys-color-on-secondary) !important;
 }
 
 :host ::ng-deep .mat-mdc-dialog-content {

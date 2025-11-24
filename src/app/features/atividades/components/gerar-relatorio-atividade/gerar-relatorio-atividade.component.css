@@ -72,3 +72,30 @@ mat-dialog-actions button mat-icon {
   color: var(--primary-color) !important;
 }
 
+/* Botão "Baixar PDF" - Garantir cor branca na label */
+::ng-deep mat-dialog-actions button[mat-raised-button][color="primary"] {
+  --mdc-filled-button-container-color: var(--primary-color) !important;
+  --mdc-filled-button-label-text-color: var(--md-sys-color-on-secondary) !important;
+  --mat-filled-button-state-layer-color: var(--md-sys-color-on-secondary) !important;
+  background-color: var(--primary-color) !important;
+  color: var(--md-sys-color-on-secondary) !important;
+}
+
+::ng-deep mat-dialog-actions button[mat-raised-button][color="primary"] .mdc-button__label,
+::ng-deep mat-dialog-actions button[mat-raised-button][color="primary"] mat-icon,
+::ng-deep mat-dialog-actions button[mat-raised-button][color="primary"] .mdc-button__label * {
+  color: var(--md-sys-color-on-secondary) !important;
+}
+
+::ng-deep mat-dialog-actions button[mat-raised-button][color="primary"]:hover {
+  background-color: var(--secondary-color) !important;
+  --mdc-filled-button-container-color: var(--secondary-color) !important;
+  color: var(--md-sys-color-on-secondary) !important;
+}
+
+::ng-deep mat-dialog-actions button[mat-raised-button][color="primary"]:hover .mdc-button__label,
+::ng-deep mat-dialog-actions button[mat-raised-button][color="primary"]:hover mat-icon,
+::ng-deep mat-dialog-actions button[mat-raised-button][color="primary"]:hover .mdc-button__label * {
+  color: var(--md-sys-color-on-secondary) !important;
+}
+

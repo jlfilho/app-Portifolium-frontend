@@ -40,7 +40,16 @@
   background: var(--bg-card);
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  --mdc-tab-indicator-active-indicator-color: var(--primary-color) !important;
+  /* A variável já está definida em :root em src/styles.css */
+}
+
+/* Garantir que o indicador de tab use a cor verde */
+::ng-deep .mat-mdc-tab-group .mdc-tab-indicator__content--underline,
+::ng-deep .mat-mdc-tab-group .mdc-tab-indicator__content--underline::after,
+::ng-deep .mat-mdc-tab-group .mat-mdc-tab.mdc-tab--active .mdc-tab-indicator__content--underline,
+::ng-deep .mat-mdc-tab-group .mat-mdc-tab.mdc-tab--active .mdc-tab-indicator__content--underline::after {
+  border-color: var(--mdc-tab-indicator-active-indicator-color) !important;
+  background-color: var(--mdc-tab-indicator-active-indicator-color) !important;
 }
 
 /* Estilos para os textos das abas */

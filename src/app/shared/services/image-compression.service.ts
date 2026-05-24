@@ -35,12 +35,7 @@ export class ImageCompressionService {
       maxSizeKB = 500 // 500KB por padrão
     } = options;
 
-    console.log('🖼️ Iniciando compressão da imagem:', {
-      nome: file.name,
-      tamanhoOriginal: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
-      tipo: file.type
-    });
-
+    
     return new Promise((resolve, reject) => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
@@ -62,8 +57,7 @@ export class ImageCompressionService {
           const sizeLimitBytes = maxSizeKB * 1024;
           let lastResult: CompressionResult | null = null;
 
-          console.log('📐 Dimensões originais:', `${originalWidth}x${originalHeight}`);
-
+          
           while (attempt < maxAttempts) {
             const { width, height } = this.calculateDimensions(
               originalWidth,
@@ -77,22 +71,12 @@ export class ImageCompressionService {
             ctx.clearRect(0, 0, width, height);
             ctx.drawImage(img, 0, 0, width, height);
 
-            console.log(`🔄 Tentativa de compressão ${attempt + 1}:`, {
-              largura: width,
-              altura: height,
-              limiteKB: maxSizeKB
-            });
-
+            
             lastResult = await this.compressWithQuality(canvas, file, quality, maxSizeKB);
 
-            console.log('📦 Resultado parcial:', {
-              tamanhoComprimido: `${(lastResult.compressedSize / 1024 / 1024).toFixed(2)} MB`,
-              taxaCompressao: `${lastResult.compressionRatio.toFixed(1)}%`
-            });
-
+            
             if (lastResult.compressedSize <= sizeLimitBytes || width <= 320 || height <= 320) {
-              console.log('✅ Compressão concluída dentro do limite definido.');
-              resolve(lastResult);
+                            resolve(lastResult);
               return;
             }
 
@@ -188,12 +172,7 @@ export class ImageCompressionService {
       });
       compressedSize = compressedFile.size;
 
-      console.log(`🔧 Tentativa ${currentStep + 1}:`, {
-        qualidade: quality,
-        tamanho: `${(compressedSize / 1024).toFixed(2)} KB`,
-        meta: `${maxSizeKB} KB`
-      });
-
+      
       // Se atingiu o tamanho desejado, parar
       if (compressedSize <= maxSizeKB * 1024) {
         break;

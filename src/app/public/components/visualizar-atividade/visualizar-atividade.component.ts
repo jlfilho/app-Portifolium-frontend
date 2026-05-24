@@ -89,14 +89,12 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.errorMessage = '';
 
-    console.log('📚 Carregando atividade pública:', this.atividadeId);
-
+    
     this.publicApiService.getAtividadeById(this.atividadeId).subscribe({
       next: (atividade: AtividadeDTO) => {
         this.atividade = atividade;
         this.isLoading = false;
-        console.log('✅ Atividade carregada:', atividade);
-      },
+              },
       error: (error: any) => {
         console.error('❌ Erro ao carregar atividade:', error);
         this.errorMessage = 'Erro ao carregar atividade';
@@ -108,8 +106,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
 
   loadEvidencias(): void {
     this.isLoadingEvidencias = true;
-    console.log('📸 Carregando evidências da atividade:', this.atividadeId);
-
+    
     this.publicApiService.getEvidenciasPorAtividade(this.atividadeId).subscribe({
       next: (evidencias: EvidenciaDTO[] | null) => {
         const normalized = Array.isArray(evidencias)
@@ -120,8 +117,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
         this.carrosselPageIndex = 0;
         this.lightboxIndex = 0;
         this.isLoadingEvidencias = false;
-        console.log('✅ Evidências carregadas:', this.evidencias.length);
-      },
+              },
       error: (error: any) => {
         console.error('❌ Erro ao carregar evidências:', error);
         this.evidencias = [];
@@ -195,34 +191,29 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     this.lightboxIndex = index;
     this.lightboxOpen = true;
     this.disableScroll();
-    console.log('🔍 Lightbox aberta para evidência:', evidencia.id);
-  }
+      }
 
   closeLightbox(): void {
     this.lightboxOpen = false;
     this.enableScroll();
-    console.log('❎ Lightbox fechada');
-  }
+      }
 
   nextLightbox(): void {
     if (!this.evidencias.length) return;
     this.lightboxIndex = (this.lightboxIndex + 1) % this.evidencias.length;
-    console.log('➡️ Próxima evidência no lightbox:', this.lightboxIndex + 1);
-  }
+      }
 
   prevLightbox(): void {
     if (!this.evidencias.length) return;
     this.lightboxIndex = (this.lightboxIndex - 1 + this.evidencias.length) % this.evidencias.length;
-    console.log('⬅️ Evidência anterior no lightbox:', this.lightboxIndex + 1);
-  }
+      }
 
   goToLightbox(index: number): void {
     if (index < 0 || index >= this.evidencias.length) {
       return;
     }
     this.lightboxIndex = index;
-    console.log('🎯 Lightbox navegada para índice:', index + 1);
-  }
+      }
 
   get lightboxEvidencia(): EvidenciaDTO | null {
     return this.evidencias[this.lightboxIndex] || null;

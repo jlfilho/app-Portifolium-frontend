@@ -90,8 +90,7 @@ export class CursosPublicosComponent implements OnInit, OnDestroy {
       debounceTime(400),
       distinctUntilChanged()
     ).subscribe(searchTerm => {
-      console.log('🔍 Buscando cursos com:', searchTerm);
-      this.pageIndex = 0;
+            this.pageIndex = 0;
       this.loadCursos();
     });
   }
@@ -100,14 +99,7 @@ export class CursosPublicosComponent implements OnInit, OnDestroy {
   loadCursos(): void {
     this.isLoading = true;
 
-    console.log('📚 Carregando cursos públicos:', {
-      pagina: this.pageIndex + 1,
-      tamanho: this.pageSize,
-      busca: this.searchTerm || 'todos',
-      apenasAtivos: true,
-      unidadeAcademicaId: this.filtroUnidadeId
-    });
-
+    
     this.publicApiService.getCursosPublicos(
       this.pageIndex,
       this.pageSize,
@@ -120,8 +112,7 @@ export class CursosPublicosComponent implements OnInit, OnDestroy {
           this.cursos = [];
           this.totalElements = 0;
           this.isLoading = false;
-          console.log('📭 Nenhum curso encontrado');
-          return;
+                    return;
         }
 
         this.cursos = page.content || [];
@@ -129,11 +120,7 @@ export class CursosPublicosComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.populateUnidadesFromCursos(this.cursos);
 
-        console.log('✅ Cursos carregados:', {
-          exibindo: this.cursos.length,
-          total: this.totalElements
-        });
-      },
+              },
       error: (error) => {
         console.error('❌ Erro ao carregar cursos:', error);
         this.cursos = [];
@@ -188,8 +175,7 @@ export class CursosPublicosComponent implements OnInit, OnDestroy {
 
   // Navegar para atividades públicas do curso
   viewCurso(curso: any): void {
-    console.log('👁️ Visualizando atividades do curso:', curso);
-    this.publicNavigationService.navigateToAtividadesPublicas(curso.id, curso.nome);
+        this.publicNavigationService.navigateToAtividadesPublicas(curso.id, curso.nome);
   }
 
   // Obter URL completa da imagem

@@ -125,19 +125,13 @@ export class ListaAtividadesComponent implements OnInit {
     this.filtroDataInicio = treAnosAtras;
     this.filtroDataFim = hoje;
 
-    console.log('📅 Filtro padrão de data configurado:', {
-      dataInicio: this.formatarDataParaISO(treAnosAtras),
-      dataFim: this.formatarDataParaISO(hoje)
-    });
-  }
+      }
 
   loadCategorias(): void {
     this.cursosService.getAllCategoriesPaginado({ page: 0, size: 1000, sortBy: 'id', direction: 'ASC' }).subscribe({
       next: (page) => {
-        console.log('📚 Categorias carregadas:', page);
-        this.categorias = Array.isArray(page) ? page : (page?.content || []);
-        console.log('📚 Categorias array:', this.categorias);
-      },
+                this.categorias = Array.isArray(page) ? page : (page?.content || []);
+              },
       error: (error) => {
         console.error('❌ Erro ao carregar categorias:', error);
         this.categorias = [];
@@ -159,13 +153,10 @@ export class ListaAtividadesComponent implements OnInit {
       dataFim: this.filtroDataFim ? this.formatarDataParaISO(this.filtroDataFim) : undefined
     };
 
-    console.log('🔍 Carregando atividades com filtros:', filtros);
-    console.log('📄 Página:', this.pageIndex, 'Tamanho:', this.pageSize);
-
+        
     this.atividadesService.getAtividadesPorFiltros(filtros, this.pageIndex, this.pageSize).subscribe({
       next: (page: Page<AtividadeDTO> | null | undefined) => {
-        console.log('✅ Atividades carregadas:', page);
-
+        
         if (!page) {
           this.handleEmptyAtividades();
           return;
@@ -177,13 +168,10 @@ export class ListaAtividadesComponent implements OnInit {
         this.complementarDadosDasAtividades();
 
         // Log detalhado das atividades para debug das fotos
-        console.log('📸 URLs das fotos de capa das atividades:');
-        this.atividades.forEach((atividade, index) => {
+                this.atividades.forEach((atividade, index) => {
           if (atividade.fotoCapa) {
-            console.log(`  ${index + 1}. ${atividade.nome}: ${this.getImageUrl(atividade.fotoCapa)}`);
-          } else {
-            console.log(`  ${index + 1}. ${atividade.nome}: Sem foto de capa`);
-          }
+                      } else {
+                      }
         });
 
         if (this.atividades.length === 0) {
@@ -197,8 +185,6 @@ export class ListaAtividadesComponent implements OnInit {
         console.error('❌ Status:', error?.status);
         console.error('❌ StatusText:', error?.statusText);
         console.error('❌ Message:', error?.message);
-        console.error('❌ Error completo:', JSON.stringify(error, null, 2));
-
         this.errorMessage = this.extractErrorMessage(error);
         this.atividades = [];
         this.totalElements = 0;
@@ -242,8 +228,7 @@ export class ListaAtividadesComponent implements OnInit {
       this.showMessage('Você não tem permissão para criar atividades', 'warning');
       return;
     }
-    console.log('➕ Criando nova atividade para curso:', this.cursoId);
-    // Navegar para o formulário de criação
+        // Navegar para o formulário de criação
     this.router.navigate(['/admin/atividades/nova', this.cursoId], {
       state: {
         cursoId: this.cursoId,
@@ -253,8 +238,7 @@ export class ListaAtividadesComponent implements OnInit {
   }
 
   visualizarAtividade(atividade: AtividadeDTO): void {
-    console.log('👁️ Visualizando atividade:', atividade);
-
+    
     // Navegar para a página de visualização
     this.router.navigate(['/admin/atividades/visualizar', atividade.id], {
       state: {
@@ -348,15 +332,12 @@ export class ListaAtividadesComponent implements OnInit {
 
   onImageError(event: any): void {
     console.error('❌ Erro ao carregar imagem:', event.target.src);
-    console.error('❌ Elemento da imagem:', event.target);
     // Substituir por imagem padrão em caso de erro
     event.target.src = '/imagens/curso-header.png';
-    console.log('🔄 Imagem substituída por padrão:', event.target.src);
-  }
+      }
 
   onImageLoad(event: any): void {
-    console.log('✅ Imagem carregada com sucesso:', event.target.src);
-  }
+      }
 
   formatarData(dataISO: string): string {
     const data = new Date(dataISO);

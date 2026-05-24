@@ -69,19 +69,10 @@ export class ChangePasswordDialogComponent {
         newPassword: newPassword.trim()
       };
 
-      console.log('=== ALTERAÇÃO DE SENHA ===');
-      console.log('Usuário ID:', this.data.usuarioId);
-      console.log('Usuário Nome:', this.data.usuarioNome);
-      console.log('Endpoint:', `PUT /api/usuarios/${this.data.usuarioId}/change-password`);
-      console.log('Payload:', { currentPassword: '***', newPassword: '***' });
-
+                              
       this.usuariosService.changePassword(this.data.usuarioId, passwordData).subscribe({
         next: (response) => {
-          console.log('=== SENHA ALTERADA COM SUCESSO ===');
-          console.log('Response:', response);
-          console.log('Mensagem:', response.message);
-          console.log('Usuário ID:', response.usuarioId);
-
+                                        
           // Exibe mensagem retornada pelo backend
           this.showMessage(response.message || 'Senha alterada com sucesso!', 'success');
           this.isSaving = false;
@@ -90,8 +81,6 @@ export class ChangePasswordDialogComponent {
         error: (error) => {
           console.error('=== ERRO AO ALTERAR SENHA ===');
           console.error('Status:', error.status);
-          console.error('Error:', error);
-          console.error('Error Message:', error.error);
 
           let errorMessage = 'Erro ao alterar senha. ';
 

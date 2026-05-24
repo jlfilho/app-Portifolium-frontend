@@ -116,12 +116,10 @@ export class FormCursoComponent implements OnInit, OnDestroy {
 
   loadCurso(id: number): void {
     this.isLoading = true;
-    console.log('📚 Carregando curso para edição, ID:', id);
-
+    
     this.cursosService.getCourseById(id).subscribe({
       next: (curso: Curso) => {
-        console.log('✅ Curso carregado:', curso);
-
+        
         if (curso) {
           this.cursoForm.patchValue({
             nome: curso.nome,
@@ -130,8 +128,7 @@ export class FormCursoComponent implements OnInit, OnDestroy {
             tipoId: (curso as any).tipoId ?? curso.tipo?.id ?? null,
             unidadeAcademicaId: (curso as any).unidadeAcademicaId ?? curso.unidadeAcademica?.id ?? null
           });
-          console.log('📝 Formulário populado:', this.cursoForm.value);
-          this.fotoCapaPath = curso.fotoCapa || null;
+                    this.fotoCapaPath = curso.fotoCapa || null;
           this.currentCoverUrl = this.fotoCapaPath ? this.buildImageUrl(this.fotoCapaPath) : null;
           this.setPreviewUrl(this.currentCoverUrl);
 

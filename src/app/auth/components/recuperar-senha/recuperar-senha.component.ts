@@ -113,7 +113,6 @@ export class RecuperarSenhaComponent implements OnInit {
       error: (error) => {
         console.error('Erro ao solicitar código:', error);
         console.error('Error status:', error.status);
-        console.error('Error error:', error.error);
         this.isLoading = false;
         
         let errorMessage = 'Erro ao solicitar código de recuperação.';
@@ -185,7 +184,6 @@ export class RecuperarSenhaComponent implements OnInit {
       error: (error) => {
         console.error('Erro ao redefinir senha:', error);
         console.error('Error status:', error.status);
-        console.error('Error error:', error.error);
         this.isLoading = false;
         
         let errorMessage = 'Erro ao redefinir senha.';

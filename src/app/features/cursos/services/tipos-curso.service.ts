@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment.development';
+import { environment } from '../../../../environments/environment';
 import { TipoCurso } from '../models/tipo-curso.model';
 import { Page } from '../../../shared/models/page.model';
 import { TipoCursoFilter } from '../models/tipo-curso-filter.model';
@@ -56,8 +56,7 @@ export class TiposCursoService {
    */
   getById(id: number): Observable<TipoCurso> {
     const url = `${this.baseUrl}/tipos-curso/${id}`;
-    console.log('📡 TiposCursoService:getById', url);
-    return this.http.get<TipoCurso>(url);
+        return this.http.get<TipoCurso>(url);
   }
 
   /**
@@ -65,8 +64,7 @@ export class TiposCursoService {
    */
   update(id: number, data: Partial<TipoCurso>): Observable<TipoCurso> {
     const url = `${this.baseUrl}/tipos-curso/${id}`;
-    console.log('✏️ TiposCursoService:update', { url, id, data });
-    return this.http.put<TipoCurso>(url, data);
+        return this.http.put<TipoCurso>(url, data);
   }
 
   /**
@@ -74,8 +72,7 @@ export class TiposCursoService {
    */
   delete(id: number): Observable<void> {
     const url = `${this.baseUrl}/tipos-curso/${id}`;
-    console.log('🗑️ TiposCursoService:delete', { url, id });
-    return this.http.delete<void>(url);
+        return this.http.delete<void>(url);
   }
 
   /**
@@ -95,8 +92,7 @@ export class TiposCursoService {
       params = params.set('nome', filter.nome.trim());
     }
 
-    console.log('📡 TiposCursoService:getPage', { url, params: params.toString() });
-    return this.http.get<Page<TipoCurso>>(url, { params }).pipe(
+        return this.http.get<Page<TipoCurso>>(url, { params }).pipe(
       map(response => ensurePageResponse(response, filter))
     );
   }
@@ -114,8 +110,7 @@ export class TiposCursoService {
    */
   create(payload: Omit<TipoCurso, 'id'>): Observable<TipoCurso> {
     const url = `${this.baseUrl}/tipos-curso`;
-    console.log('📝 TiposCursoService:create', { url, payload });
-    return this.http.post<TipoCurso>(url, payload);
+        return this.http.post<TipoCurso>(url, payload);
   }
 }
 

@@ -116,8 +116,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
       this.cursoId = state.cursoId || atividadeEstado.curso.id;
       this.cursoNome = state.cursoNome || atividadeEstado.curso.nome;
       this.isLoading = false;
-      console.log('👁️ Atividade carregada do state:', this.atividade);
-
+      
       if (!atividadeEstado.integrantes || atividadeEstado.integrantes.length === 0) {
         this.carregarAtividade(false);
       }
@@ -142,8 +141,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     if (showLoading) {
       this.isLoading = true;
     }
-    console.log('📡 Carregando atividade ID:', this.atividadeId);
-
+    
     this.atividadesService.getAtividadeById(this.atividadeId).subscribe({
       next: (response) => {
         const atividadeNormalizada = this.normalizeAtividade(response);
@@ -156,8 +154,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
         this.cursoId = atividadeNormalizada.curso.id;
         this.cursoNome = atividadeNormalizada.curso.nome;
         this.isLoading = false;
-        console.log('✅ Atividade carregada:', this.atividade);
-      },
+              },
       error: (error) => {
         console.error('❌ Erro ao carregar atividade:', error);
         this.errorMessage = 'Erro ao carregar atividade';
@@ -220,8 +217,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    console.log('✏️ Navegando para edição da atividade:', this.atividadeId);
-    this.router.navigate(['/admin/atividades/editar', this.atividadeId], {
+        this.router.navigate(['/admin/atividades/editar', this.atividadeId], {
       state: {
         atividade: this.atividade,
         cursoId: this.cursoId,
@@ -231,8 +227,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
   }
 
   voltar(): void {
-    console.log('🔙 Voltando para lista de atividades');
-    this.router.navigate(['/admin/atividades/curso', this.cursoId], {
+        this.router.navigate(['/admin/atividades/curso', this.cursoId], {
       state: {
         cursoNome: this.cursoNome
       }
@@ -382,8 +377,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
 
   carregarEvidencias(): void {
     this.isLoadingEvidencias = true;
-    console.log('📸 Carregando evidências da atividade:', this.atividadeId);
-
+    
     this.evidenciasService.listarEvidenciasPorAtividade(this.atividadeId).subscribe({
       next: (evidencias) => {
         const normalized = evidencias.map(e => this.normalizeEvidencia(e));
@@ -393,9 +387,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
         this.savingOrder = false;
         this.refreshCarouselAfterDataChange();
         this.isLoadingEvidencias = false;
-        console.log(`✅ ${evidencias.length} evidência(s) carregada(s)`);
-        console.log(`📄 ${this.totalCarrosselPages} página(s) de ${this.carrosselPageSize} evidências`);
-
+                
         if (this.isReordering && !this.orderChanged) {
           // Mantenha modo reordenação apenas se o usuário estiver no meio do ajuste
           this.isReordering = false;
@@ -532,8 +524,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    console.log('📎 Arquivo selecionado:', file.name, this.formatFileSize(file.size));
-
+    
     // Iniciar compressão
     this.isCompressing = true;
     this.compressionInfo = null;
@@ -543,8 +534,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
       const requiresDownscale = file.size > maxSizeBytes;
 
       if (requiresDownscale) {
-        console.log('📉 Redimensionando imagem para atender ao limite de 10MB.');
-      }
+              }
 
       // Comprimir imagem
       const compressionResult = await this.imageCompressionService.compressImage(file, {
@@ -570,12 +560,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
 
       // Mostrar resultado da compressão
       const reduction = compressionResult.compressionRatio.toFixed(1);
-      console.log('✅ Compressão concluída:', {
-        original: this.formatFileSize(compressionResult.originalSize),
-        comprimido: this.formatFileSize(compressionResult.compressedSize),
-        redução: `${reduction}%`
-      });
-
+      
       if (compressionResult.compressionRatio > 10) {
         this.showMessage(
           `Imagem comprimida: ${this.formatFileSize(compressionResult.compressedSize)} (${reduction}% menor)`,
@@ -639,8 +624,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     }
 
     this.isUploading = true;
-    console.log(this.isEditingEvidence ? '📤 Atualizando evidência...' : '📤 Enviando evidência...');
-
+    
     const legendaFormatada = this.legenda.trim();
 
     const request$ = this.isEditingEvidence && evidenciaId !== null

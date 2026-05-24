@@ -141,28 +141,21 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
 
     this.usuariosService.getAllUsersPaginado(pageRequest, term).subscribe({
       next: (page) => {
-        console.log('📦 Resposta recebida:', page);
-        console.log('📦 Conteúdo (page.content):', page.content);
-        console.log('📦 Total de elementos:', page.totalElements);
-
+                        
         // Garantir que sempre seja um array
         this.usuarios = Array.isArray(page.content) ? page.content : [];
         this.isLoadingUsers = false;
         this.refreshAvailableUsers();
         this.updateFilteredUsuarios();
 
-        console.log('✅ Usuários carregados:', this.usuarios.length);
-        if (this.usuarios.length > 0) {
-          console.log('✅ Primeiro usuário:', this.usuarios[0]);
-        }
+                if (this.usuarios.length > 0) {
+                  }
       },
       error: (error) => {
         console.error('❌ ERRO ao carregar usuários:');
         console.error('❌ Status:', error.status);
         console.error('❌ StatusText:', error.statusText);
         console.error('❌ Message:', error.message);
-        console.error('❌ Error body:', error.error);
-
         // Mostrar mensagem de erro ao usuário
         if (error.status === 403 || error.status === 401) {
           this.showMessage('Você não tem permissão para visualizar a lista de usuários.', 'error');
@@ -183,26 +176,17 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
   }
 
   addUserToCourse(): void {
-    console.log('🔵 addUserToCourse() chamado');
-    console.log('🔵 usuarioSelecionado:', this.usuarioSelecionado);
-    console.log('🔵 cursoId:', this.cursoId);
-
+            
     if (!this.usuarioSelecionado) {
-      console.log('⚠️ Nenhum usuário selecionado');
-      this.showMessage('Selecione um usuário para adicionar', 'warning');
+            this.showMessage('Selecione um usuário para adicionar', 'warning');
       return;
     }
 
-    console.log('🔵 Iniciando adição de usuário...');
-    this.isAdding = true;
+        this.isAdding = true;
 
     this.cursosService.addUserToCourse(this.cursoId, this.usuarioSelecionado).subscribe({
       next: (permissoes) => {
-        console.log('✅ Usuário adicionado com sucesso!');
-        console.log('✅ Permissões recebidas:', permissoes);
-        console.log('✅ Tipo das permissões:', typeof permissoes);
-        console.log('✅ É array?', Array.isArray(permissoes));
-
+                                
         this.permissoes = permissoes;
         this.refreshAvailableUsers();
         this.skipUserSearch = true;
@@ -216,7 +200,6 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
         console.error('❌ Erro ao adicionar usuário:', error);
         console.error('❌ Status:', error.status);
         console.error('❌ Error message:', error.message);
-        console.error('❌ Error body:', error.error);
 
         const errorMessage = extractApiMessage(error) || 'Erro ao adicionar usuário ao curso. Tente novamente.';
         this.showMessage(errorMessage, 'error');

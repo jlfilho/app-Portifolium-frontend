@@ -46,20 +46,15 @@ export class AtividadesService {
    */
   createAtividade(atividade: AtividadeDTO): Observable<AtividadeDTO> {
     const url = this.baseUrl;
-    console.log('📡 Criando nova atividade:', url);
-    console.log('📋 Dados da nova atividade:', atividade);
-    console.log('📋 JSON enviado:', JSON.stringify(atividade, null, 2));
-
+            
     return this.http.post<AtividadeDTO>(url, atividade).pipe(
       timeout(30000),
       tap(response => {
-        console.log('✅ Atividade criada com sucesso:', response);
-      }),
+              }),
       catchError((error: HttpErrorResponse) => {
         console.error('❌ Erro ao criar atividade:', error);
         console.error('❌ Status:', error?.status);
         console.error('❌ Message:', error?.message);
-        console.error('❌ Error body:', error?.error);
         throw error;
       })
     );
@@ -71,13 +66,11 @@ export class AtividadesService {
    */
   getAtividadeById(atividadeId: number): Observable<AtividadeDTO> {
     const url = `${this.baseUrl}/${atividadeId}`;
-    console.log('📡 Buscando atividade por ID:', url);
-
+    
     return this.http.get<AtividadeDTO>(url).pipe(
       timeout(30000),
       tap(response => {
-        console.log('✅ Atividade encontrada:', response);
-      }),
+              }),
       catchError((error: any) => {
         console.error('❌ Erro ao buscar atividade por ID:', error);
         throw error;
@@ -87,27 +80,19 @@ export class AtividadesService {
 
   updateAtividade(atividadeId: number, atividadeUpdate: any): Observable<AtividadeDTO> {
     const url = `${this.baseUrl}/${atividadeId}`;
-    console.log('📡 Atualizando atividade:', url);
-    console.log('📋 Dados para atualização:', atividadeUpdate);
-    console.log('📋 JSON enviado:', JSON.stringify(atividadeUpdate, null, 2));
-
+            
     return this.http.put<AtividadeDTO>(url, atividadeUpdate).pipe(
       timeout(30000),
       tap(response => {
-        console.log('✅ Atividade atualizada com sucesso:', response);
-      }),
+              }),
       catchError((error: any) => {
         console.error('❌ Erro ao atualizar atividade:', error);
         console.error('❌ Status:', error?.status);
         console.error('❌ Status Text:', error?.statusText);
-        console.error('❌ Error Body:', error?.error);
-        console.error('❌ Headers:', error?.headers);
         console.error('❌ URL:', error?.url);
-        console.error('❌ Request Body:', atividadeUpdate);
 
         // Log detalhado do erro para debug
         if (error?.error) {
-          console.error('❌ Detalhes do erro:', JSON.stringify(error.error, null, 2));
         }
 
         throw error;
@@ -117,17 +102,14 @@ export class AtividadesService {
 
   uploadFotoCapa(atividadeId: number, file: File): Observable<AtividadeDTO> {
     const url = `${this.baseUrl}/foto-capa/${atividadeId}`;
-    console.log('📡 Upload de foto de capa:', url);
-    console.log('📸 Arquivo:', file.name, file.size, file.type);
-
+        
     const formData = new FormData();
     formData.append('file', file);
 
     return this.http.put<AtividadeDTO>(url, formData).pipe(
       timeout(60000), // 60 segundos para upload
       tap(response => {
-        console.log('✅ Foto de capa enviada com sucesso:', response);
-      }),
+              }),
       catchError((error: any) => {
         console.error('❌ Erro no upload da foto:', error);
         throw error;
@@ -168,34 +150,21 @@ export class AtividadesService {
     }
 
     const url = `${this.baseUrl}/filtros`;
-    console.log('📡 Request URL:', url);
-    console.log('📋 Params:', params.toString());
-
+        
     return this.http.get<Page<AtividadeDTO>>(url, { params }).pipe(
       timeout(30000), // 30 segundos de timeout
       tap(response => {
-        console.log('🌐 Response recebida:', response);
-        if (!response) {
-          console.log('⚠️ Resposta nula do servidor (possível 204 No Content)');
-          return;
+                if (!response) {
+                    return;
         }
-        console.log('📦 Content length:', response?.content?.length || 0);
-        console.log('📊 Total elements:', response?.totalElements ?? 0);
-      }),
+                      }),
       map(response => {
         if (!response || !Array.isArray(response.content)) {
-          console.log('⚠️ Resposta vazia ou sem conteúdo válido, retornando página vazia');
-          return this.buildEmptyPage(page, size);
+                    return this.buildEmptyPage(page, size);
         }
 
         // Validar estrutura da resposta
-        console.log('✅ Body validado:', {
-          contentLength: response.content?.length || 0,
-          totalElements: response.totalElements,
-          totalPages: response.totalPages,
-          pageNumber: response.number
-        });
-
+        
         return {
           ...response,
           content: response.content ?? [],
@@ -212,7 +181,6 @@ export class AtividadesService {
         console.error('🚨 Erro HTTP capturado no serviço:', error);
         console.error('🚨 Status:', error?.status);
         console.error('🚨 Message:', error?.message);
-        console.error('🚨 Error body:', error?.error);
         console.error('🚨 Name:', error?.name);
 
         // Se for erro de timeout
@@ -223,8 +191,7 @@ export class AtividadesService {
         throw error;
       }),
       finalize(() => {
-        console.log('🏁 Requisição finalizada (sucesso ou erro)');
-      })
+              })
     );
   }
 
@@ -377,9 +344,7 @@ export class AtividadesService {
    */
   importarPessoasCsv(atividadeId: number, file: File): Observable<PessoaPapelDTO[]> {
     const url = `${environment.apiUrl}/atividades-pessoas/${atividadeId}/pessoas/import`;
-    console.log('📡 Importando participantes via CSV:', url);
-    console.log('📄 Arquivo selecionado:', file.name, '-', file.size, 'bytes');
-
+        
     const formData = new FormData();
     formData.append('file', file);
 
@@ -387,13 +352,11 @@ export class AtividadesService {
       timeout(30000),
       tap(response => {
         const quantidade = Array.isArray(response) ? response.length : 0;
-        console.log(`✅ Importação concluída. Registros processados: ${quantidade}`);
-      }),
+              }),
       catchError((error: HttpErrorResponse) => {
         console.error('❌ Erro ao importar participantes via CSV:', error);
         console.error('❌ Status:', error?.status);
         console.error('❌ Message:', error?.message);
-        console.error('❌ Error body:', error?.error);
         throw error;
       })
     );
@@ -406,21 +369,17 @@ export class AtividadesService {
    */
   associarPessoa(atividadeId: number, pessoaId: number, papel: Papel): Observable<any> {
     const url = `${environment.apiUrl}/atividades-pessoas/${atividadeId}/pessoas/${pessoaId}`;
-    console.log('📡 Associando pessoa à atividade:', url);
-    console.log('📋 Papel:', papel);
-
+        
     const params = new HttpParams().set('papel', papel);
 
     return this.http.post<any>(url, null, { params }).pipe(
       timeout(30000),
       tap(response => {
-        console.log('✅ Pessoa associada com sucesso:', response);
-      }),
+              }),
       catchError((error: HttpErrorResponse) => {
         console.error('❌ Erro ao associar pessoa:', error);
         console.error('❌ Status:', error?.status);
         console.error('❌ Message:', error?.message);
-        console.error('❌ Error body:', error?.error);
         throw error;
       })
     );
@@ -433,21 +392,17 @@ export class AtividadesService {
    */
   alterarPapelPessoa(atividadeId: number, pessoaId: number, novoPapel: Papel): Observable<any> {
     const url = `${environment.apiUrl}/atividades-pessoas/${atividadeId}/pessoas/${pessoaId}`;
-    console.log('📡 Alterando papel da pessoa:', url);
-    console.log('📋 Novo papel:', novoPapel);
-
+        
     const params = new HttpParams().set('novoPapel', novoPapel);
 
     return this.http.put<any>(url, null, { params }).pipe(
       timeout(30000),
       tap(response => {
-        console.log('✅ Papel alterado com sucesso:', response);
-      }),
+              }),
       catchError((error: HttpErrorResponse) => {
         console.error('❌ Erro ao alterar papel:', error);
         console.error('❌ Status:', error?.status);
         console.error('❌ Message:', error?.message);
-        console.error('❌ Error body:', error?.error);
         throw error;
       })
     );
@@ -460,18 +415,15 @@ export class AtividadesService {
    */
   listarPessoasPorAtividade(atividadeId: number): Observable<PessoaPapelDTO[]> {
     const url = `${environment.apiUrl}/atividades-pessoas/${atividadeId}/pessoas`;
-    console.log('📡 Listando pessoas da atividade:', url);
-
+    
     return this.http.get<PessoaPapelDTO[]>(url).pipe(
       timeout(30000),
       tap(response => {
-        console.log('✅ Pessoas da atividade carregadas:', response);
-      }),
+              }),
       catchError((error: HttpErrorResponse) => {
         console.error('❌ Erro ao listar pessoas:', error);
         console.error('❌ Status:', error?.status);
         console.error('❌ Message:', error?.message);
-        console.error('❌ Error body:', error?.error);
         throw error;
       })
     );
@@ -484,18 +436,15 @@ export class AtividadesService {
    */
   removerPessoaDaAtividade(atividadeId: number, pessoaId: number): Observable<void> {
     const url = `${environment.apiUrl}/atividades-pessoas/${atividadeId}/pessoas/${pessoaId}`;
-    console.log('📡 Removendo pessoa da atividade:', url);
-
+    
     return this.http.delete<void>(url).pipe(
       timeout(30000),
       tap(() => {
-        console.log('✅ Pessoa removida da atividade com sucesso');
-      }),
+              }),
       catchError((error: HttpErrorResponse) => {
         console.error('❌ Erro ao remover pessoa:', error);
         console.error('❌ Status:', error?.status);
         console.error('❌ Message:', error?.message);
-        console.error('❌ Error body:', error?.error);
         throw error;
       })
     );

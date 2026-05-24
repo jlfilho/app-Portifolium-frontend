@@ -13,8 +13,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       // Token expirado ou inválido
       if (error.status === 401) {
         console.warn('⚠️ Token expirado ou inválido (401 Unauthorized)');
-        console.log('🚪 Redirecionando para login...');
-
+        
         // Limpar dados de autenticação
         apiService.logout();
 
@@ -34,8 +33,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         // Verificar se é erro de token expirado
         if (error.error?.message?.toLowerCase().includes('token') ||
             error.error?.message?.toLowerCase().includes('expired')) {
-          console.log('🚪 Token expirado - Redirecionando para login...');
-          apiService.logout();
+                    apiService.logout();
           router.navigate(['/login'], {
             queryParams: { reason: 'token-expired' }
           });

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, interval, of } from 'rxjs';
 import { tap, timeout, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { environment } from '../../environments/environment.development';
+import { environment } from '../../environments/environment';
 import { AuthoritiesResponse } from '../features/usuarios/models/usuario.model';
 import { isTokenExpired, getTokenExpirationTime, decodeToken, JwtPayload } from './utils/jwt.helper';
 
@@ -46,18 +46,15 @@ export class ApiService {
   }
 
   login(username: string, password: string): Observable<any> {
-    console.log('Tentando fazer login com: ', username, password);
-    return this.http.post<any>(`${this.baseUrl}/auth/login`, { username, password }).pipe(
+        return this.http.post<any>(`${this.baseUrl}/auth/login`, { username, password }).pipe(
       tap((response) => {
         if (response?.token) {
           localStorage.setItem('token', response.token);
           this.tokenSubject.next(response.token);
-          console.log('✅ Login efetuado com sucesso!');
-
+          
           // Verificar expiração do token
           const expiresIn = getTokenExpirationTime(response.token);
-          console.log(`⏱️ Token expira em: ${Math.floor(expiresIn / 60)} minutos`);
-
+          
           // Carregar authorities após login
           this.loadAuthorities();
 
@@ -97,8 +94,7 @@ export class ApiService {
         })
       ).subscribe({
         next: () => {
-          console.log('✅ Logout registrado na auditoria');
-        },
+                  },
         error: (error) => {
           // Este bloco não deve ser executado devido ao catchError, mas mantido por segurança
           console.warn('⚠️ Erro ao registrar logout na auditoria:', error);
@@ -110,8 +106,7 @@ export class ApiService {
       });
     } else {
       // Se não houver token, executar logout local diretamente
-      console.log('🚪 Nenhum token encontrado, executando logout local');
-      this.performLocalLogout();
+            this.performLocalLogout();
     }
   }
 
@@ -129,8 +124,7 @@ export class ApiService {
     this.tokenSubject.next(null);
     this.authoritiesSubject.next([]);
     
-    console.log('✅ Logout local concluído');
-  }
+      }
 
   getToken(): string | null {
     return this.tokenSubject.value;
@@ -209,8 +203,7 @@ export class ApiService {
 
       if (token && isTokenExpired(token)) {
         console.warn('⚠️ Token expirado detectado na verificação periódica');
-        console.log('🚪 Efetuando logout automático...');
-
+        
         this.logout();
         this.router.navigate(['/login'], {
           queryParams: {
@@ -257,8 +250,7 @@ export class ApiService {
       return null;
     }
 
-    console.log('🔍 Token decodificado:', decoded);
-
+    
     // Extrair informações do token
     // O "sub" geralmente contém o username/email
     const username = decoded.sub || '';

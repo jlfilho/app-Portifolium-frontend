@@ -168,21 +168,16 @@ export class EditarPerfilDialogComponent implements OnInit {
         cursos: cursosIds
       };
 
-      console.log('📝 Atualizando perfil do usuário:', dadosAtualizados);
-      console.log('📝 Payload JSON:', JSON.stringify(dadosAtualizados, null, 2));
-
+            
       this.usuariosService.updateUser(this.usuarioOriginal.id, dadosAtualizados).subscribe({
         next: (usuarioAtualizado) => {
-          console.log('✅ Perfil atualizado com sucesso:', usuarioAtualizado);
-          this.showMessage('Perfil atualizado com sucesso!', 'success');
+                    this.showMessage('Perfil atualizado com sucesso!', 'success');
           this.isSaving = false;
           this.dialogRef.close(usuarioAtualizado);
         },
         error: (error) => {
           console.error('❌ Erro ao atualizar perfil:', error);
           console.error('❌ Status:', error.status);
-          console.error('❌ Error body:', error.error);
-          
           let errorMessage = '';
 
           // Extrair mensagem do backend (pode estar em error.error.error, error.error.message, ou error.error)

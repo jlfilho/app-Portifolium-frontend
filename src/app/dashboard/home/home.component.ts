@@ -67,13 +67,11 @@ export class HomeComponent implements OnInit {
    * Carrega informações do usuário do token JWT
    */
   loadUserInfo(): void {
-    console.log('📊 Carregando informações do usuário do token...');
-
+    
     const userInfo = this.apiService.getUserInfoFromToken();
 
     if (userInfo) {
-      console.log('✅ Informações extraídas do token:', userInfo);
-
+      
       // Atualizar propriedades do componente
       this.userEmail = userInfo.email || userInfo.username || '';
       this.userAuthorities = userInfo.authorities;
@@ -85,8 +83,7 @@ export class HomeComponent implements OnInit {
       if (hasName && nameFromToken) {
         // Se o token tem o nome, usar diretamente
         this.userName = nameFromToken;
-        console.log('👤 Nome do usuário (do token):', this.userName);
-      } else {
+              } else {
         // Se não tem nome no token, inicializar com placeholder e buscar
         this.userName = 'Carregando...';
         
@@ -102,9 +99,7 @@ export class HomeComponent implements OnInit {
         }
       }
 
-      console.log('📧 Email do usuário:', this.userEmail);
-      console.log('🔐 Permissões:', this.userAuthorities);
-    } else {
+                } else {
       console.warn('⚠️ Não foi possível extrair informações do token');
       // Manter valores padrão
       this.userName = 'Usuário';
@@ -118,8 +113,7 @@ export class HomeComponent implements OnInit {
         const nome = pessoa?.nome?.trim();
         if (nome) {
           this.userName = nome;
-          console.log('👤 Nome do usuário (da pessoa):', this.userName);
-        } else {
+                  } else {
           // Se não encontrou nome na pessoa, tentar buscar por email
           if (this.userEmail) {
             this.fetchUsuarioNomePorEmail(this.userEmail);
@@ -146,8 +140,7 @@ export class HomeComponent implements OnInit {
         const nome = usuario?.nome?.trim();
         if (nome) {
           this.userName = nome;
-          console.log('👤 Nome do usuário (do usuário):', this.userName);
-        } else {
+                  } else {
           // Se não encontrou nome, usar email como último recurso
           this.userName = email.split('@')[0] || 'Usuário';
         }
@@ -213,15 +206,13 @@ export class HomeComponent implements OnInit {
    */
   toggleSidebar(): void {
     this.isCollapsed = !this.isCollapsed;
-    console.log('Sidebar:', this.isCollapsed ? 'Colapsada' : 'Expandida');
-  }
+      }
 
   /**
    * Abre o diálogo de perfil do usuário
    */
   goToProfile(): void {
-    console.log('📱 Abrindo perfil do usuário');
-    
+        
     if (!this.userEmail) {
       console.warn('⚠️ Email do usuário não disponível');
       return;
@@ -256,8 +247,7 @@ export class HomeComponent implements OnInit {
    * Realiza logout do usuário
    */
   logout(): void {
-    console.log('🚪 Efetuando logout...');
-    this.apiService.logout();
+        this.apiService.logout();
     this.router.navigate(['/cursos-publicos']);
   }
 

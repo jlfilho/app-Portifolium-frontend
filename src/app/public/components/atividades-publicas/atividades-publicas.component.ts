@@ -122,8 +122,7 @@ export class AtividadesPublicasComponent implements OnInit, OnDestroy {
       debounceTime(400),
       distinctUntilChanged()
     ).subscribe(searchTerm => {
-      console.log('🔍 Buscando atividades com:', searchTerm);
-      this.pageIndex = 0;
+            this.pageIndex = 0;
       this.loadAtividades();
     });
   }
@@ -138,9 +137,7 @@ export class AtividadesPublicasComponent implements OnInit, OnDestroy {
       statusPublicacao: true // Filtrar apenas atividades ativas/publicadas
     };
 
-    console.log('📚 Carregando atividades públicas do curso:', this.cursoId);
-    console.log('🔍 Filtros aplicados:', filtro);
-
+        
     this.publicApiService.getAtividadesPublicasPorCurso(
       this.cursoId,
       this.pageIndex,
@@ -152,8 +149,7 @@ export class AtividadesPublicasComponent implements OnInit, OnDestroy {
           this.atividades = [];
           this.totalElements = 0;
           this.isLoading = false;
-          console.log('📭 Nenhuma atividade pública encontrada para este curso');
-          return;
+                    return;
         }
 
         this.atividades = page.content || [];
@@ -161,18 +157,7 @@ export class AtividadesPublicasComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.preencherMetadadosAtividades();
 
-        console.log('✅ Atividades carregadas:', {
-          exibindo: this.atividades.length,
-          total: this.totalElements,
-          filtro: filtro,
-          atividades: this.atividades.map(a => ({
-            id: a.id,
-            nome: a.nome,
-            statusPublicacao: a.statusPublicacao,
-            cursoId: a.curso?.id
-          }))
-        });
-      },
+              },
       error: (error: any) => {
         console.error('❌ Erro ao carregar atividades:', error);
         this.atividades = [];
@@ -205,8 +190,7 @@ export class AtividadesPublicasComponent implements OnInit, OnDestroy {
 
   // Visualizar atividade
   viewAtividade(atividade: AtividadeDTO): void {
-    console.log('👁️ Visualizando atividade:', atividade);
-    if (atividade.id) {
+        if (atividade.id) {
       this.publicNavigationService.navigateToVisualizarAtividade(atividade.id, this.cursoId, this.cursoNome);
     }
   }

@@ -72,12 +72,10 @@ export class LoginComponent implements OnInit {
       this.isLoading = true;
       this.errorMessage = '';
 
-      console.log('🔐 Tentando fazer login com:', username);
-
+      
       this.apiService.login(username, password).subscribe({
         next: () => {
-          console.log('✅ Login bem-sucedido, redirecionando...');
-          this.router.navigate(['/admin']);
+                    this.router.navigate(['/admin']);
         },
         error: (err) => {
           console.error('❌ Erro no login:', err);

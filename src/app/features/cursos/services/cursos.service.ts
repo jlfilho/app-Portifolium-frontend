@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment.development';
+import { map } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
 import { Page, PageRequest } from '../../../shared/models/page.model';
 import { Curso } from '../models/curso.model';
 import { CursoFilter } from '../models/curso-filter.model';
@@ -38,18 +38,7 @@ export class CursosService {
   getUserCoursesPaginado(filter: CursoFilter): Observable<Page<Curso>> {
     const params = this.buildCursoParams(filter);
 
-    console.log('📡 Buscando cursos do usuário (paginado):', {
-      page: filter.page,
-      size: filter.size,
-      sort: `${filter.sortBy},${filter.direction}`,
-      ativo: filter.ativo !== null && filter.ativo !== undefined ? filter.ativo : 'todos',
-      nome: filter.nome || 'sem filtro',
-      tipoId: filter.tipoId ?? 'todos',
-      unidadeAcademicaId: filter.unidadeAcademicaId ?? 'todas'
-    });
-
     return this.http.get<Page<Curso> | Curso[]>(`${this.baseUrl}/cursos/usuarios`, { params }).pipe(
-      tap(response => console.log('📡 CursosService - Resposta recebida:', response)),
       map(response => this.ensurePageResponse<Curso>(response, filter))
     );
   }
@@ -60,23 +49,7 @@ export class CursosService {
   getAllCourses(filter: CursoFilter): Observable<Page<Curso>> {
     const params = this.buildCursoParams(filter);
 
-    console.log('📡 Buscando todos os cursos (paginado):', {
-      page: filter.page,
-      size: filter.size,
-      sort: `${filter.sortBy},${filter.direction}`,
-      ativo: filter.ativo !== null && filter.ativo !== undefined ? filter.ativo : 'todos',
-      nome: filter.nome || 'sem filtro',
-      tipoId: filter.tipoId ?? 'todos',
-      unidadeAcademicaId: filter.unidadeAcademicaId ?? 'todas'
-    });
-
     return this.http.get<Page<Curso> | Curso[]>(`${this.baseUrl}/cursos`, { params }).pipe(
-      tap(response => {
-        const count = Array.isArray(response)
-          ? response.length
-          : ((response as Page<Curso>)?.content?.length || 0);
-        console.log('✅ Cursos carregados:', count);
-      }),
       map(response => this.ensurePageResponse<Curso>(response, filter))
     );
   }
@@ -85,10 +58,7 @@ export class CursosService {
    * GET /cursos/{id}
    */
   getCourseById(id: number): Observable<Curso> {
-    console.log('📡 Buscando curso ID:', id);
-    return this.http.get<Curso>(`${this.baseUrl}/cursos/${id}`).pipe(
-      tap(curso => console.log('✅ Curso encontrado:', curso))
-    );
+    return this.http.get<Curso>(`${this.baseUrl}/cursos/${id}`);
   }
 
   createCourse(courseData: Partial<Curso>): Observable<Curso> {
@@ -127,41 +97,32 @@ export class CursosService {
   }
 
   deleteCourse(id: number): Observable<void> {
-    console.log('🗑️ Service: excluindo curso ID:', id);
-    console.log('📡 URL:', `${this.baseUrl}/cursos/${id}`);
-    return this.http.delete<void>(`${this.baseUrl}/cursos/${id}`);
+            return this.http.delete<void>(`${this.baseUrl}/cursos/${id}`);
   }
 
   updateCourseStatus(id: number, ativo: boolean): Observable<void> {
-    console.log('🔄 Atualizando status do curso:', id, 'Ativo:', ativo);
-    return this.http.put<void>(`${this.baseUrl}/cursos/${id}/status`, { ativo });
+        return this.http.put<void>(`${this.baseUrl}/cursos/${id}/status`, { ativo });
   }
 
   /**
    * GET /cursos/permissoes/{cursoId}
    */
   getCoursePermissions(cursoId: number): Observable<any[]> {
-    console.log('👥 Buscando permissões do curso ID:', cursoId);
-    console.log('📡 URL:', `${this.baseUrl}/cursos/permissoes/${cursoId}`);
-    return this.http.get<any[]>(`${this.baseUrl}/cursos/permissoes/${cursoId}`);
+            return this.http.get<any[]>(`${this.baseUrl}/cursos/permissoes/${cursoId}`);
   }
 
   /**
    * PUT /cursos/{cursoId}/usuarios/{usuarioId}
    */
   addUserToCourse(cursoId: number, usuarioId: number): Observable<any[]> {
-    console.log('➕ Adicionando usuário ao curso:', { cursoId, usuarioId });
-    console.log('📡 URL:', `${this.baseUrl}/cursos/${cursoId}/usuarios/${usuarioId}`);
-    return this.http.put<any[]>(`${this.baseUrl}/cursos/${cursoId}/usuarios/${usuarioId}`, {});
+            return this.http.put<any[]>(`${this.baseUrl}/cursos/${cursoId}/usuarios/${usuarioId}`, {});
   }
 
   /**
    * DELETE /cursos/{cursoId}/usuarios/{usuarioId}
    */
   removeUserFromCourse(cursoId: number, usuarioId: number): Observable<any[]> {
-    console.log('➖ Removendo usuário do curso:', { cursoId, usuarioId });
-    console.log('📡 URL:', `${this.baseUrl}/cursos/${cursoId}/usuarios/${usuarioId}`);
-    return this.http.delete<any[]>(`${this.baseUrl}/cursos/${cursoId}/usuarios/${usuarioId}`);
+            return this.http.delete<any[]>(`${this.baseUrl}/cursos/${cursoId}/usuarios/${usuarioId}`);
   }
 
   /**
@@ -175,24 +136,21 @@ export class CursosService {
    * POST /categorias
    */
   createCategory(categoryData: { nome: string }): Observable<any> {
-    console.log('📝 Criando categoria:', categoryData);
-    return this.http.post(`${this.baseUrl}/categorias`, categoryData);
+        return this.http.post(`${this.baseUrl}/categorias`, categoryData);
   }
 
   /**
    * PUT /categorias/{categoriaId}
    */
   updateCategory(id: number, categoryData: { nome: string }): Observable<any> {
-    console.log('✏️ Atualizando categoria:', id, categoryData);
-    return this.http.put(`${this.baseUrl}/categorias/${id}`, categoryData);
+        return this.http.put(`${this.baseUrl}/categorias/${id}`, categoryData);
   }
 
   /**
    * DELETE /categorias/{categoriaId}
    */
   deleteCategory(id: number): Observable<any> {
-    console.log('🗑️ Deletando categoria:', id);
-    return this.http.delete(`${this.baseUrl}/categorias/${id}`);
+        return this.http.delete(`${this.baseUrl}/categorias/${id}`);
   }
 
   private buildCursoParams(filter: CursoFilter): HttpParams {

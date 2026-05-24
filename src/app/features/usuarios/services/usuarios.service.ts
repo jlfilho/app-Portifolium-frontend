@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap, map } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment.development';
+import { environment } from '../../../../environments/environment';
 import { Usuario, ChangePasswordRequest, ChangePasswordResponse, AuthoritiesResponse } from '../models/usuario.model';
 import { Page, PageRequest } from '../../../shared/models/page.model';
 
@@ -34,15 +34,12 @@ export class UsuariosService {
       params = params.set('nome', nome.trim());
     }
 
-    console.log('📡 UsuariosService - Fazendo requisição para:', `${this.baseUrl}/usuarios`);
-    console.log('📡 UsuariosService - Parâmetros:', params.toString());
-
+        
     return this.http.get<Page<Usuario>>(`${this.baseUrl}/usuarios`, {
       params
     }).pipe(
       tap((response: Page<Usuario>) => {
-        console.log('📡 UsuariosService - Resposta recebida:', response);
-      }),
+              }),
       map((response: Page<Usuario>) => {
         // Se a resposta está vazia, retornar página vazia estruturada
         if (!response || !response.content || response.content.length === 0) {

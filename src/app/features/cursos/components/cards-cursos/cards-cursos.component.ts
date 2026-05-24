@@ -112,8 +112,7 @@ export class CardsCursosComponent  implements OnInit {
       debounceTime(500), // Aguarda 500ms após parar de digitar
       distinctUntilChanged() // Só emite se o valor mudou
     ).subscribe(searchTerm => {
-      console.log('🔍 Aplicando filtro de nome:', searchTerm);
-      this.pageIndex = 0; // Resetar para primeira página
+            this.pageIndex = 0; // Resetar para primeira página
       this.loadCourses();
     });
   }
@@ -158,19 +157,11 @@ export class CardsCursosComponent  implements OnInit {
       unidadeAcademicaId: this.filtroUnidade ?? undefined
     };
 
-    console.log('📡 Carregando cursos do usuário (página ' + (this.pageIndex + 1) + ')');
-    console.log('🔍 Filtros aplicados:', {
-      nome: this.filtroNome || 'sem filtro',
-      status: this.filtroStatus !== null ? (this.filtroStatus ? 'Ativos' : 'Inativos') : 'Todos',
-      tipoId: this.filtroTipo ?? 'todos',
-      unidadeAcademicaId: this.filtroUnidade ?? 'todas'
-    });
-
+        
     this.cursosService.getUserCoursesPaginado(filter).subscribe({
       next: (page) => {
         if (!page || page === null) {
-          console.log('📭 Nenhum curso encontrado (204 No Content)');
-          this.handleEmptyCourses();
+                    this.handleEmptyCourses();
           return;
         }
 
@@ -185,13 +176,7 @@ export class CardsCursosComponent  implements OnInit {
           return;
         }
 
-        console.log('✅ Cursos do usuário carregados:', {
-          exibindo: this.cursos.length,
-          total: this.totalElements,
-          pagina: this.pageIndex + 1,
-          totalPaginas: page.totalPages || 0
-        });
-      },
+              },
       error: (error) => {
         console.error('❌ Erro ao carregar cursos do usuário:', error);
         const apiMessage = extractApiMessage(error);
@@ -229,27 +214,23 @@ export class CardsCursosComponent  implements OnInit {
 
   // Chamado quando usuário muda o filtro de status
   onStatusChange(): void {
-    console.log('📊 Filtro de status alterado:', this.filtroStatus);
-    this.pageIndex = 0; // Resetar para primeira página
+        this.pageIndex = 0; // Resetar para primeira página
     this.loadCourses();
   }
 
   onTipoChange(): void {
-    console.log('🏷️ Filtro de tipo alterado:', this.filtroTipo);
-    this.pageIndex = 0;
+        this.pageIndex = 0;
     this.loadCourses();
   }
 
   onUnidadeChange(): void {
-    console.log('🏛️ Filtro de unidade acadêmica alterado:', this.filtroUnidade);
-    this.pageIndex = 0;
+        this.pageIndex = 0;
     this.loadCourses();
   }
 
   // Limpar filtros
   limparFiltros(): void {
-    console.log('🧹 Limpando filtros');
-    this.filtroNome = '';
+        this.filtroNome = '';
     this.filtroStatus = null;
     this.filtroTipo = null;
     this.filtroUnidade = null;
@@ -259,8 +240,7 @@ export class CardsCursosComponent  implements OnInit {
 
   // Método de evento de mudança de página
   onPageChange(event: PageEvent): void {
-    console.log('📄 Mudança de página:', event);
-    this.pageIndex = event.pageIndex;
+        this.pageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
     this.loadCourses();
   }
@@ -281,8 +261,7 @@ export class CardsCursosComponent  implements OnInit {
 
   // Navegar para a tela de gerenciar permissões (formulário)
   managePermissions(curso: Curso): void {
-    console.log('👥 Gerenciar permissões para curso:', curso);
-    if (curso?.id == null) {
+        if (curso?.id == null) {
       this.showMessage('Curso inválido selecionado. Tente novamente.', 'error');
       return;
     }
@@ -292,8 +271,7 @@ export class CardsCursosComponent  implements OnInit {
 
   // Navegar para a tela de atividades do curso
   manageAtividades(curso: Curso): void {
-    console.log('📚 Gerenciar atividades para curso:', curso);
-    if (curso?.id == null) {
+        if (curso?.id == null) {
       this.showMessage('Curso inválido selecionado. Tente novamente.', 'error');
       return;
     }
@@ -303,8 +281,7 @@ export class CardsCursosComponent  implements OnInit {
 
   // Deletar curso com diálogo de confirmação
   deleteCourse(curso: Curso): void {
-    console.log('🗑️ Excluir curso chamado para:', curso);
-    if (curso?.id == null) {
+        if (curso?.id == null) {
       this.showMessage('Curso inválido selecionado. Tente novamente.', 'error');
       return;
     }
@@ -321,46 +298,36 @@ export class CardsCursosComponent  implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('💬 Resultado do diálogo de exclusão:', result);
-      if (result === true) {
-        console.log('✅ Confirmado! Executando exclusão...');
-        const cursoId = curso.id!;
+            if (result === true) {
+                const cursoId = curso.id!;
         this.performDelete(cursoId, curso.nome);
       } else {
-        console.log('❌ Exclusão cancelada pelo usuário');
-      }
+              }
     });
   }
 
   // Executar a exclusão
   private performDelete(cursoId: number, cursoNome: string): void {
-    console.log('📡 Chamando API para excluir curso ID:', cursoId);
-
+    
     this.cursosService.deleteCourse(cursoId).subscribe({
       next: (response) => {
-        console.log('✅ Curso excluído com sucesso! Response:', response);
-        this.showMessage(`Curso "${cursoNome}" excluído com sucesso!`, 'success');
-        console.log('🔄 Recarregando lista de cursos...');
-        this.loadCourses(); // Recarrega a lista
+                this.showMessage(`Curso "${cursoNome}" excluído com sucesso!`, 'success');
+                this.loadCourses(); // Recarrega a lista
       },
       error: (error) => {
         console.error('❌ Erro ao deletar curso:', error);
-        console.error('📊 Detalhes do erro:', error.error);
         console.error('🔢 Status HTTP:', error.status);
 
         const errorMessage = extractApiMessage(error) || 'Erro ao excluir curso. Tente novamente.';
 
-        console.log('📢 Mensagem de erro extraída:', errorMessage);
-        this.showMessage(errorMessage, 'error');
+                this.showMessage(errorMessage, 'error');
       }
     });
   }
 
   // Toggle status do curso (ativar/desativar) com confirmação
   toggleCourseStatus(curso: Curso): void {
-    console.log('🔄 Toggle status chamado para curso:', curso);
-    console.log('📊 Status atual:', curso.ativo);
-
+        
     if (curso?.id == null) {
       this.showMessage('Curso inválido selecionado. Tente novamente.', 'error');
       return;
@@ -370,8 +337,7 @@ export class CardsCursosComponent  implements OnInit {
     const acao = novoStatus ? 'ativar' : 'desativar';
     const acaoCapitalizada = novoStatus ? 'Ativar' : 'Desativar';
 
-    console.log('🎯 Novo status será:', novoStatus);
-
+    
     const dialogRef = this.dialog.open(SimpleConfirmDialogComponent, {
       width: '500px',
       panelClass: 'custom-dialog-panel',
@@ -384,39 +350,30 @@ export class CardsCursosComponent  implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('💬 Resultado do diálogo:', result);
-      if (result === true) {
-        console.log('✅ Confirmado! Executando atualização...');
-        const cursoId = curso.id!;
+            if (result === true) {
+                const cursoId = curso.id!;
         this.performStatusUpdate(cursoId, curso.nome, novoStatus);
       } else {
-        console.log('❌ Cancelado pelo usuário');
-      }
+              }
     });
   }
 
   // Executar a atualização de status
   private performStatusUpdate(cursoId: number, cursoNome: string, novoStatus: boolean): void {
-    console.log('📡 Chamando API para atualizar status...');
-    console.log('📋 Dados:', { cursoId, novoStatus });
-
+        
     this.cursosService.updateCourseStatus(cursoId, novoStatus).subscribe({
       next: (response) => {
-        console.log('✅ Resposta da API:', response);
-        const statusTexto = novoStatus ? 'ativado' : 'desativado';
+                const statusTexto = novoStatus ? 'ativado' : 'desativado';
         this.showMessage(`Curso "${cursoNome}" ${statusTexto} com sucesso!`, 'success');
-        console.log('🔄 Recarregando lista de cursos...');
-        this.loadCourses(); // Recarrega a lista
+                this.loadCourses(); // Recarrega a lista
       },
       error: (error) => {
         console.error('❌ Erro ao atualizar status do curso:', error);
-        console.error('📊 Detalhes do erro:', error.error);
         console.error('🔢 Status HTTP:', error.status);
 
         const errorMessage = extractApiMessage(error) || 'Erro ao atualizar status do curso. Tente novamente.';
 
-        console.log('📢 Mensagem de erro extraída:', errorMessage);
-        this.showMessage(errorMessage, 'error');
+                this.showMessage(errorMessage, 'error');
       }
     });
   }

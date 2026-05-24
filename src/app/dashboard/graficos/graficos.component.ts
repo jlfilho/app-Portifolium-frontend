@@ -218,8 +218,7 @@ export class GraficosComponent implements OnInit {
     }
 
     // Log para debug - verificar dados recebidos do endpoint
-    console.log('📊 Dados de distribuição recebidos do endpoint:', this.dashboard.distribuicaoUsuarios);
-
+    
     // Mapear tipos do backend para nomes padronizados (case-insensitive)
     const normalizarTipo = (tipo: string): string => {
       const tipoLower = tipo.toLowerCase().trim();
@@ -267,8 +266,7 @@ export class GraficosComponent implements OnInit {
       }, [] as { tipo: string; quantidade: number }[]);
 
     // Log para debug - verificar dados processados
-    console.log('📊 Dados processados:', distribuicaoProcessada);
-
+    
     // Verificar se "Coordenador de atividades" existe, se não, adicionar com valor 0
     const temCoordenador = distribuicaoProcessada.some(item => item.tipo === 'Coordenador de atividades');
     if (!temCoordenador) {
@@ -297,8 +295,7 @@ export class GraficosComponent implements OnInit {
     }));
 
     // Log final para debug
-    console.log('📊 Distribuição de usuários final:', this.usuariosPorRole);
-  }
+      }
 
   // Cursos em Destaque
   private loadTopCursos(): void {
@@ -392,8 +389,7 @@ export class GraficosComponent implements OnInit {
 
   // Navegação
   navigateTo(route: string): void {
-    console.log('🔗 Navegando para:', route);
-  }
+      }
 
   // Mostrar mensagem
   private showMessage(message: string, type: 'success' | 'error' | 'warning'): void {

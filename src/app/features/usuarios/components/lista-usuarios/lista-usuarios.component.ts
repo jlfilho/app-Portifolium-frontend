@@ -104,13 +104,10 @@ export class ListaUsuariosComponent implements OnInit {
       direction: this.sortDirection
     };
 
-    console.log('📄 Carregando usuários paginados:', pageRequest);
-
+    
     this.usuariosService.getAllUsersPaginado(pageRequest).subscribe({
       next: (page) => {
-        console.log('✅ Página recebida:', page);
-        console.log(`📊 ${page.numberOfElements} de ${page.totalElements} usuários`);
-
+                
         this.dataSource.data = page.content;
         this.totalElements = page.totalElements;
         this.isLoading = false;
@@ -132,8 +129,7 @@ export class ListaUsuariosComponent implements OnInit {
   }
 
   onPageChange(event: any): void {
-    console.log('📄 Mudança de página:', event);
-    this.pageIndex = event.pageIndex;
+        this.pageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
     this.loadUsers();
   }
@@ -181,8 +177,7 @@ export class ListaUsuariosComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result === true) {
         // Senha alterada com sucesso
-        console.log('Senha alterada para usuário:', usuario.nome);
-      }
+              }
     });
   }
 

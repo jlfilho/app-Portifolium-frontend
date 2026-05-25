@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatChipsModule } from '@angular/material/chips';
+import { APP_VERSION } from '../../../environments/version';
 
 @Component({
   selector: 'app-sobre-admin',
@@ -23,7 +24,7 @@ import { MatChipsModule } from '@angular/material/chips';
   styleUrl: './sobre.component.css'
 })
 export class SobreAdminComponent {
-  versao = '1.0.0';
+  versao = APP_VERSION;
   anoAtual = new Date().getFullYear();
 }
 

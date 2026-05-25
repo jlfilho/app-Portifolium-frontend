@@ -380,10 +380,15 @@
 
 /* Card Header Image */
 .card-header-image {
-  height: 240px;
-  background: var(--gradient-primary);
+  height: 220px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 8%, var(--bg-card)) 0%, var(--bg-card) 100%);
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--border-color);
 }
 
 /* Efeito decorativo quando NÃO tem imagem */
@@ -395,8 +400,8 @@
   right: 0;
   bottom: 0;
   background:
-    radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
-    radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    radial-gradient(circle at 30% 40%, color-mix(in srgb, var(--primary-color) 14%, transparent) 0%, transparent 60%),
+    radial-gradient(circle at 70% 70%, color-mix(in srgb, var(--secondary-color) 10%, transparent) 0%, transparent 50%);
 }
 
 /* Ícone decorativo quando NÃO tem imagem */
@@ -408,7 +413,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 80px;
-  color: rgba(255, 255, 255, 0.3);
+  color: color-mix(in srgb, var(--primary-color) 35%, transparent);
   pointer-events: none;
 }
 
@@ -416,43 +421,44 @@
 .curso-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
   transition: transform 0.3s ease;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 .curso-card:hover .curso-image {
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
-/* Overlay com título */
-.header-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 24px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
+.curso-heading {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
-  z-index: 2;
+  gap: 10px;
+  margin-bottom: 14px;
+  min-height: 76px;
 }
 
 .curso-nome {
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 600;
-  color: white;
+  color: var(--text-dark);
   margin: 0;
-  line-height: 1.3;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  line-height: 1.25;
   width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Chip de tipo do curso */
 .tipo-chip-set {
   pointer-events: none;
+  max-width: 100%;
 }
 
 /* remove specific tipo-chip styling in favor of global chip-highlight */
@@ -671,11 +677,11 @@
   }
 
   .curso-nome {
-    font-size: 14px;
+    font-size: 17px;
   }
 
   .card-header-image {
-    height: 160px;
+    height: 180px;
   }
 
   .empty-icon {

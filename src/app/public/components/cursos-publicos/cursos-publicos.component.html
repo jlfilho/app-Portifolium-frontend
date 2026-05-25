@@ -92,26 +92,23 @@
       class="curso-card"
       matRipple
       (click)="viewCurso(curso)">
-      <!-- Card Header com Imagem -->
-      <div class="card-header-image" [class.has-image]="curso.fotoCapa || curso.imagemCapa">
-        <!-- Imagem de capa -->
+      <div class="card-header-image has-image">
         <img
           [src]="getCursoCardImage(curso)"
           [alt]="'Capa do curso ' + curso.nome"
           class="curso-image"
           (error)="onImageError($event)">
+      </div>
 
-        <!-- Overlay com título -->
-        <div class="header-overlay">
+      <!-- Card Content -->
+      <mat-card-content class="card-content">
+        <div class="curso-heading">
           <h3 class="curso-nome">{{ curso.nome }}</h3>
           <mat-chip-set *ngIf="getTipoNome(curso)" class="tipo-chip-set">
             <mat-chip class="chip-highlight">{{ getTipoNome(curso) }}</mat-chip>
           </mat-chip-set>
         </div>
-      </div>
 
-      <!-- Card Content -->
-      <mat-card-content class="card-content">
         <p class="curso-descricao" *ngIf="curso.descricao">
           {{ curso.descricao }}
         </p>
@@ -162,4 +159,3 @@
     class="paginator">
   </mat-paginator>
 </div>
-

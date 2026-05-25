@@ -45,8 +45,7 @@ export class CustomDialogService {
       document.body.appendChild(this.dialogRef.location.nativeElement);
       this.appRef.attachView(this.dialogRef.hostView);
 
-      console.log('🔍 Custom Dialog Aberto:', data);
-    });
+          });
   }
 
   private close(): void {

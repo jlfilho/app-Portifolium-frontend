@@ -1,0 +1,105 @@
+<div class="log-export-card">
+  <div class="card-header">
+    <div>
+      <h2>Exportar Logs em CSV</h2>
+      <p>Filtre os registros e faça download dos logs de auditoria ou ação.</p>
+    </div>
+    <button
+      mat-stroked-button
+      type="button"
+      (click)="clearFilters()"
+      [disabled]="loading"
+    >
+      <mat-icon>clear_all</mat-icon>
+      Limpar filtros
+    </button>
+  </div>
+
+  <form [formGroup]="exportForm" (ngSubmit)="exportLogs()" class="export-form">
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Tipo de log</mat-label>
+        <mat-select formControlName="logType">
+          <mat-option value="audit">Logs de Auditoria</mat-option>
+          <mat-option value="action">Logs de Ação</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Email do usuário</mat-label>
+        <input matInput type="email" placeholder="admin@uea.edu.br" formControlName="userEmail">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Data inicial</mat-label>
+        <input matInput type="datetime-local" formControlName="startDate">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Data final</mat-label>
+        <input matInput type="datetime-local" formControlName="endDate">
+      </mat-form-field>
+    </div>
+
+    <div class="form-grid" *ngIf="showAuditFilters">
+      <mat-form-field appearance="outline">
+        <mat-label>Ação</mat-label>
+        <mat-select formControlName="action">
+          <mat-option value="">Todas</mat-option>
+          <mat-option *ngFor="let action of auditActions" [value]="action">
+            {{ action }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Nome da entidade</mat-label>
+        <input matInput placeholder="Curso, Atividade..." formControlName="entityName">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>ID da entidade</mat-label>
+        <input matInput type="number" placeholder="EX: 42" formControlName="entityId">
+      </mat-form-field>
+    </div>
+
+    <div class="form-grid" *ngIf="showActionFilters">
+      <mat-form-field appearance="outline">
+        <mat-label>Tipo de ação</mat-label>
+        <mat-select formControlName="actionType">
+          <mat-option value="">Todos</mat-option>
+          <mat-option *ngFor="let actionType of actionTypes" [value]="actionType">
+            {{ actionType }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="success">
+          <mat-option value="">Todos</mat-option>
+          <mat-option value="true">Sucesso</mat-option>
+          <mat-option value="false">Falha</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="actions">
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="loading"
+      >
+        <mat-icon *ngIf="!loading">download</mat-icon>
+        <mat-progress-spinner
+          *ngIf="loading"
+          diameter="20"
+          mode="indeterminate"
+        ></mat-progress-spinner>
+        {{ loading ? 'Exportando...' : 'Exportar CSV' }}
+      </button>
+    </div>
+  </form>
+</div>
+

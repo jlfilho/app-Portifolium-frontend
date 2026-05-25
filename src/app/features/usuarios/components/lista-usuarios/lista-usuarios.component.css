@@ -1,17 +1,7 @@
 /* ========================================
    🎨 VARIÁVEIS E PALETA - MINIMAL TECH LIGHT+
+   Usa variáveis globais de src/styles/variables.css
    ======================================== */
-:host {
-  --primary-color: #3B82F6;
-  --secondary-color: #8B5CF6;
-  --accent-color: #6366F1;
-  --error-color: #EF4444;
-  --text-dark: #0F172A;
-  --text-medium: #475569;
-  --text-light: #64748B;
-  --bg-hover: rgba(59, 130, 246, 0.1);
-  --border-color: #CBD5E1;
-}
 
 /* ========================================
    📦 CONTAINER PRINCIPAL
@@ -69,7 +59,7 @@ mat-divider {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
   padding: 24px;
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   animation: fadeIn 0.3s ease-out;
 }
 
@@ -114,7 +104,7 @@ mat-divider {
 
 .usuarios-table {
   width: 100%;
-  background: #ffffff;
+  background: var(--bg-card);
 }
 
 /* Header da Tabela */
@@ -137,8 +127,17 @@ mat-divider {
 /* Células da Tabela */
 ::ng-deep .usuarios-table .mat-mdc-cell {
   padding: 16px 12px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-color);
   font-size: 14px;
+  overflow: visible; /* Garantir que conteúdo não seja cortado */
+}
+
+/* Garantir que a célula da coluna nome não corte o ícone */
+::ng-deep .usuarios-table .mat-column-nome .mat-mdc-cell {
+  overflow: visible !important;
+  min-width: 200px;
+  padding-left: 12px;
+  padding-right: 12px;
 }
 
 /* Linhas da Tabela */
@@ -166,6 +165,8 @@ mat-divider {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0; /* Permite que o texto seja truncado se necessário */
+  width: 100%;
 }
 
 .user-avatar {
@@ -173,11 +174,23 @@ mat-divider {
   font-size: 32px;
   width: 32px;
   height: 32px;
+  flex-shrink: 0; /* Impede que o ícone seja reduzido */
 }
 
 .user-name {
   font-weight: 500;
   color: var(--text-dark);
+  flex: 1;
+  min-width: 0; /* Permite truncamento do texto */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Garantir que a célula da coluna nome tenha espaço suficiente */
+::ng-deep .usuarios-table .mat-column-nome .mat-mdc-cell {
+  overflow: visible;
+  min-width: 200px;
 }
 
 /* Email */
@@ -221,6 +234,49 @@ mat-divider {
   position: relative;
 }
 
+/* Formatação do matBadge - Garantir que o badge seja exibido corretamente */
+::ng-deep .cursos-badge-button .mat-badge {
+  position: relative !important;
+}
+
+::ng-deep .cursos-badge-button .mat-badge-content {
+  background-color: var(--accent-color) !important;
+  color: white !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  min-width: 18px !important;
+  height: 18px !important;
+  line-height: 18px !important;
+  border-radius: 9px !important;
+  padding: 0 6px !important;
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: absolute !important;
+  top: -8px !important;
+  right: -8px !important;
+  z-index: 1 !important;
+}
+
+::ng-deep .cursos-badge-button[matBadgeColor="accent"] .mat-badge-content {
+  background-color: var(--accent-color) !important;
+}
+
+::ng-deep .cursos-badge-button[matBadgeColor="primary"] .mat-badge-content {
+  background-color: var(--primary-color) !important;
+}
+
+::ng-deep .cursos-badge-button[matBadgeColor="warn"] .mat-badge-content {
+  background-color: var(--error-color) !important;
+}
+
+/* Garantir que a célula da tabela permita o posicionamento do badge */
+::ng-deep .mat-column-cursos .mat-mdc-cell {
+  position: relative;
+  overflow: visible;
+}
+
 /* Actions */
 .actions-header {
   text-align: right;
@@ -255,7 +311,7 @@ mat-divider {
   font-size: 64px;
   width: 64px;
   height: 64px;
-  color: #ccc;
+  color: var(--text-light);
 }
 
 .no-data p {
@@ -289,7 +345,7 @@ mat-divider {
 }
 
 .user-card {
-  background: #ffffff;
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 16px;
@@ -409,22 +465,131 @@ mat-divider {
 /* ========================================
    🎨 MATERIAL OVERRIDES
    ======================================== */
+/* Administrador: mat-warn -> --primary-color */
 ::ng-deep .mat-mdc-chip.mat-warn {
   --mdc-chip-label-text-color: white !important;
-  --mdc-chip-elevated-container-color: #EF4444 !important;
+  --mdc-chip-elevated-container-color: var(--primary-color) !important;
 }
 
+/* Gerente: mat-primary -> --secondary-color */
 ::ng-deep .mat-mdc-chip.mat-primary {
   --mdc-chip-label-text-color: white !important;
-  --mdc-chip-elevated-container-color: #3B82F6 !important;
+  --mdc-chip-elevated-container-color: var(--secondary-color) !important;
 }
 
+/* Secretário: mat-accent -> --accent-color */
 ::ng-deep .mat-mdc-chip.mat-accent {
   --mdc-chip-label-text-color: white !important;
-  --mdc-chip-elevated-container-color: #A78BFA !important;
+  --mdc-chip-elevated-container-color: var(--accent-color) !important;
+}
+
+/* Coordenador de Atividade: coordenador-atividade -> --accent-color-light */
+::ng-deep .mat-mdc-chip.coordenador-atividade {
+  --mdc-chip-label-text-color: white !important;
+  --mdc-chip-elevated-container-color: var(--accent-color-light) !important;
+  --mdc-chip-container-color: var(--accent-color-light) !important;
+  background-color: var(--accent-color-light) !important;
+}
+
+::ng-deep .mat-mdc-chip.coordenador-atividade .mat-mdc-chip-action-label,
+::ng-deep .mat-mdc-chip.coordenador-atividade span,
+::ng-deep .mat-mdc-chip.coordenador-atividade .mat-icon {
+  color: white !important;
+}
+
+::ng-deep .mat-mdc-chip.coordenador-atividade.mdc-evolution-chip {
+  background-color: var(--success-color) !important;
 }
 
 ::ng-deep .mat-mdc-chip .mat-icon {
+  color: white !important;
+}
+
+/* ========================================
+   🎨 TOOLTIPS DE PAPEL (ROLE TOOLTIPS)
+   ======================================== */
+/* Tooltip para Administrador - Cor verde primária */
+::ng-deep .role-tooltip-administrador {
+  --mdc-plain-tooltip-container-color: var(--primary-color) !important;
+  --mdc-plain-tooltip-supporting-text-color: white !important;
+  background-color: var(--primary-color) !important;
+  color: white !important;
+}
+
+::ng-deep .role-tooltip-administrador .mdc-tooltip__surface {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+}
+
+::ng-deep .role-tooltip-administrador .mdc-tooltip__surface-text {
+  color: white !important;
+}
+
+/* Tooltip para Gerente - Cor verde secundária */
+::ng-deep .role-tooltip-gerente {
+  --mdc-plain-tooltip-container-color: var(--secondary-color) !important;
+  --mdc-plain-tooltip-supporting-text-color: white !important;
+  background-color: var(--secondary-color) !important;
+  color: white !important;
+}
+
+::ng-deep .role-tooltip-gerente .mdc-tooltip__surface {
+  background-color: var(--secondary-color) !important;
+  color: white !important;
+}
+
+::ng-deep .role-tooltip-gerente .mdc-tooltip__surface-text {
+  color: white !important;
+}
+
+/* Tooltip para Secretário - Cor accent */
+::ng-deep .role-tooltip-secretario {
+  --mdc-plain-tooltip-container-color: var(--accent-color) !important;
+  --mdc-plain-tooltip-supporting-text-color: white !important;
+  background-color: var(--accent-color) !important;
+  color: white !important;
+}
+
+::ng-deep .role-tooltip-secretario .mdc-tooltip__surface {
+  background-color: var(--accent-color) !important;
+  color: white !important;
+}
+
+::ng-deep .role-tooltip-secretario .mdc-tooltip__surface-text {
+  color: white !important;
+}
+
+/* Tooltip para Coordenador de Atividade - Cor accent-light */
+::ng-deep .role-tooltip-coordenador-atividade {
+  --mdc-plain-tooltip-container-color: var(--accent-color-light) !important;
+  --mdc-plain-tooltip-supporting-text-color: white !important;
+  background-color: var(--accent-color-light) !important;
+  color: white !important;
+}
+
+::ng-deep .role-tooltip-coordenador-atividade .mdc-tooltip__surface {
+  background-color: var(--accent-color-light) !important;
+  color: white !important;
+}
+
+::ng-deep .role-tooltip-coordenador-atividade .mdc-tooltip__surface-text {
+  color: white !important;
+}
+
+/* Tooltip padrão (fallback) */
+::ng-deep .role-tooltip-default {
+  --mdc-plain-tooltip-container-color: var(--text-dark) !important;
+  --mdc-plain-tooltip-supporting-text-color: white !important;
+  background-color: var(--text-dark) !important;
+  color: white !important;
+}
+
+::ng-deep .role-tooltip-default .mdc-tooltip__surface {
+  background-color: var(--text-dark) !important;
+  color: white !important;
+}
+
+::ng-deep .role-tooltip-default .mdc-tooltip__surface-text {
   color: white !important;
 }
 
@@ -461,7 +626,7 @@ mat-divider {
 }
 
 .table-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--bg-darker);
   border-radius: 4px;
 }
 

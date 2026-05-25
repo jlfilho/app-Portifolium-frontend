@@ -8,10 +8,33 @@
         </mat-card-title>
         <mat-card-subtitle *ngIf="cursoNome">{{ cursoNome }}</mat-card-subtitle>
       </div>
-      <button mat-raised-button color="primary" (click)="novaAtividade()" class="btn-nova-atividade">
-        <mat-icon>add_circle</mat-icon>
-        Nova Atividade
-      </button>
+      <div class="header-actions">
+        <button
+          mat-stroked-button
+          color="primary"
+          class="btn-relatorio"
+          (click)="abrirDialogRelatorio()"
+          *ngIf="podeGerarRelatorio"
+          [disabled]="isLoading || isGeneratingRelatorio">
+          <mat-progress-spinner
+            *ngIf="isGeneratingRelatorio"
+            diameter="18"
+            mode="indeterminate">
+          </mat-progress-spinner>
+          <mat-icon *ngIf="!isGeneratingRelatorio">picture_as_pdf</mat-icon>
+          <span>{{ isGeneratingRelatorio ? 'Gerando...' : 'Relatório PDF' }}</span>
+        </button>
+
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="novaAtividade()" 
+          class="btn-nova-atividade"
+          *ngIf="podeCriarAtividade">
+          <mat-icon>add_circle</mat-icon>
+          Nova Atividade
+        </button>
+      </div>
     </div>
   </mat-card-header>
 
@@ -57,7 +80,7 @@
         <!-- Filtro por Data Início -->
         <mat-form-field appearance="outline" class="filter-field">
           <mat-label>Data Início</mat-label>
-          <input matInput [matDatepicker]="pickerInicio" [(ngModel)]="filtroDataInicio">
+          <input matInput [matDatepicker]="pickerInicio" [(ngModel)]="filtroDataInicio" [ngModelOptions]="{standalone: true}">
           <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
           <mat-datepicker #pickerInicio></mat-datepicker>
           <mat-icon matPrefix>event</mat-icon>
@@ -66,7 +89,7 @@
         <!-- Filtro por Data Fim -->
         <mat-form-field appearance="outline" class="filter-field">
           <mat-label>Data Fim</mat-label>
-          <input matInput [matDatepicker]="pickerFim" [(ngModel)]="filtroDataFim">
+          <input matInput [matDatepicker]="pickerFim" [(ngModel)]="filtroDataFim" [ngModelOptions]="{standalone: true}">
           <mat-datepicker-toggle matSuffix [for]="pickerFim"></mat-datepicker-toggle>
           <mat-datepicker #pickerFim></mat-datepicker>
           <mat-icon matPrefix>event</mat-icon>
@@ -120,9 +143,13 @@
           </div>
 
           <mat-card-content>
-            <!-- Título e Status -->
+            <!-- Título -->
             <div class="card-header">
               <h3 class="atividade-nome">{{ atividade.nome }}</h3>
+            </div>
+
+            <!-- Status -->
+            <div class="card-status">
               <mat-chip
                 [class.chip-publicada]="atividade.statusPublicacao"
                 [class.chip-nao-publicada]="!atividade.statusPublicacao"
@@ -138,7 +165,7 @@
             <div class="card-info-resumido">
               <div class="info-row">
                 <mat-icon class="info-icon">event</mat-icon>
-                <span class="info-text">{{ formatarData(atividade.dataRealizacao) }}</span>
+                <span class="info-text">{{ formatarDataAtividade(atividade) }}</span>
               </div>
 
               <div class="info-row">
@@ -151,14 +178,19 @@
                 <span class="info-text">{{ atividade.coordenador || 'Sem coordenador' }}</span>
               </div>
 
-              <div class="info-row" *ngIf="atividade.integrantes.length > 0">
+              <div class="info-row" *ngIf="getParticipantesCount(atividade) > 0">
                 <mat-icon class="info-icon">people</mat-icon>
-                <span class="info-text">{{ atividade.integrantes.length }} participante(s)</span>
+                <span class="info-text">{{ getParticipantesCount(atividade) }} participante(s)</span>
               </div>
 
               <div class="info-row" *ngIf="atividade.fontesFinanciadora.length > 0">
                 <mat-icon class="info-icon">attach_money</mat-icon>
                 <span class="info-text">{{ atividade.fontesFinanciadora.length }} fonte(s) financiadora(s)</span>
+              </div>
+
+              <div class="info-row">
+                <mat-icon class="info-icon">photo_library</mat-icon>
+                <span class="info-text">{{ getEvidenciasCount(atividade) }} evidência(s)</span>
               </div>
             </div>
           </mat-card-content>
@@ -179,7 +211,8 @@
               color="primary"
               (click)="editarAtividade(atividade)"
               class="btn-editar"
-              [disabled]="isLoading">
+              [disabled]="isLoading"
+              *ngIf="podeEditarAtividade(atividade)">
               <mat-icon>edit</mat-icon>
               Editar
             </button>
@@ -188,7 +221,8 @@
               color="warn"
               (click)="confirmarExclusao(atividade)"
               class="btn-excluir"
-              [disabled]="isLoading">
+              [disabled]="isLoading"
+              *ngIf="podeExcluirAtividade(atividade)">
               <mat-icon>delete</mat-icon>
               Excluir
             </button>
@@ -218,8 +252,8 @@
 
   <mat-card-actions align="end">
     <button mat-stroked-button color="primary" (click)="back()">
-      <mat-icon>arrow_back</mat-icon>
-      Voltar
+      <mat-icon>close</mat-icon>
+      Cancelar
     </button>
   </mat-card-actions>
 </mat-card>

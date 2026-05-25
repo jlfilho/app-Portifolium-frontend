@@ -45,9 +45,7 @@ export function isTokenExpired(token: string): boolean {
 
   if (isExpired) {
     console.warn('⚠️ Token expirado!');
-    console.log('Expirou em:', new Date(decoded.exp * 1000));
-    console.log('Hora atual:', new Date());
-  }
+          }
 
   return isExpired;
 }

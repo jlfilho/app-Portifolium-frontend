@@ -3,7 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideHttpClient } from '@angular/common/http';
 
 import { CursosService } from './cursos.service';
-import { environment } from '../../../../environments/environment.development';
+import { environment } from '../../../../environments/environment';
 
 describe('CursosService', () => {
   let service: CursosService;
@@ -135,17 +135,6 @@ describe('CursosService', () => {
       req.flush(mockResponse);
     });
 
-    it('deve logar mensagem ao criar categoria', () => {
-      spyOn(console, 'log');
-      const novaCategoria = { nome: 'Pesquisa' };
-
-      service.createCategory(novaCategoria).subscribe();
-
-      const req = httpMock.expectOne(`${baseUrl}/categorias`);
-      req.flush({ id: 2, nome: 'Pesquisa' });
-
-      expect(console.log).toHaveBeenCalledWith('📝 Criando categoria:', novaCategoria);
-    });
 
     it('deve tratar erro 403 ao criar sem permissão', () => {
       const novaCategoria = { nome: 'Extensão' };
@@ -192,17 +181,6 @@ describe('CursosService', () => {
       req.flush(mockResponse);
     });
 
-    it('deve logar mensagem ao atualizar categoria', () => {
-      spyOn(console, 'log');
-      const categoriaAtualizada = { nome: 'Pesquisa Científica' };
-
-      service.updateCategory(2, categoriaAtualizada).subscribe();
-
-      const req = httpMock.expectOne(`${baseUrl}/categorias/2`);
-      req.flush({ id: 2, nome: 'Pesquisa Científica' });
-
-      expect(console.log).toHaveBeenCalledWith('✏️ Atualizando categoria:', 2, categoriaAtualizada);
-    });
 
     it('deve tratar erro 404 ao atualizar categoria inexistente', () => {
       const categoriaAtualizada = { nome: 'Teste' };
@@ -244,16 +222,6 @@ describe('CursosService', () => {
       req.flush(null);
     });
 
-    it('deve logar mensagem ao excluir categoria', () => {
-      spyOn(console, 'log');
-
-      service.deleteCategory(1).subscribe();
-
-      const req = httpMock.expectOne(`${baseUrl}/categorias/1`);
-      req.flush(null);
-
-      expect(console.log).toHaveBeenCalledWith('🗑️ Deletando categoria:', 1);
-    });
 
     it('deve tratar erro 404 ao excluir categoria inexistente', () => {
       service.deleteCategory(999).subscribe({

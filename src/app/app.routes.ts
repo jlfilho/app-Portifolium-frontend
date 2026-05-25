@@ -6,6 +6,11 @@ export const routes: Routes = [
     path: 'login',
     loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent)
   },
+  {
+    path: 'recuperar-senha',
+    loadComponent: () => import('./auth/components/recuperar-senha/recuperar-senha.component').then(m => m.RecuperarSenhaComponent),
+    title: 'Recuperar Senha'
+  },
   // Rotas públicas
   {
     path: 'cursos-publicos',
@@ -23,7 +28,19 @@ export const routes: Routes = [
     title: 'Visualizar Atividade'
   },
   {
+    path: 'sobre',
+    loadComponent: () => import('./public/components/sobre/sobre.component').then(m => m.SobreComponent),
+    title: 'Sobre'
+  },
+  // Rota default - redireciona para página pública
+  {
     path: '',
+    redirectTo: 'cursos-publicos',
+    pathMatch: 'full'
+  },
+  // Área administrativa
+  {
+    path: 'admin',
     loadComponent: () => import('./dashboard/home/home.component').then(m => m.HomeComponent),
     canActivate: [authGuard],
     children: [
@@ -47,6 +64,18 @@ export const routes: Routes = [
       {
         path: '',
         loadChildren: () => import('./features/atividades/atividades.routes').then(m => m.atividadesRoutes)
+      },
+      {
+        path: '',
+        loadChildren: () => import('./features/unidades-academicas/unidades-academicas.routes').then(m => m.UNIDADES_ACADEMICAS_ROUTES)
+      },
+      {
+        path: '',
+        loadChildren: () => import('./features/pessoas/pessoas.routes').then(m => m.PESSOAS_ROUTES)
+      },
+      {
+        path: '',
+        loadChildren: () => import('./features/auditoria/auditoria.routes').then(m => m.AUDITORIA_ROUTES)
       }
     ]
   },

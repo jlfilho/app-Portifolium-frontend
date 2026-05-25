@@ -31,18 +31,15 @@ export class FontesFinanciadorasService {
    */
   listarTodas(): Observable<FonteFinanciadoraDTO[]> {
     const url = this.baseUrl;
-    console.log('📡 Buscando todas as fontes financiadoras:', url);
-
+    
     return this.http.get<FonteFinanciadoraDTO[]>(url).pipe(
       timeout(30000),
       tap(response => {
-        console.log('✅ Fontes financiadoras carregadas:', response);
-      }),
+              }),
       catchError((error: HttpErrorResponse) => {
         console.error('❌ Erro ao buscar fontes financiadoras:', error);
         console.error('❌ Status:', error?.status);
         console.error('❌ Message:', error?.message);
-        console.error('❌ Error body:', error?.error);
         throw error;
       })
     );
@@ -54,18 +51,15 @@ export class FontesFinanciadorasService {
    */
   recuperarPorId(id: number): Observable<FonteFinanciadoraDTO> {
     const url = `${this.baseUrl}/${id}`;
-    console.log('📡 Buscando fonte financiadora por ID:', url);
-
+    
     return this.http.get<FonteFinanciadoraDTO>(url).pipe(
       timeout(30000),
       tap(response => {
-        console.log('✅ Fonte financiadora encontrada:', response);
-      }),
+              }),
       catchError((error: HttpErrorResponse) => {
         console.error('❌ Erro ao buscar fonte financiadora:', error);
         console.error('❌ Status:', error?.status);
         console.error('❌ Message:', error?.message);
-        console.error('❌ Error body:', error?.error);
         throw error;
       })
     );
@@ -78,19 +72,15 @@ export class FontesFinanciadorasService {
    */
   salvar(fonteFinanciadora: FonteFinanciadoraCreateDTO): Observable<FonteFinanciadoraDTO> {
     const url = this.baseUrl;
-    console.log('📡 Criando nova fonte financiadora:', url);
-    console.log('📋 Dados:', fonteFinanciadora);
-
+        
     return this.http.post<FonteFinanciadoraDTO>(url, fonteFinanciadora).pipe(
       timeout(30000),
       tap(response => {
-        console.log('✅ Fonte financiadora criada com sucesso:', response);
-      }),
+              }),
       catchError((error: HttpErrorResponse) => {
         console.error('❌ Erro ao criar fonte financiadora:', error);
         console.error('❌ Status:', error?.status);
         console.error('❌ Message:', error?.message);
-        console.error('❌ Error body:', error?.error);
         throw error;
       })
     );
@@ -103,19 +93,15 @@ export class FontesFinanciadorasService {
    */
   atualizar(id: number, fonteFinanciadora: FonteFinanciadoraUpdateDTO): Observable<FonteFinanciadoraDTO> {
     const url = `${this.baseUrl}/${id}`;
-    console.log('📡 Atualizando fonte financiadora:', url);
-    console.log('📋 Dados para atualização:', fonteFinanciadora);
-
+        
     return this.http.put<FonteFinanciadoraDTO>(url, fonteFinanciadora).pipe(
       timeout(30000),
       tap(response => {
-        console.log('✅ Fonte financiadora atualizada com sucesso:', response);
-      }),
+              }),
       catchError((error: HttpErrorResponse) => {
         console.error('❌ Erro ao atualizar fonte financiadora:', error);
         console.error('❌ Status:', error?.status);
         console.error('❌ Message:', error?.message);
-        console.error('❌ Error body:', error?.error);
         throw error;
       })
     );
@@ -128,18 +114,15 @@ export class FontesFinanciadorasService {
    */
   deletar(id: number): Observable<void> {
     const url = `${this.baseUrl}/${id}`;
-    console.log('📡 Deletando fonte financiadora:', url);
-
+    
     return this.http.delete<void>(url).pipe(
       timeout(30000),
       tap(() => {
-        console.log('✅ Fonte financiadora deletada com sucesso');
-      }),
+              }),
       catchError((error: HttpErrorResponse) => {
         console.error('❌ Erro ao deletar fonte financiadora:', error);
         console.error('❌ Status:', error?.status);
         console.error('❌ Message:', error?.message);
-        console.error('❌ Error body:', error?.error);
         throw error;
       })
     );

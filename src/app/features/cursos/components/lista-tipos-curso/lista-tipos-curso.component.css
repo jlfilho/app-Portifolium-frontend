@@ -5,20 +5,7 @@
   box-sizing: border-box;
 }
 
-/* ===== Paleta de cores (alinhada ao tema) ===== */
-:host {
-  --primary-color: #3B82F6;
-  --secondary-color: #8B5CF6;
-  --accent-color: #6366F1;
-  --success-color: #10B981;
-  --error-color: #EF4444;
-  --warning-color: #F59E0B;
-  --text-dark: #0F172A;
-  --text-medium: #475569;
-  --text-light: #64748B;
-  --bg-hover: rgba(59, 130, 246, 0.1);
-  --border-color: #CBD5E1;
-}
+/* ===== Paleta de cores - Usa variáveis globais de src/styles/variables.css ===== */
 
 /* Header */
 .header {
@@ -41,7 +28,7 @@ mat-card.table-card {
   padding: 16px;
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  background: #fff;
+  background: var(--bg-card);
   position: relative;
   z-index: 1;
   box-shadow: var(--shadow-soft);
@@ -89,7 +76,7 @@ mat-card.table-card {
 /* Células da tabela */
 ::ng-deep .tipos-table .mat-mdc-cell {
   padding: 16px 12px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-color);
   font-size: 14px;
 }
 
@@ -135,7 +122,7 @@ mat-card.table-card {
 }
 
 .actions-cell button:nth-child(1):hover {
-  background: rgba(139, 92, 246, 0.12) !important;
+  background: color-mix(in srgb, var(--secondary-color) 12%, transparent) !important;
 }
 
 .actions-cell button:nth-child(2):hover {

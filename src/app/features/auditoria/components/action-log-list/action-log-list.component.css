@@ -1,0 +1,136 @@
+.action-log-container {
+  padding: 24px;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+.action-log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.action-log-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.filters-card {
+  margin-bottom: 24px;
+}
+
+.filters-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.filters-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.table-card {
+  background: var(--bg-card);
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  gap: 16px;
+}
+
+.table-container {
+  padding: 0 24px 24px;
+}
+
+.action-log-table {
+  width: 100%;
+}
+
+.description-text,
+.endpoint-text,
+.error-text {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+}
+
+.error-text {
+  color: var(--error-color);
+}
+
+.error-row {
+  background-color: rgba(239, 68, 68, 0.05); /* Usa rgba com var(--error-color) seria ideal, mas rgba precisa de valores numéricos */
+}
+
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  gap: 12px;
+}
+
+.no-data mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: var(--text-light);
+}
+
+.no-data p {
+  font-size: 18px;
+  color: var(--text-medium);
+  margin: 0;
+}
+
+/* Status badges */
+::ng-deep .status-success {
+  background-color: var(--success-color) !important;
+  color: white !important;
+}
+
+::ng-deep .status-error {
+  background-color: var(--error-color) !important;
+  color: white !important;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .action-log-container {
+    padding: 16px;
+  }
+
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filters-actions {
+    flex-direction: column;
+  }
+
+  .filters-actions button {
+    width: 100%;
+  }
+}
+

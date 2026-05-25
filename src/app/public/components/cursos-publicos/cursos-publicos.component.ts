@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
@@ -16,10 +16,16 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatRippleModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
 
 // Services
 import { PublicApiService } from '../../services/public-api.service';
 import { PublicNavigationService } from '../../services/public-navigation.service';
+import { UnidadeAcademica } from '../../../features/unidades-academicas/models/unidade-academica.model';
+import { Curso } from '../../../features/cursos/models/curso.model';
+
+// Components
+import { PublicHeaderComponent } from '../shared/public-header/public-header.component';
 
 @Component({
   selector: 'acadmanage-lista-cursos-publica',
@@ -27,6 +33,7 @@ import { PublicNavigationService } from '../../services/public-navigation.servic
   imports: [
     CommonModule,
     FormsModule,
+    RouterModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
@@ -36,7 +43,9 @@ import { PublicNavigationService } from '../../services/public-navigation.servic
     MatPaginatorModule,
     MatChipsModule,
     MatDividerModule,
-    MatRippleModule
+    MatRippleModule,
+    MatSelectModule,
+    PublicHeaderComponent
   ],
   templateUrl: './cursos-publicos.component.html',
   styleUrl: './cursos-publicos.component.css'
@@ -44,6 +53,7 @@ import { PublicNavigationService } from '../../services/public-navigation.servic
 export class CursosPublicosComponent implements OnInit, OnDestroy {
   cursos: any[] = [];
   isLoading = false;
+  isLoadingUnidades = false;
 
   // Paginação
   totalElements = 0;
@@ -54,6 +64,9 @@ export class CursosPublicosComponent implements OnInit, OnDestroy {
   // Busca
   searchTerm = '';
   private searchSubject = new Subject<string>();
+  unidadesAcademicas: UnidadeAcademica[] = [];
+  filtroUnidadeId: number | null = null;
+  private readonly defaultCourseImage = '/imagens/curso-header.png';
 
   constructor(
     private publicApiService: PublicApiService,
@@ -64,6 +77,7 @@ export class CursosPublicosComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.setupSearchDebounce();
     this.loadCursos();
+    this.loadUnidades();
   }
 
   ngOnDestroy(): void {
@@ -76,8 +90,7 @@ export class CursosPublicosComponent implements OnInit, OnDestroy {
       debounceTime(400),
       distinctUntilChanged()
     ).subscribe(searchTerm => {
-      console.log('🔍 Buscando cursos com:', searchTerm);
-      this.pageIndex = 0;
+            this.pageIndex = 0;
       this.loadCursos();
     });
   }
@@ -86,33 +99,28 @@ export class CursosPublicosComponent implements OnInit, OnDestroy {
   loadCursos(): void {
     this.isLoading = true;
 
-    console.log('📚 Carregando cursos públicos:', {
-      pagina: this.pageIndex + 1,
-      tamanho: this.pageSize,
-      busca: this.searchTerm || 'todos',
-      apenasAtivos: true
-    });
-
-    this.publicApiService.getCursosPublicos(this.pageIndex, this.pageSize, this.searchTerm).subscribe({
+    
+    this.publicApiService.getCursosPublicos(
+      this.pageIndex,
+      this.pageSize,
+      this.searchTerm,
+      this.filtroUnidadeId ?? undefined
+    ).subscribe({
       next: (page) => {
         // Tratar resposta vazia (204 No Content)
         if (!page) {
           this.cursos = [];
           this.totalElements = 0;
           this.isLoading = false;
-          console.log('📭 Nenhum curso encontrado');
-          return;
+                    return;
         }
 
         this.cursos = page.content || [];
         this.totalElements = page.totalElements || 0;
         this.isLoading = false;
+        this.populateUnidadesFromCursos(this.cursos);
 
-        console.log('✅ Cursos carregados:', {
-          exibindo: this.cursos.length,
-          total: this.totalElements
-        });
-      },
+              },
       error: (error) => {
         console.error('❌ Erro ao carregar cursos:', error);
         this.cursos = [];
@@ -136,8 +144,21 @@ export class CursosPublicosComponent implements OnInit, OnDestroy {
   }
 
   // Limpar busca
-  clearSearch(): void {
+  clearSearchText(): void {
+    if (!this.searchTerm) {
+      return;
+    }
     this.searchTerm = '';
+    this.pageIndex = 0;
+    this.loadCursos();
+  }
+
+  clearAllFilters(): void {
+    if (!this.hasActiveFilters()) {
+      return;
+    }
+    this.searchTerm = '';
+    this.filtroUnidadeId = null;
     this.pageIndex = 0;
     this.loadCursos();
   }
@@ -154,8 +175,7 @@ export class CursosPublicosComponent implements OnInit, OnDestroy {
 
   // Navegar para atividades públicas do curso
   viewCurso(curso: any): void {
-    console.log('👁️ Visualizando atividades do curso:', curso);
-    this.publicNavigationService.navigateToAtividadesPublicas(curso.id, curso.nome);
+        this.publicNavigationService.navigateToAtividadesPublicas(curso.id, curso.nome);
   }
 
   // Obter URL completa da imagem
@@ -163,15 +183,91 @@ export class CursosPublicosComponent implements OnInit, OnDestroy {
     return this.publicApiService.getCursoImageUrl(fotoCapa);
   }
 
+  getCursoCardImage(curso: Curso | any): string {
+    const caminho = curso?.fotoCapa || curso?.imagemCapa;
+    if (caminho) {
+      return this.publicApiService.getCursoImageUrl(caminho);
+    }
+    return this.defaultCourseImage;
+  }
+
   // Tratamento de erro de imagem
   onImageError(event: any): void {
-    console.log('⚠️ Erro ao carregar imagem do curso, usando gradiente padrão');
-    // Remove o elemento img para mostrar o gradiente de fundo
-    event.target.style.display = 'none';
+    if (event?.target) {
+      event.target.onerror = null;
+      event.target.src = this.defaultCourseImage;
+      event.target.style.display = 'block';
+    }
   }
 
   getTipoNome(curso: any): string {
     return curso?.tipo?.nome || curso?.tipoNome || '';
+  }
+
+  onUnidadeChange(id: number | null): void {
+    this.filtroUnidadeId = id ?? null;
+    this.pageIndex = 0;
+    this.loadCursos();
+  }
+
+  private loadUnidades(): void {
+    this.isLoadingUnidades = true;
+    this.publicApiService.getUnidadesAcademicasList(undefined, 100).subscribe({
+      next: (list) => {
+        this.unidadesAcademicas = list || [];
+        this.isLoadingUnidades = false;
+      },
+      error: (error) => {
+        console.error('❌ Erro ao carregar unidades acadêmicas públicas:', error);
+        this.unidadesAcademicas = [];
+        this.isLoadingUnidades = false;
+        this.populateUnidadesFromCursos(this.cursos);
+      }
+    });
+  }
+
+  private populateUnidadesFromCursos(cursos: Curso[]): void {
+    if (!Array.isArray(cursos) || cursos.length === 0) {
+      return;
+    }
+
+    const mapa = new Map<number, UnidadeAcademica>();
+    cursos.forEach(curso => {
+      const unidade = (curso as any)?.unidadeAcademica as UnidadeAcademica | undefined;
+      const unidadeId = (curso as any)?.unidadeAcademicaId ?? unidade?.id;
+      const unidadeNome =
+        unidade?.nome ??
+        (curso as any)?.unidadeAcademicaNome ??
+        (curso as any)?.unidadeNome ??
+        null;
+
+      if (unidadeId && unidadeNome) {
+        mapa.set(unidadeId, { id: unidadeId, nome: unidadeNome });
+      }
+    });
+
+    if (mapa.size > 0) {
+      const derivadas = Array.from(mapa.values()).sort((a, b) => a.nome.localeCompare(b.nome));
+      const idsExistentes = new Set(this.unidadesAcademicas.map(u => u.id));
+      let alterou = false;
+      derivadas.forEach(unidade => {
+        if (!idsExistentes.has(unidade.id)) {
+          this.unidadesAcademicas.push(unidade);
+          alterou = true;
+        }
+      });
+
+      if (alterou) {
+        this.unidadesAcademicas.sort((a, b) => a.nome.localeCompare(b.nome));
+      }
+    }
+  }
+
+  hasActiveFilters(): boolean {
+    return Boolean(
+      (this.searchTerm && this.searchTerm.trim().length > 0) ||
+      this.filtroUnidadeId !== null
+    );
   }
 }
 

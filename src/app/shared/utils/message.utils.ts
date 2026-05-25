@@ -31,13 +31,33 @@ export function extractApiMessage(error: HttpErrorResponse | any): string | null
     return null;
   };
 
+  const fromObjectValues = (input: any): string | null => {
+    if (!input || typeof input !== 'object' || Array.isArray(input)) return null;
+    for (const value of Object.values(input)) {
+      const direct = sanitize(value);
+      if (direct) return direct;
+      if (Array.isArray(value)) {
+        const fromArray = fromErrorsArray(value);
+        if (fromArray) return fromArray;
+      }
+    }
+    return null;
+  };
+
   const tryExtractFromObject = (obj: any): string | null => {
     if (!obj || typeof obj !== 'object') return null;
 
     const direct = sanitize(obj.message) || sanitize(obj.mensagem) || sanitize(obj.detail) || sanitize(obj.detalhe) || sanitize(obj.descricao);
     if (direct) return direct;
 
-    const fromErrors = fromErrorsArray(obj.errors) || fromErrorsArray(obj.erros) || fromErrorsArray(obj.mensagens);
+    const fromErrors =
+      fromErrorsArray(obj.details) ||
+      fromErrorsArray(obj.detalhes) ||
+      fromErrorsArray(obj.errors) ||
+      fromErrorsArray(obj.erros) ||
+      fromErrorsArray(obj.mensagens) ||
+      fromObjectValues(obj.fieldErrors) ||
+      fromObjectValues(obj.validationErrors);
     if (fromErrors) return fromErrors;
 
     if (obj.error && obj.error !== obj) {

@@ -17,6 +17,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatOptionSelectionChange } from '@angular/material/core';
 
 // Services
 import { CursosService } from '../../services/cursos.service';
@@ -51,7 +53,8 @@ export interface PermissaoCurso {
     MatDividerModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatAutocompleteModule
   ],
   templateUrl: './permissoes-curso-form.component.html',
   styleUrl: './permissoes-curso-form.component.css'
@@ -62,6 +65,8 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
 
   permissoes: PermissaoCurso[] = [];
   usuarios: any[] = [];
+  availableUsers: any[] = [];
+  filteredUsuarios: any[] = [];
   usuarioSelecionado: number | null = null;
   usuarioFiltro = '';
   isLoading = true;
@@ -69,6 +74,7 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
   isAdding = false;
   errorMessage = '';
   private userSearchSubject = new Subject<string>();
+  private skipUserSearch = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -98,7 +104,6 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
       debounceTime(400),
       distinctUntilChanged()
     ).subscribe(term => {
-      this.usuarioFiltro = term;
       this.loadUsers(term);
     });
   }
@@ -111,10 +116,14 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
       next: (permissoes) => {
         this.permissoes = permissoes;
         this.isLoading = false;
+        this.refreshAvailableUsers();
+        this.updateFilteredUsuarios();
       },
       error: (error) => {
         this.errorMessage = extractApiMessage(error) || 'Erro ao carregar permissões do curso. Tente novamente.';
         this.isLoading = false;
+        this.refreshAvailableUsers();
+        this.updateFilteredUsuarios();
       }
     });
   }
@@ -132,26 +141,21 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
 
     this.usuariosService.getAllUsersPaginado(pageRequest, term).subscribe({
       next: (page) => {
-        console.log('📦 Resposta recebida:', page);
-        console.log('📦 Conteúdo (page.content):', page.content);
-        console.log('📦 Total de elementos:', page.totalElements);
-
+                        
         // Garantir que sempre seja um array
         this.usuarios = Array.isArray(page.content) ? page.content : [];
         this.isLoadingUsers = false;
+        this.refreshAvailableUsers();
+        this.updateFilteredUsuarios();
 
-        console.log('✅ Usuários carregados:', this.usuarios.length);
-        if (this.usuarios.length > 0) {
-          console.log('✅ Primeiro usuário:', this.usuarios[0]);
-        }
+                if (this.usuarios.length > 0) {
+                  }
       },
       error: (error) => {
         console.error('❌ ERRO ao carregar usuários:');
         console.error('❌ Status:', error.status);
         console.error('❌ StatusText:', error.statusText);
         console.error('❌ Message:', error.message);
-        console.error('❌ Error body:', error.error);
-
         // Mostrar mensagem de erro ao usuário
         if (error.status === 403 || error.status === 401) {
           this.showMessage('Você não tem permissão para visualizar a lista de usuários.', 'error');
@@ -161,54 +165,33 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
 
         this.usuarios = []; // Garantir que seja um array mesmo em caso de erro
         this.isLoadingUsers = false;
+        this.refreshAvailableUsers();
+        this.updateFilteredUsuarios();
       }
     });
   }
 
   getAvailableUsers(): any[] {
-    // Se ainda está carregando usuários, retornar array vazio
-    if (this.isLoadingUsers) {
-      return [];
-    }
-
-    // Verificar se this.usuarios é um array antes de usar filter
-    if (!Array.isArray(this.usuarios)) {
-      console.error('❌ this.usuarios não é um array!', this.usuarios);
-      return [];
-    }
-
-    const usuariosComPermissao = this.permissoes.map(p => p.usuarioId);
-    const availableUsers = this.usuarios.filter(u => !usuariosComPermissao.includes(u.id));
-
-    console.log('📋 Total de usuários:', this.usuarios.length);
-    console.log('📋 Usuários com permissão:', usuariosComPermissao);
-    console.log('📋 Usuários disponíveis:', availableUsers.length);
-
-    return availableUsers;
+    return this.availableUsers;
   }
 
   addUserToCourse(): void {
-    console.log('🔵 addUserToCourse() chamado');
-    console.log('🔵 usuarioSelecionado:', this.usuarioSelecionado);
-    console.log('🔵 cursoId:', this.cursoId);
-
+            
     if (!this.usuarioSelecionado) {
-      console.log('⚠️ Nenhum usuário selecionado');
-      this.showMessage('Selecione um usuário para adicionar', 'warning');
+            this.showMessage('Selecione um usuário para adicionar', 'warning');
       return;
     }
 
-    console.log('🔵 Iniciando adição de usuário...');
-    this.isAdding = true;
+        this.isAdding = true;
 
     this.cursosService.addUserToCourse(this.cursoId, this.usuarioSelecionado).subscribe({
       next: (permissoes) => {
-        console.log('✅ Usuário adicionado com sucesso!');
-        console.log('✅ Permissões recebidas:', permissoes);
-        console.log('✅ Tipo das permissões:', typeof permissoes);
-        console.log('✅ É array?', Array.isArray(permissoes));
-
+                                
         this.permissoes = permissoes;
+        this.refreshAvailableUsers();
+        this.skipUserSearch = true;
+        this.usuarioFiltro = '';
+        this.updateFilteredUsuarios();
         this.usuarioSelecionado = null;
         this.isAdding = false;
         this.showMessage('Usuário adicionado ao curso com sucesso!', 'success');
@@ -217,7 +200,6 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
         console.error('❌ Erro ao adicionar usuário:', error);
         console.error('❌ Status:', error.status);
         console.error('❌ Error message:', error.message);
-        console.error('❌ Error body:', error.error);
 
         const errorMessage = extractApiMessage(error) || 'Erro ao adicionar usuário ao curso. Tente novamente.';
         this.showMessage(errorMessage, 'error');
@@ -227,6 +209,12 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
   }
 
   onUserSearchChange(term: string): void {
+    if (this.skipUserSearch) {
+      this.skipUserSearch = false;
+      return;
+    }
+    this.usuarioFiltro = term;
+    this.updateFilteredUsuarios();
     this.userSearchSubject.next(term);
   }
 
@@ -252,6 +240,8 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
     this.cursosService.removeUserFromCourse(this.cursoId, usuarioId).subscribe({
       next: (permissoes) => {
         this.permissoes = [...permissoes];
+        this.refreshAvailableUsers();
+        this.updateFilteredUsuarios();
         this.showMessage(`Usuário "${usuarioNome}" removido do curso com sucesso!`, 'success');
       },
       error: (error) => {
@@ -301,7 +291,7 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
   }
 
   back(): void {
-    this.router.navigate(['/cursos']);
+    this.router.navigate(['/admin/cursos']);
   }
 
   private showMessage(message: string, type: 'success' | 'error' | 'warning'): void {
@@ -324,13 +314,49 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
   getRoleColor(role: string): string {
     const roleUpper = role.toUpperCase();
     if (roleUpper.includes('ADMINISTRADOR')) {
-      return 'error';
+      return 'warn'; // Usa mat-warn -> --primary-color
     } else if (roleUpper.includes('GERENTE')) {
-      return 'success';
+      return 'primary'; // Usa mat-primary -> --secondary-color
     } else if (roleUpper.includes('SECRETARIO')) {
-      return 'warn';
+      return 'accent'; // Usa mat-accent -> --accent-color
+    } else if (roleUpper.includes('COORDENADOR_ATIVIDADE') || roleUpper.includes('COORDENADOR ATIVIDADE')) {
+      return ''; // Retorna vazio para usar classe CSS customizada
     }
     return '';
+  }
+
+  isCoordenadorAtividade(role: string): boolean {
+    const roleUpper = role.toUpperCase();
+    return roleUpper.includes('COORDENADOR_ATIVIDADE') || roleUpper.includes('COORDENADOR ATIVIDADE');
+  }
+
+  isAdministrador(role: string): boolean {
+    const roleUpper = role.toUpperCase();
+    return roleUpper.includes('ADMINISTRADOR');
+  }
+
+  isGerente(role: string): boolean {
+    const roleUpper = role.toUpperCase();
+    return roleUpper.includes('GERENTE');
+  }
+
+  isSecretario(role: string): boolean {
+    const roleUpper = role.toUpperCase();
+    return roleUpper.includes('SECRETARIO');
+  }
+
+  getRoleTooltipClass(role: string): string {
+    const roleUpper = role.toUpperCase();
+    if (roleUpper.includes('ADMINISTRADOR')) {
+      return 'administrador';
+    } else if (roleUpper.includes('GERENTE')) {
+      return 'gerente';
+    } else if (roleUpper.includes('SECRETARIO')) {
+      return 'secretario';
+    } else if (roleUpper.includes('COORDENADOR_ATIVIDADE') || roleUpper.includes('COORDENADOR ATIVIDADE')) {
+      return 'coordenador-atividade';
+    }
+    return 'default';
   }
 
   getRoleIcon(role: string): string {
@@ -341,8 +367,48 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
       return 'manage_accounts';
     } else if (roleUpper.includes('SECRETARIO')) {
       return 'assignment_ind';
+    } else if (roleUpper.includes('COORDENADOR_ATIVIDADE') || roleUpper.includes('COORDENADOR ATIVIDADE')) {
+      return 'event_note';
     }
     return 'person';
+  }
+
+  onUsuarioAutoOptionSelected(event: MatOptionSelectionChange, user: any): void {
+    if (!event.isUserInput || !user) {
+      return;
+    }
+    this.skipUserSearch = true;
+    this.usuarioFiltro = user.nome || user.name || user.email || '';
+    this.usuarioSelecionado = user.id;
+    this.updateFilteredUsuarios();
+  }
+
+  private refreshAvailableUsers(): void {
+    if (!Array.isArray(this.usuarios)) {
+      this.availableUsers = [];
+      return;
+    }
+    const usuariosComPermissao = this.permissoes.map(p => p.usuarioId);
+    this.availableUsers = this.usuarios.filter(u => !usuariosComPermissao.includes(u.id));
+  }
+
+  private updateFilteredUsuarios(): void {
+    const filtro = (this.usuarioFiltro || '').trim().toLowerCase();
+    if (!filtro) {
+      this.filteredUsuarios = [...this.availableUsers];
+      return;
+    }
+    this.filteredUsuarios = this.availableUsers.filter(u => this.matchesUsuarioFiltro(u, filtro));
+  }
+
+  private matchesUsuarioFiltro(usuario: any, filtro: string): boolean {
+    const campos = [
+      usuario?.nome,
+      usuario?.name,
+      usuario?.email,
+      usuario?.cpf
+    ];
+    return campos.some(campo => typeof campo === 'string' && campo.toLowerCase().includes(filtro));
   }
 }
 

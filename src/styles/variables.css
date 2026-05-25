@@ -3,10 +3,68 @@
    ============================================ */
 
 :root {
+  /* ============================================
+     VARIÁVEIS DO MATERIAL DESIGN SYSTEM
+     (Angular Material v15+ usa estas variáveis)
+     ============================================ */
+  
+  /* Primary Colors */
+  --md-sys-color-primary: #3B82F6;
+  --md-sys-color-on-primary: #FFFFFF;
+  --md-sys-color-primary-container: #E3F2FD;
+  --md-sys-color-on-primary-container: #0D47A1;
+  
+  /* Secondary Colors */
+  --md-sys-color-secondary: #8B5CF6;
+  --md-sys-color-on-secondary: #FFFFFF;
+  --md-sys-color-secondary-container: #F3E5F5;
+  --md-sys-color-on-secondary-container: #4A148C;
+  
+  /* Tertiary/Accent Colors */
+  --md-sys-color-tertiary: #6366F1;
+  --md-sys-color-on-tertiary: #FFFFFF;
+  --md-sys-color-tertiary-container: #E8EAF6;
+  --md-sys-color-on-tertiary-container: #1A237E;
+  
+  /* Error Colors */
+  --md-sys-color-error: #EF4444;
+  --md-sys-color-on-error: #FFFFFF;
+  --md-sys-color-error-container: #FFEBEE;
+  --md-sys-color-on-error-container: #B71C1C;
+  
+  /* Surface Colors */
+  --md-sys-color-surface: #FFFFFF;
+  --md-sys-color-on-surface: #1E293B;
+  --md-sys-color-surface-variant: #FFFFFF;
+  --md-sys-color-on-surface-variant: #475569;
+  
+  /* Background Colors */
+  --md-sys-color-background: #F8FAF9;
+  --md-sys-color-on-background: #1E293B;
+  
+  /* Outline Colors */
+  --md-sys-color-outline: #CBD5E1;
+  --md-sys-color-outline-variant: #E2E8F0;
+  
+  /* Shadow Colors */
+  --md-sys-color-shadow: rgba(0, 0, 0, 0.1);
+  --md-sys-color-scrim: rgba(0, 0, 0, 0.6);
+  
+  /* Inverse Colors */
+  --md-sys-color-inverse-surface: #1E293B;
+  --md-sys-color-inverse-on-surface: #FFFFFF;
+  --md-sys-color-inverse-primary: #90CAF9;
+  
+  /* ============================================
+     VARIÁVEIS CUSTOMIZADAS DO PROJETO
+     (Mantidas para compatibilidade)
+     ============================================ */
+  
   /* Cores Primárias */
   --primary-color: #3B82F6;           /* Azul principal */
   --secondary-color: #8B5CF6;         /* Lilás suave */
   --accent-color: #6366F1;            /* Azul-violeta */
+  --accent-color-light: #A78BFA;      /* Lilás claro */
 
   /* Backgrounds */
   --bg-dark: #F8FAFC;                 /* Fundo principal (branco levemente azulado) */
@@ -17,10 +75,11 @@
   --bg-hover: rgba(59, 130, 246, 0.1); /* Hover sutil */
 
   /* Texto */
-  --text-primary: #0F172A;            /* Texto principal (azul-acinzentado) */
+  --text-primary: #1E293B;            /* Texto principal (azul-acinzentado) */
   --text-secondary: #475569;          /* Texto secundário (cinza frio) */
   --text-dark: #0F172A;               /* Texto em fundo claro */
   --text-medium: #64748B;             /* Cinza médio */
+  --text-light: #94A3B8;              /* Texto em estados desativados/descrições */
 
   /* Bordas */
   --border-color: #CBD5E1;            /* Bordas/linhas (cinza claro) */
@@ -38,7 +97,7 @@
   --chip-text-color: #1e293b;
 
   /* Estados */
-  --success-color: #10B981;           /* Verde esmeralda */
+  --success-color: #22C55E;           /* Verde esmeralda */
   --error-color: #EF4444;             /* Vermelho consistente */
   --warning-color: #F59E0B;           /* Laranja quente */
   --info-color: #3B82F6;              /* Azul principal */
@@ -73,7 +132,7 @@
   --spacing-2xl: 48px;
 
   /* Tipografia */
-  --font-family-base: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  --font-family-base: 'Roboto', Arial, sans-serif;
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
@@ -98,6 +157,14 @@
   --page-max-width-wide: 1400px;
   --card-max-width: 960px;
   --card-max-width-narrow: 640px;
+
+  /* Breakpoints Responsivos */
+  --breakpoint-xs: 480px;   /* Mobile pequeno */
+  --breakpoint-sm: 600px;   /* Mobile */
+  --breakpoint-md: 768px;   /* Tablet */
+  --breakpoint-lg: 1024px;  /* Desktop pequeno */
+  --breakpoint-xl: 1200px;  /* Desktop */
+  --breakpoint-2xl: 1400px; /* Desktop grande */
 }
 
 /* ============================================
@@ -332,12 +399,30 @@
   font-weight: var(--font-weight-medium) !important;
   border-radius: var(--border-radius-md);
   padding: 0 var(--spacing-md) !important;
+  min-height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: var(--spacing-sm) !important;
 }
 
 .btn-cancel:hover:not([disabled]) {
   background-color: var(--bg-hover) !important;
   color: var(--text-dark) !important;
   border-color: var(--text-medium) !important;
+}
+
+/* Padronizar altura de botões de ação (Cancelar, Limpar, etc.) */
+mat-card-actions button[mat-stroked-button],
+mat-card-actions button[mat-button],
+.cancel-button,
+button[mat-stroked-button].cancel-button,
+button[mat-button]:has(mat-icon:contains('close')) {
+  min-height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: var(--spacing-sm) !important;
 }
 
 /* Estados globais */

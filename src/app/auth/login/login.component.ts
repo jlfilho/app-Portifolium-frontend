@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 
 // Angular Material
 import { MatButtonModule } from '@angular/material/button';
@@ -10,8 +10,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { ApiService } from './../../shared/api.service';
+import { RecuperarSenhaDialogComponent } from '../components/recuperar-senha-dialog/recuperar-senha-dialog.component';
 
 @Component({
   selector: 'acadmanage-login',
@@ -19,12 +21,14 @@ import { ApiService } from './../../shared/api.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    RouterModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
     MatIconModule,
     MatCardModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatDialogModule
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
@@ -41,7 +45,8 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private apiService: ApiService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private dialog: MatDialog
   ) {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
@@ -67,12 +72,10 @@ export class LoginComponent implements OnInit {
       this.isLoading = true;
       this.errorMessage = '';
 
-      console.log('🔐 Tentando fazer login com:', username);
-
+      
       this.apiService.login(username, password).subscribe({
         next: () => {
-          console.log('✅ Login bem-sucedido, redirecionando...');
-          this.router.navigate(['/dashboard']);
+                    this.router.navigate(['/admin']);
         },
         error: (err) => {
           console.error('❌ Erro no login:', err);
@@ -83,7 +86,17 @@ export class LoginComponent implements OnInit {
     }
   }
 
+  abrirRecuperarSenha(): void {
+    const dialogRef = this.dialog.open(RecuperarSenhaDialogComponent, {
+      width: '500px',
+      maxWidth: '90vw'
+    });
 
-
-
+    dialogRef.afterClosed().subscribe((senhaRedefinida) => {
+      if (senhaRedefinida) {
+        // Opcional: mostrar mensagem de sucesso ou limpar formulário
+        this.errorMessage = '';
+      }
+    });
+  }
 }

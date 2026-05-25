@@ -48,7 +48,7 @@ export interface SimpleConfirmDialogData {
       margin: 0 0 16px 0;
       font-size: 20px;
       font-weight: 500;
-      color: #0F172A;
+      color: var(--text-dark);
     }
 
     mat-dialog-content {
@@ -58,7 +58,7 @@ export interface SimpleConfirmDialogData {
     mat-dialog-content p {
       margin: 0;
       font-size: 16px;
-      color: #475569;
+      color: var(--text-medium);
       line-height: 1.5;
     }
 

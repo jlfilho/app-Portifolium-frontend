@@ -1,0 +1,118 @@
+<div class="perfil-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>person</mat-icon>
+      Meu Perfil
+    </h2>
+    <button mat-icon-button (click)="onClose()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+      <p>Carregando dados do usuário...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="error-container">
+      <mat-icon class="error-icon">error_outline</mat-icon>
+      <p>{{ error }}</p>
+    </div>
+
+    <!-- User Data -->
+    <div *ngIf="!loading && !error && usuario" class="user-data">
+      <mat-card class="profile-card">
+        <mat-card-content>
+          <!-- Informações Pessoais -->
+          <div class="section">
+            <h3 class="section-title">
+              <mat-icon>person</mat-icon>
+              Informações Pessoais
+            </h3>
+            <div class="field-group">
+              <div class="field">
+                <label class="field-label">Nome</label>
+                <div class="field-value">{{ usuario.nome || 'Não informado' }}</div>
+              </div>
+              <div class="field">
+                <label class="field-label">CPF</label>
+                <div class="field-value">{{ formatarCPF(usuario.cpf) || 'Não informado' }}</div>
+              </div>
+              <div class="field">
+                <label class="field-label">E-mail</label>
+                <div class="field-value">{{ usuario.email || 'Não informado' }}</div>
+              </div>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <!-- Informações de Acesso -->
+          <div class="section">
+            <h3 class="section-title">
+              <mat-icon>security</mat-icon>
+              Informações de Acesso
+            </h3>
+            <div class="field-group">
+              <div class="field">
+                <label class="field-label">ID do Usuário</label>
+                <div class="field-value">#{{ usuario.id }}</div>
+              </div>
+              <div class="field">
+                <label class="field-label">Perfil</label>
+                <div class="field-value">
+                  <mat-chip 
+                    [color]="getRoleColor(usuario.role)" 
+                    [class.coordenador-atividade]="isCoordenadorAtividade(usuario.role)"
+                    class="role-chip">
+                    {{ getRoleLabel(usuario.role) }}
+                  </mat-chip>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <mat-divider *ngIf="usuario.cursos && usuario.cursos.length > 0"></mat-divider>
+
+          <!-- Cursos Associados -->
+          <div class="section" *ngIf="usuario.cursos && usuario.cursos.length > 0">
+            <h3 class="section-title">
+              <mat-icon>school</mat-icon>
+              Cursos Associados
+            </h3>
+            <div class="cursos-list">
+              <div *ngFor="let curso of usuario.cursos" class="curso-item">
+                <mat-icon class="curso-icon">school</mat-icon>
+                <span class="curso-nome">{{ curso.nome }}</span>
+                <mat-chip class="status-chip" [class.active]="curso.ativo" [class.inactive]="!curso.ativo">
+                  {{ curso.ativo ? 'Ativo' : 'Inativo' }}
+                </mat-chip>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sem cursos -->
+          <div *ngIf="!usuario.cursos || usuario.cursos.length === 0" class="no-cursos">
+            <mat-icon>info</mat-icon>
+            <p>Nenhum curso associado</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onClose()">
+      <mat-icon>close</mat-icon>
+      Fechar
+    </button>
+    <button mat-raised-button color="primary" (click)="abrirEdicao()" [disabled]="!usuario || loading">
+      <mat-icon>edit</mat-icon>
+      Editar
+    </button>
+  </mat-dialog-actions>
+</div>
+

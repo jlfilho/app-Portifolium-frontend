@@ -18,7 +18,10 @@ import { MatDialog } from '@angular/material/dialog';
 
 // Services
 import { ApiService } from './../../shared/api.service';
-import { TestDialogComponent } from '../../shared/components/test-dialog/test-dialog.component';
+import { PerfilUsuarioDialogComponent } from '../../shared/components/perfil-usuario-dialog/perfil-usuario-dialog.component';
+import { PessoasService } from '../../features/pessoas/services/pessoas.service';
+import { Pessoa } from '../../features/pessoas/models/pessoa.model';
+import { UsuariosService } from '../../features/usuarios/services/usuarios.service';
 
 @Component({
   selector: 'acadmanage-home',
@@ -51,7 +54,9 @@ export class HomeComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private pessoasService: PessoasService,
+    private usuariosService: UsuariosService
   ) {}
 
   ngOnInit(): void {
@@ -62,27 +67,90 @@ export class HomeComponent implements OnInit {
    * Carrega informações do usuário do token JWT
    */
   loadUserInfo(): void {
-    console.log('📊 Carregando informações do usuário do token...');
-
+    
     const userInfo = this.apiService.getUserInfoFromToken();
 
     if (userInfo) {
-      console.log('✅ Informações extraídas do token:', userInfo);
-
+      
       // Atualizar propriedades do componente
-      this.userName = userInfo.name || userInfo.username || 'Usuário';
-      this.userEmail = userInfo.email;
+      this.userEmail = userInfo.email || userInfo.username || '';
       this.userAuthorities = userInfo.authorities;
 
-      console.log('👤 Nome do usuário:', this.userName);
-      console.log('📧 Email do usuário:', this.userEmail);
-      console.log('🔐 Permissões:', this.userAuthorities);
-    } else {
+      // Verificar se o token tem o nome
+      const nameFromToken = userInfo.name?.trim();
+      const hasName = !!nameFromToken;
+
+      if (hasName && nameFromToken) {
+        // Se o token tem o nome, usar diretamente
+        this.userName = nameFromToken;
+              } else {
+        // Se não tem nome no token, inicializar com placeholder e buscar
+        this.userName = 'Carregando...';
+        
+        // Priorizar busca por pessoaId, depois por email
+        if (userInfo.pessoaId) {
+          this.fetchPessoaNome(userInfo.pessoaId);
+        } else if (this.userEmail) {
+          // Buscar por email (funciona para todos os usuários)
+          this.fetchUsuarioNomePorEmail(this.userEmail);
+        } else {
+          // Fallback final se não conseguir buscar
+          this.userName = 'Usuário';
+        }
+      }
+
+                } else {
       console.warn('⚠️ Não foi possível extrair informações do token');
       // Manter valores padrão
       this.userName = 'Usuário';
       this.userEmail = '';
     }
+  }
+
+  private fetchPessoaNome(pessoaId: number): void {
+    this.pessoasService.getById(pessoaId).subscribe({
+      next: (pessoa: Pessoa) => {
+        const nome = pessoa?.nome?.trim();
+        if (nome) {
+          this.userName = nome;
+                  } else {
+          // Se não encontrou nome na pessoa, tentar buscar por email
+          if (this.userEmail) {
+            this.fetchUsuarioNomePorEmail(this.userEmail);
+          } else {
+            this.userName = 'Usuário';
+          }
+        }
+      },
+      error: (error) => {
+        console.warn('⚠️ Não foi possível carregar nome da pessoa pelo ID.', error);
+        // Se falhar, tentar buscar por email
+        if (this.userEmail) {
+          this.fetchUsuarioNomePorEmail(this.userEmail);
+        } else {
+          this.userName = 'Usuário';
+        }
+      }
+    });
+  }
+
+  private fetchUsuarioNomePorEmail(email: string): void {
+    this.usuariosService.getUserByEmail(email).subscribe({
+      next: (usuario) => {
+        const nome = usuario?.nome?.trim();
+        if (nome) {
+          this.userName = nome;
+                  } else {
+          // Se não encontrou nome, usar email como último recurso
+          this.userName = email.split('@')[0] || 'Usuário';
+        }
+      },
+      error: (error) => {
+        console.warn('⚠️ Não foi possível carregar nome do usuário pelo e-mail.', error);
+        // Como último recurso, usar parte do email antes do @
+        this.userName = email ? email.split('@')[0] : 'Usuário';
+      }
+    });
   }
 
   /**
@@ -97,6 +165,8 @@ export class HomeComponent implements OnInit {
       return 'Professor';
     } else if (this.userAuthorities.includes('ROLE_SECRETARIO')) {
       return 'Secretário';
+    } else if (this.userAuthorities.includes('ROLE_COORDENADOR_ATIVIDADE')) {
+      return 'Coordenador de Atividades';
     } else if (this.userAuthorities.includes('ROLE_ALUNO')) {
       return 'Aluno';
     }
@@ -104,27 +174,66 @@ export class HomeComponent implements OnInit {
   }
 
   /**
+   * Obtém a inicial do nome do usuário para o avatar
+   */
+  getUserInitial(): string {
+    if (this.userName && this.userName !== 'Usuário' && this.userName !== 'Carregando...') {
+      const names = this.userName.trim().split(' ');
+      if (names.length >= 2) {
+        return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+      }
+      return this.userName[0].toUpperCase();
+    }
+    return 'U';
+  }
+
+  /**
+   * Obtém a versão abreviada da role do usuário
+   */
+  getUserRoleShort(): string {
+    const role = this.getUserRole();
+    if (role.includes('Administrador')) return 'ADM';
+    if (role.includes('Gerente')) return 'GER';
+    if (role.includes('Secretário')) return 'SEC';
+    if (role.includes('Coordenador')) return 'COORD';
+    if (role.includes('Professor')) return 'PROF';
+    if (role.includes('Aluno')) return 'ALUNO';
+    return 'USR';
+  }
+
+  /**
    * Alterna estado da sidebar (expandida/colapsada)
    */
   toggleSidebar(): void {
     this.isCollapsed = !this.isCollapsed;
-    console.log('Sidebar:', this.isCollapsed ? 'Colapsada' : 'Expandida');
-  }
+      }
 
   /**
-   * Navega para a página de perfil
+   * Abre o diálogo de perfil do usuário
    */
   goToProfile(): void {
-    console.log('📱 Navegando para perfil do usuário');
-    this.router.navigate(['/perfil']);
+        
+    if (!this.userEmail) {
+      console.warn('⚠️ Email do usuário não disponível');
+      return;
+    }
+
+    this.dialog.open(PerfilUsuarioDialogComponent, {
+      width: '600px',
+      maxWidth: '90vw',
+      data: {
+        userEmail: this.userEmail
+      }
+    });
   }
 
   /**
-   * Navega para a página de configurações
+   * Verifica se usuário possui uma das roles administrativas (admin/gerente/secretário)
    */
-  goToSettings(): void {
-    console.log('⚙️ Navegando para configurações');
-    this.router.navigate(['/configuracoes']);
+  canManageUsers(): boolean {
+    return this.apiService.hasRole('ADMINISTRADOR') ||
+      this.apiService.hasRole('GERENTE') ||
+      this.apiService.hasRole('SECRETARIO');
   }
 
   /**
@@ -138,24 +247,8 @@ export class HomeComponent implements OnInit {
    * Realiza logout do usuário
    */
   logout(): void {
-    console.log('🚪 Efetuando logout...');
-    this.apiService.logout();
-    this.router.navigate(['/login']);
+        this.apiService.logout();
+    this.router.navigate(['/cursos-publicos']);
   }
 
-  /**
-   * Testa o diálogo para verificar se está funcionando
-   */
-  testDialog(): void {
-    console.log('🧪 Testando diálogo...');
-
-    const dialogRef = this.dialog.open(TestDialogComponent, {
-      width: '500px',
-      data: { message: 'Teste de diálogo' }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('📋 Resultado do diálogo:', result);
-    });
-  }
 }

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 
 // Angular Material
 import { MatCardModule } from '@angular/material/card';
@@ -24,9 +25,13 @@ import { firstValueFrom } from 'rxjs';
 // Services
 import { AtividadesService } from '../../services/atividades.service';
 import { CursosService } from '../../../cursos/services/cursos.service';
-import { AtividadeDTO, AtividadeFiltroDTO, Page } from '../../models/atividade.model';
-import { PageRequest } from '../../../../shared/models/page.model';
+import { CursosRelatoriosService } from '../../../cursos/services/cursos-relatorios.service';
+import { AtividadeDTO, AtividadeFiltroDTO, Page, PessoaPapelDTO } from '../../models/atividade.model';
 import { extractApiMessage } from '../../../../shared/utils/message.utils';
+import { ApiService } from '../../../../shared/api.service';
+import { RelatorioCursoDialogComponent } from '../../../cursos/components/relatorio-curso-dialog/relatorio-curso-dialog.component';
+import type { RelatorioCursoDialogResult } from '../../../cursos/components/relatorio-curso-dialog/relatorio-curso-dialog.component';
+import { EvidenciasService } from '../../../evidencias/services/evidencias.service';
 
 @Component({
   selector: 'acadmanage-lista-atividades',
@@ -60,6 +65,7 @@ export class ListaAtividadesComponent implements OnInit {
   atividades: AtividadeDTO[] = [];
   categorias: any[] = [];
   isLoading = true;
+  isGeneratingRelatorio = false;
   errorMessage = '';
   emptyMessage = 'Sem atividade cadastrada!';
 
@@ -84,13 +90,19 @@ export class ListaAtividadesComponent implements OnInit {
     { value: false, label: 'Não Publicado' }
   ];
 
+  private participantesCache = new Map<number, PessoaPapelDTO[]>();
+  private evidenciasCountCache = new Map<number, number>();
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     public atividadesService: AtividadesService,
     private cursosService: CursosService,
+    private readonly cursosRelatoriosService: CursosRelatoriosService,
+    private readonly apiService: ApiService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private evidenciasService: EvidenciasService
   ) {}
 
   ngOnInit(): void {
@@ -113,19 +125,13 @@ export class ListaAtividadesComponent implements OnInit {
     this.filtroDataInicio = treAnosAtras;
     this.filtroDataFim = hoje;
 
-    console.log('📅 Filtro padrão de data configurado:', {
-      dataInicio: this.formatarDataParaISO(treAnosAtras),
-      dataFim: this.formatarDataParaISO(hoje)
-    });
-  }
+      }
 
   loadCategorias(): void {
     this.cursosService.getAllCategoriesPaginado({ page: 0, size: 1000, sortBy: 'id', direction: 'ASC' }).subscribe({
       next: (page) => {
-        console.log('📚 Categorias carregadas:', page);
-        this.categorias = Array.isArray(page) ? page : (page?.content || []);
-        console.log('📚 Categorias array:', this.categorias);
-      },
+                this.categorias = Array.isArray(page) ? page : (page?.content || []);
+              },
       error: (error) => {
         console.error('❌ Erro ao carregar categorias:', error);
         this.categorias = [];
@@ -147,13 +153,10 @@ export class ListaAtividadesComponent implements OnInit {
       dataFim: this.filtroDataFim ? this.formatarDataParaISO(this.filtroDataFim) : undefined
     };
 
-    console.log('🔍 Carregando atividades com filtros:', filtros);
-    console.log('📄 Página:', this.pageIndex, 'Tamanho:', this.pageSize);
-
+        
     this.atividadesService.getAtividadesPorFiltros(filtros, this.pageIndex, this.pageSize).subscribe({
       next: (page: Page<AtividadeDTO> | null | undefined) => {
-        console.log('✅ Atividades carregadas:', page);
-
+        
         if (!page) {
           this.handleEmptyAtividades();
           return;
@@ -162,15 +165,13 @@ export class ListaAtividadesComponent implements OnInit {
         this.atividades = page.content || [];
         this.totalElements = page.totalElements || 0;
         this.isLoading = false;
+        this.complementarDadosDasAtividades();
 
         // Log detalhado das atividades para debug das fotos
-        console.log('📸 URLs das fotos de capa das atividades:');
-        this.atividades.forEach((atividade, index) => {
+                this.atividades.forEach((atividade, index) => {
           if (atividade.fotoCapa) {
-            console.log(`  ${index + 1}. ${atividade.nome}: ${this.getImageUrl(atividade.fotoCapa)}`);
-          } else {
-            console.log(`  ${index + 1}. ${atividade.nome}: Sem foto de capa`);
-          }
+                      } else {
+                      }
         });
 
         if (this.atividades.length === 0) {
@@ -184,8 +185,6 @@ export class ListaAtividadesComponent implements OnInit {
         console.error('❌ Status:', error?.status);
         console.error('❌ StatusText:', error?.statusText);
         console.error('❌ Message:', error?.message);
-        console.error('❌ Error completo:', JSON.stringify(error, null, 2));
-
         this.errorMessage = this.extractErrorMessage(error);
         this.atividades = [];
         this.totalElements = 0;
@@ -196,7 +195,7 @@ export class ListaAtividadesComponent implements OnInit {
   }
 
   aplicarFiltros(): void {
-    this.pageIndex = 0; // Resetar para primeira página
+    this.pageIndex = 0; // Resetar para primeira página ao aplicar filtros
     this.loadAtividades();
   }
 
@@ -221,13 +220,16 @@ export class ListaAtividadesComponent implements OnInit {
   }
 
   back(): void {
-    this.router.navigate(['/cursos']);
+    this.router.navigate(['/admin/cursos']);
   }
 
   novaAtividade(): void {
-    console.log('➕ Criando nova atividade para curso:', this.cursoId);
-    // Navegar para o formulário de criação
-    this.router.navigate(['/atividades/nova', this.cursoId], {
+    if (!this.podeCriarAtividade) {
+      this.showMessage('Você não tem permissão para criar atividades', 'warning');
+      return;
+    }
+        // Navegar para o formulário de criação
+    this.router.navigate(['/admin/atividades/nova', this.cursoId], {
       state: {
         cursoId: this.cursoId,
         cursoNome: this.cursoNome
@@ -236,10 +238,9 @@ export class ListaAtividadesComponent implements OnInit {
   }
 
   visualizarAtividade(atividade: AtividadeDTO): void {
-    console.log('👁️ Visualizando atividade:', atividade);
-
+    
     // Navegar para a página de visualização
-    this.router.navigate(['/atividades/visualizar', atividade.id], {
+    this.router.navigate(['/admin/atividades/visualizar', atividade.id], {
       state: {
         atividade: atividade,
         cursoId: this.cursoId,
@@ -253,10 +254,30 @@ export class ListaAtividadesComponent implements OnInit {
       console.warn('⚠️ Atividade inválida ao tentar editar:', atividade);
       return;
     }
-    this.router.navigate(['/atividades/editar', atividade.id], { state: { atividade, cursoNome: this.cursoNome } });
+    if (!this.podeEditarAtividade(atividade)) {
+      this.showMessage(
+        'Você não tem permissão para editar esta atividade. Apenas coordenadores da atividade podem editá-la.',
+        'warning'
+      );
+      return;
+    }
+    this.router.navigate(['/admin/atividades/editar', atividade.id], {
+      state: {
+        atividade,
+        cursoNome: this.cursoNome,
+        cursoId: this.cursoId
+      }
+    });
   }
 
   async confirmarExclusao(atividade: AtividadeDTO): Promise<void> {
+    if (!this.podeExcluirAtividade(atividade)) {
+      this.showMessage(
+        'Você não tem permissão para excluir esta atividade. Apenas coordenadores da atividade podem excluí-la.',
+        'warning'
+      );
+      return;
+    }
     const confirmado = await this.openConfirmDialog({
       title: 'Excluir Atividade',
       message: `Tem certeza que deseja excluir a atividade "${atividade?.nome}"? Essa ação não pode ser desfeita.`,
@@ -277,9 +298,16 @@ export class ListaAtividadesComponent implements OnInit {
         this.loadAtividades();
       },
       error: (error) => {
-        const apiMessage = extractApiMessage(error);
-        this.showMessage(apiMessage || 'Erro ao excluir atividade. Tente novamente.', 'error');
         this.isLoading = false;
+        if (error?.status === 403) {
+          this.showMessage(
+            'Você não tem permissão para excluir esta atividade. Apenas coordenadores da atividade podem excluí-la.',
+            'error'
+          );
+        } else {
+          const apiMessage = extractApiMessage(error);
+          this.showMessage(apiMessage || 'Erro ao excluir atividade. Tente novamente.', 'error');
+        }
       }
     });
   }
@@ -304,19 +332,33 @@ export class ListaAtividadesComponent implements OnInit {
 
   onImageError(event: any): void {
     console.error('❌ Erro ao carregar imagem:', event.target.src);
-    console.error('❌ Elemento da imagem:', event.target);
     // Substituir por imagem padrão em caso de erro
     event.target.src = '/imagens/curso-header.png';
-    console.log('🔄 Imagem substituída por padrão:', event.target.src);
-  }
+      }
 
   onImageLoad(event: any): void {
-    console.log('✅ Imagem carregada com sucesso:', event.target.src);
-  }
+      }
 
   formatarData(dataISO: string): string {
     const data = new Date(dataISO);
     return data.toLocaleDateString('pt-BR');
+  }
+
+  formatarDataAtividade(atividade: AtividadeDTO): string {
+    if (!atividade.dataRealizacao) return 'Data não informada';
+    
+    const dataInicio = new Date(atividade.dataRealizacao + 'T00:00:00');
+    const dataInicioFormatada = dataInicio.toLocaleDateString('pt-BR');
+    
+    if (!atividade.dataFim) {
+      // Evento em data única
+      return dataInicioFormatada;
+    } else {
+      // Evento em período
+      const dataFim = new Date(atividade.dataFim + 'T00:00:00');
+      const dataFimFormatada = dataFim.toLocaleDateString('pt-BR');
+      return `${dataInicioFormatada} a ${dataFimFormatada}`;
+    }
   }
 
   private showMessage(message: string, type: 'success' | 'error' | 'warning'): void {
@@ -346,6 +388,121 @@ export class ListaAtividadesComponent implements OnInit {
     return atividade.id || index;
   }
 
+  getParticipantesCount(atividade: AtividadeDTO): number {
+    if (!atividade) {
+      return 0;
+    }
+
+    const integrantesLength = Array.isArray(atividade.integrantes) ? atividade.integrantes.length : 0;
+    if (integrantesLength > 0) {
+      return integrantesLength;
+    }
+
+    const atividadeAny = atividade as any;
+    return atividadeAny.totalParticipantes ?? atividadeAny.participantesCount ?? 0;
+  }
+
+  getEvidenciasCount(atividade: AtividadeDTO): number {
+    if (!atividade) {
+      return 0;
+    }
+
+    const atividadeAny = atividade as any;
+    return atividadeAny.totalEvidencias ?? atividadeAny.evidenciasCount ?? 0;
+  }
+
+  private complementarDadosDasAtividades(): void {
+    if (!Array.isArray(this.atividades) || this.atividades.length === 0) {
+      return;
+    }
+
+    this.atividades.forEach(atividade => {
+      this.preencherParticipantes(atividade);
+      this.preencherEvidencias(atividade);
+    });
+  }
+
+  private preencherParticipantes(atividade: AtividadeDTO): void {
+    const atividadeId = atividade.id;
+    if (!atividadeId) {
+      return;
+    }
+
+    if (Array.isArray(atividade.integrantes) && atividade.integrantes.length > 0) {
+      (atividade as any).totalParticipantes = atividade.integrantes.length;
+      this.participantesCache.set(atividadeId, atividade.integrantes);
+      return;
+    }
+
+    if (this.participantesCache.has(atividadeId)) {
+      const participantesCacheados = this.participantesCache.get(atividadeId) ?? [];
+      atividade.integrantes = participantesCacheados;
+      (atividade as any).totalParticipantes = participantesCacheados.length;
+      return;
+    }
+
+    this.atividadesService.listarPessoasPorAtividade(atividadeId).subscribe({
+      next: (participantes) => {
+        const participantesNormalizados = this.normalizeParticipantes(participantes);
+        this.participantesCache.set(atividadeId, participantesNormalizados);
+        atividade.integrantes = participantesNormalizados;
+        (atividade as any).totalParticipantes = participantesNormalizados.length;
+      },
+      error: (error) => {
+        console.error('❌ Erro ao carregar participantes para atividade', atividadeId, error);
+        (atividade as any).totalParticipantes = 0;
+      }
+    });
+  }
+
+  private preencherEvidencias(atividade: AtividadeDTO): void {
+    const atividadeId = atividade.id;
+    if (!atividadeId) {
+      return;
+    }
+
+    const evidenciasExistentes = (atividade as any).totalEvidencias ?? (atividade as any).evidenciasCount;
+    if (typeof evidenciasExistentes === 'number') {
+      (atividade as any).totalEvidencias = evidenciasExistentes;
+      return;
+    }
+
+    if (this.evidenciasCountCache.has(atividadeId)) {
+      (atividade as any).totalEvidencias = this.evidenciasCountCache.get(atividadeId) ?? 0;
+      return;
+    }
+
+    this.evidenciasService.listarEvidenciasPorAtividade(atividadeId).subscribe({
+      next: (evidencias) => {
+        const totalEvidencias = Array.isArray(evidencias) ? evidencias.length : 0;
+        this.evidenciasCountCache.set(atividadeId, totalEvidencias);
+        (atividade as any).totalEvidencias = totalEvidencias;
+      },
+      error: (error) => {
+        console.error('❌ Erro ao carregar evidências para atividade', atividadeId, error);
+        this.evidenciasCountCache.set(atividadeId, 0);
+        (atividade as any).totalEvidencias = 0;
+      }
+    });
+  }
+
+  private normalizeParticipantes(participantes: PessoaPapelDTO[] | null | undefined): PessoaPapelDTO[] {
+    if (!Array.isArray(participantes)) {
+      return [];
+    }
+
+    return participantes
+      .filter((participante): participante is PessoaPapelDTO => !!participante)
+      .map(participante => ({
+        id: participante.id ?? 0,
+        nome: participante.nome?.trim() && participante.nome.trim().length > 0
+          ? participante.nome.trim()
+          : 'Participante',
+        cpf: participante.cpf ?? '',
+        papel: participante.papel ?? ''
+      }));
+  }
+
   private hasActiveFilters(): boolean {
     return Boolean(
       (this.filtroNome && this.filtroNome.trim()) ||
@@ -363,5 +520,72 @@ export class ListaAtividadesComponent implements OnInit {
     this.emptyMessage = this.hasActiveFilters()
       ? 'Nenhuma atividade encontrada com os filtros aplicados.'
       : 'Sem atividade cadastrada!';
+  }
+
+  get podeGerarRelatorio(): boolean {
+    return this.apiService.hasAnyRole(['ADMINISTRADOR', 'GERENTE', 'SECRETARIO']);
+  }
+
+  get podeCriarAtividade(): boolean {
+    return this.atividadesService.podeCriarAtividade();
+  }
+
+  podeEditarAtividade(atividade: AtividadeDTO): boolean {
+    return this.atividadesService.podeEditarAtividade(atividade);
+  }
+
+  podeExcluirAtividade(atividade: AtividadeDTO): boolean {
+    // Mesma lógica de edição
+    return this.atividadesService.podeEditarAtividade(atividade);
+  }
+
+  async abrirDialogRelatorio(): Promise<void> {
+    if (!this.podeGerarRelatorio) {
+      return;
+    }
+
+    const categoriasDialog = (this.categorias || []).map((categoria: any) => ({
+      id: categoria.id,
+      nome: categoria.nome
+    }));
+
+    const dialogRef = this.dialog.open<RelatorioCursoDialogComponent, { cursoNome: string; categorias: Array<{ id: number; nome: string }> }, RelatorioCursoDialogResult | null>(
+      RelatorioCursoDialogComponent,
+      {
+        width: '600px',
+        data: {
+          cursoNome: this.cursoNome,
+          categorias: categoriasDialog
+        }
+      }
+    );
+
+    const resultado = await firstValueFrom(dialogRef.afterClosed());
+
+    if (resultado) {
+      this.gerarRelatorio(resultado);
+    }
+  }
+
+  private gerarRelatorio(filtro: RelatorioCursoDialogResult): void {
+    this.isGeneratingRelatorio = true;
+    this.cursosRelatoriosService.gerarRelatorioCurso(this.cursoId, filtro).subscribe({
+      next: (blob: Blob) => {
+        this.isGeneratingRelatorio = false;
+        const fileName = `relatorio-curso-${this.cursoId}-${filtro.dataInicio}-${filtro.dataFim}.pdf`;
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = fileName;
+        link.click();
+        window.URL.revokeObjectURL(blobUrl);
+        this.showMessage('Relatório gerado com sucesso!', 'success');
+      },
+      error: (error: HttpErrorResponse) => {
+        this.isGeneratingRelatorio = false;
+        const mensagem = extractApiMessage(error) || 'Não foi possível gerar o relatório. Verifique os filtros e tente novamente.';
+        this.showMessage(mensagem, 'error');
+      }
+    });
   }
 }

@@ -19,13 +19,11 @@ export class EvidenciasService {
    */
   listarEvidenciasPorAtividade(atividadeId: number): Observable<EvidenciaDTO[]> {
     const url = `${this.baseUrl}/atividade/${atividadeId}`;
-    console.log('📡 Listando evidências da atividade:', atividadeId);
-
+    
     return this.http.get<EvidenciaDTO[]>(url).pipe(
       timeout(this.requestTimeout),
       tap(response => {
-        console.log('✅ Evidências carregadas:', response.length);
-      }),
+              }),
       catchError(this.handleError)
     );
   }
@@ -36,13 +34,11 @@ export class EvidenciasService {
    */
   getEvidenciasPorId(evidenciaId: number): Observable<EvidenciaDTO> {
     const url = `${this.baseUrl}/${evidenciaId}`;
-    console.log('📡 Buscando evidência ID:', evidenciaId);
-
+    
     return this.http.get<EvidenciaDTO>(url).pipe(
       timeout(this.requestTimeout),
       tap(response => {
-        console.log('✅ Evidência encontrada:', response);
-      }),
+              }),
       catchError(this.handleError)
     );
   }
@@ -53,10 +49,7 @@ export class EvidenciasService {
    */
   salvarEvidencia(atividadeId: number, legenda: string, file: File): Observable<EvidenciaDTO> {
     const url = this.baseUrl;
-    console.log('📡 Salvando nova evidência para atividade:', atividadeId);
-    console.log('📋 Legenda:', legenda);
-    console.log('📎 Arquivo:', file.name, `(${this.formatFileSize(file.size)})`);
-
+            
     // Criar FormData para envio multipart
     const formData = new FormData();
     formData.append('atividadeId', atividadeId.toString());
@@ -66,8 +59,7 @@ export class EvidenciasService {
     return this.http.post<EvidenciaDTO>(url, formData).pipe(
       timeout(this.requestTimeout),
       tap(response => {
-        console.log('✅ Evidência salva com sucesso:', response);
-      }),
+              }),
       catchError(this.handleError)
     );
   }
@@ -78,10 +70,7 @@ export class EvidenciasService {
    */
   atualizarEvidencia(evidenciaId: number, legenda: string, file: File): Observable<EvidenciaDTO> {
     const url = `${this.baseUrl}/${evidenciaId}`;
-    console.log('📡 Atualizando evidência ID:', evidenciaId);
-    console.log('📋 Nova legenda:', legenda);
-    console.log('📎 Novo arquivo:', file.name, `(${this.formatFileSize(file.size)})`);
-
+            
     // Criar FormData para envio multipart
     const formData = new FormData();
     formData.append('legenda', legenda);
@@ -90,8 +79,7 @@ export class EvidenciasService {
     return this.http.put<EvidenciaDTO>(url, formData).pipe(
       timeout(this.requestTimeout),
       tap(response => {
-        console.log('✅ Evidência atualizada com sucesso:', response);
-      }),
+              }),
       catchError(this.handleError)
     );
   }
@@ -102,14 +90,50 @@ export class EvidenciasService {
    */
   excluirEvidencia(evidenciaId: number): Observable<void> {
     const url = `${this.baseUrl}/${evidenciaId}`;
-    console.log('📡 Excluindo evidência ID:', evidenciaId);
-
+    
     return this.http.delete<void>(url).pipe(
       timeout(this.requestTimeout),
       tap(() => {
-        console.log('✅ Evidência excluída com sucesso');
-      }),
+              }),
       catchError(this.handleError)
+    );
+  }
+
+  /**
+   * PUT /api/evidencias/atividade/{atividadeId}/ordenacao
+   * Atualiza a ordem das evidências de uma atividade
+   */
+  reordenarEvidencias(
+    atividadeId: number,
+    ordenacao: Array<{ id?: number; evidenciaId?: number; ordem: number }>
+  ): Observable<EvidenciaDTO[]> {
+    const urlPrimario = `${this.baseUrl}/atividade/${atividadeId}/ordem`;
+    const urlLegado = `${this.baseUrl}/atividade/${atividadeId}/ordenacao`;
+    const payload = this.buildOrdenacaoPayload(ordenacao);
+    
+    const requestHeaders = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    const primario$ = this.http.put<EvidenciaDTO[]>(urlPrimario, payload, { headers: requestHeaders }).pipe(
+      timeout(this.requestTimeout),
+      tap(response => {
+              })
+    );
+
+    return primario$.pipe(
+      catchError(error => {
+        if (this.deveTentarEndpointLegado(error)) {
+          console.warn('⚠️ Endpoint principal indisponível. Tentando endpoint legado /ordenacao...');
+
+          return this.http.put<EvidenciaDTO[]>(urlLegado, payload, { headers: requestHeaders }).pipe(
+            timeout(this.requestTimeout),
+            tap(response => {
+                          }),
+            catchError(errLegado => this.handleError(errLegado))
+          );
+        }
+
+        return this.handleError(error);
+      })
     );
   }
 
@@ -135,6 +159,50 @@ export class EvidenciasService {
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
   }
 
+  private buildOrdenacaoPayload(
+    ordenacao: Array<{ id?: number; evidenciaId?: number; ordem: number }>
+  ): Array<{ evidenciaId: number; ordem: number }> {
+    return ordenacao
+      .map(item => {
+        const evidenciaId = item.evidenciaId ?? item.id;
+        if (evidenciaId === undefined || evidenciaId === null) {
+          console.warn('⚠️ Registro de ordenação ignorado por não possuir ID:', item);
+          return null;
+        }
+        return {
+          evidenciaId,
+          ordem: item.ordem
+        };
+      })
+      .filter((item): item is { evidenciaId: number; ordem: number } => item !== null);
+  }
+
+  private deveTentarEndpointLegado(error: any): boolean {
+    if (!error) {
+      return false;
+    }
+
+    const status = error.status;
+    if (status === 404) {
+      return true;
+    }
+
+    if (status === 500) {
+      const mensagemBruta =
+        (typeof error.error === 'string' && error.error) ||
+        error.error?.message ||
+        error.message ||
+        '';
+
+      const mensagemNormalizada = mensagemBruta.toString().toLowerCase();
+      if (mensagemNormalizada.includes('no static resource') || mensagemNormalizada.includes('noresourcefound')) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   /**
    * Tratamento de erros HTTP
    */
@@ -150,8 +218,6 @@ export class EvidenciasService {
       console.error('❌ Erro do servidor:');
       console.error('❌ Status:', error.status);
       console.error('❌ Message:', error.message);
-      console.error('❌ Error body:', error.error);
-
       // Extrair mensagem de erro específica do backend
       if (error.error) {
         if (typeof error.error === 'string') {

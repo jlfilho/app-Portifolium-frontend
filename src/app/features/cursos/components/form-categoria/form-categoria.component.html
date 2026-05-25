@@ -4,9 +4,9 @@
     <button
       mat-icon-button
       class="back-button"
-      matTooltip="Voltar"
+      matTooltip="Cancelar"
       (click)="onCancel()">
-      <mat-icon>arrow_back</mat-icon>
+      <mat-icon>close</mat-icon>
     </button>
     <h2>
       <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
@@ -73,7 +73,7 @@
             mat-raised-button
             color="primary"
             type="submit"
-            class="submit-button"
+            class="btn-primary"
             [disabled]="categoriaForm.invalid || isSaving">
             <mat-spinner
               *ngIf="isSaving"
@@ -82,7 +82,7 @@
             </mat-spinner>
             <span *ngIf="!isSaving">
               <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
-              {{ isEditMode ? 'Salvar' : 'Criar' }}
+              {{ isEditMode ? 'Atualizar' : 'Cadastrar' }}
             </span>
             <span *ngIf="isSaving">
               {{ isEditMode ? 'Salvando...' : 'Criando...' }}

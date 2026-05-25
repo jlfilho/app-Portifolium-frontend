@@ -32,9 +32,7 @@ export class CursosUsuarioDialogComponent {
     if (!this.data.usuario.cursos) {
       this.data.usuario.cursos = [];
     }
-    console.log('📚 Diálogo de Cursos - Usuário:', this.data.usuario);
-    console.log('📚 Total de cursos:', this.data.usuario.cursos.length);
-  }
+          }
 
   close(): void {
     this.dialogRef.close();

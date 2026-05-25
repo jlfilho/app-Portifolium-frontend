@@ -110,10 +110,8 @@
             <mat-icon matPrefix>work</mat-icon>
             <mat-select formControlName="role" placeholder="Selecione a função">
               <mat-option *ngFor="let role of roles" [value]="role.value">
-                <div class="role-option">
-                  <mat-icon>{{ role.icon }}</mat-icon>
-                  {{ role.label }}
-                </div>
+                <mat-icon class="role-option-icon">{{ role.icon }}</mat-icon>
+                {{ role.label }}
               </mat-option>
             </mat-select>
             <mat-error *ngIf="role?.hasError('required')">
@@ -143,7 +141,7 @@
           <mat-chip-set>
             <mat-chip [highlighted]="true" class="role-chip-preview">
               <mat-icon>{{ getRoleIcon(role.value) }}</mat-icon>
-              {{ role.value }}
+              {{ getRoleLabel(role.value) }}
             </mat-chip>
           </mat-chip-set>
         </div>
@@ -173,11 +171,12 @@
       <button
         mat-raised-button
         color="primary"
+        class="btn-primary"
         type="button"
         (click)="onSubmit()"
         [disabled]="isSaving || usuarioForm.invalid"
         matTooltip="Salvar usuário">
-        <mat-icon>{{ isSaving ? 'hourglass_empty' : 'save' }}</mat-icon>
+        <mat-icon>{{ isSaving ? 'hourglass_empty' : (isEditMode ? 'save' : 'add') }}</mat-icon>
         {{ isSaving ? 'Salvando...' : (isEditMode ? 'Atualizar' : 'Cadastrar') }}
       </button>
     </mat-card-actions>

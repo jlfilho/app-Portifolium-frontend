@@ -51,7 +51,7 @@ export interface Categoria {
   styleUrl: './lista-categorias.component.css'
 })
 export class ListaCategoriasComponent implements OnInit {
-  displayedColumns: string[] = ['id', 'nome', 'acao'];
+  displayedColumns: string[] = ['nome', 'acao'];
   dataSource!: MatTableDataSource<Categoria>;
   isLoading = true;
   errorMessage: string = '';
@@ -108,13 +108,10 @@ export class ListaCategoriasComponent implements OnInit {
       direction: this.sortDirection
     };
 
-    console.log('📄 Carregando tipos de atividades paginados:', pageRequest);
-
+    
     this.cursosService.getAllCategoriesPaginado(pageRequest).subscribe({
       next: (page) => {
-        console.log('✅ Página recebida:', page);
-        console.log(`📊 ${page.numberOfElements} de ${page.totalElements} tipos de atividades`);
-
+                
         this.dataSource.data = page.content;
         this.totalElements = page.totalElements;
         this.isLoading = false;
@@ -138,25 +135,21 @@ export class ListaCategoriasComponent implements OnInit {
   }
 
   onPageChange(event: any): void {
-    console.log('📄 Mudança de página:', event);
-    this.pageIndex = event.pageIndex;
+        this.pageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
     this.loadCatagories();
   }
 
   addCategoria(): void {
-    console.log('➕ Navegar para adicionar novo tipo de atividade');
-    this.router.navigate(['/categorias/novo']);
+        this.router.navigate(['/admin/categorias/novo']);
   }
 
   editCategoria(categoria: Categoria): void {
-    console.log('✏️ Navegar para editar tipo de atividade:', categoria);
-    this.router.navigate(['/categorias/editar', categoria.id]);
+        this.router.navigate(['/admin/categorias/editar', categoria.id]);
   }
 
   deleteCategoria(categoria: Categoria): void {
-    console.log('🗑️ Solicitando confirmação para excluir tipo de atividade:', categoria);
-
+    
     const dialogRef = this.dialog.open(SimpleConfirmDialogComponent, {
       width: '400px',
       panelClass: 'custom-dialog-panel',
@@ -176,12 +169,10 @@ export class ListaCategoriasComponent implements OnInit {
   }
 
   performDelete(categoria: Categoria): void {
-    console.log('🗑️ Excluindo tipo de atividade:', categoria.id);
-
+    
     this.cursosService.deleteCategory(categoria.id).subscribe({
       next: () => {
-        console.log('✅ Tipo de atividade excluído com sucesso');
-        this.showMessage(`Tipo de atividade "${categoria.nome}" excluído com sucesso!`, 'success');
+                this.showMessage(`Tipo de atividade "${categoria.nome}" excluído com sucesso!`, 'success');
         this.loadCatagories(); // Recarregar a lista
       },
       error: (error) => {

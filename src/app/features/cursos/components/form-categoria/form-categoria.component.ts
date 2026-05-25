@@ -66,12 +66,10 @@ export class FormCategoriaComponent implements OnInit {
 
   loadCategoria(id: number): void {
     this.isLoading = true;
-    console.log('📂 Carregando categoria para edição:', id);
-
+    
     this.cursosService.getCategoryById(id).subscribe({
       next: (categoria) => {
-        console.log('✅ Categoria carregada:', categoria);
-        this.categoriaForm.patchValue({
+                this.categoriaForm.patchValue({
           nome: categoria.nome
         });
         this.isLoading = false;
@@ -80,7 +78,7 @@ export class FormCategoriaComponent implements OnInit {
         console.error('❌ Erro ao carregar categoria:', error);
         this.showMessage('Erro ao carregar tipo de atividade.', 'error');
         this.isLoading = false;
-        this.router.navigate(['/categorias']);
+        this.router.navigate(['/admin/categorias']);
       }
     });
   }
@@ -104,14 +102,12 @@ export class FormCategoriaComponent implements OnInit {
   }
 
   createCategoria(categoriaData: { nome: string }): void {
-    console.log('➕ Criando tipo de atividade:', categoriaData);
-
+    
     this.cursosService.createCategory(categoriaData).subscribe({
       next: (response) => {
-        console.log('✅ Tipo de atividade criado:', response);
-        this.showMessage('Tipo de atividade criado com sucesso!', 'success');
+                this.showMessage('Tipo de atividade criado com sucesso!', 'success');
         this.isSaving = false;
-        this.router.navigate(['/categorias']);
+        this.router.navigate(['/admin/categorias']);
       },
       error: (error) => {
         console.error('❌ Erro ao criar tipo de atividade:', error);
@@ -129,14 +125,12 @@ export class FormCategoriaComponent implements OnInit {
   }
 
   updateCategoria(id: number, categoriaData: { nome: string }): void {
-    console.log('✏️ Atualizando tipo de atividade:', id, categoriaData);
-
+    
     this.cursosService.updateCategory(id, categoriaData).subscribe({
       next: (response) => {
-        console.log('✅ Tipo de atividade atualizado:', response);
-        this.showMessage('Tipo de atividade atualizado com sucesso!', 'success');
+                this.showMessage('Tipo de atividade atualizado com sucesso!', 'success');
         this.isSaving = false;
-        this.router.navigate(['/categorias']);
+        this.router.navigate(['/admin/categorias']);
       },
       error: (error) => {
         console.error('❌ Erro ao atualizar tipo de atividade:', error);
@@ -156,7 +150,7 @@ export class FormCategoriaComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/categorias']);
+    this.router.navigate(['/admin/categorias']);
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {

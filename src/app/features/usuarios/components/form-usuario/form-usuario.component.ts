@@ -50,7 +50,8 @@ export class FormUsuarioComponent implements OnInit {
   roles = [
     { value: 'ROLE_ADMINISTRADOR', label: 'Administrador', icon: 'admin_panel_settings' },
     { value: 'ROLE_GERENTE', label: 'Gerente', icon: 'manage_accounts' },
-    { value: 'ROLE_SECRETARIO', label: 'Secretário(a)', icon: 'assignment_ind' }
+    { value: 'ROLE_SECRETARIO', label: 'Secretário(a)', icon: 'assignment_ind' },
+    { value: 'ROLE_COORDENADOR_ATIVIDADE', label: 'Coordenador de Atividade', icon: 'event_note' }
   ];
 
   constructor(
@@ -75,11 +76,9 @@ export class FormUsuarioComponent implements OnInit {
                                  window.history.state?.['usuario'];
 
         if (usuarioFromState) {
-          console.log('📦 Usando dados do state (não faz nova requisição)');
-          this.loadUsuarioFromData(usuarioFromState);
+                    this.loadUsuarioFromData(usuarioFromState);
         } else {
-          console.log('🌐 Carregando dados do servidor (GET /api/usuarios/' + this.usuarioId + ')');
-          this.loadUsuario(this.usuarioId);
+                    this.loadUsuario(this.usuarioId);
         }
       }
     });
@@ -111,23 +110,19 @@ export class FormUsuarioComponent implements OnInit {
     this.usuarioForm.get('senha')?.setValidators([Validators.minLength(6)]);
     this.usuarioForm.get('senha')?.updateValueAndValidity();
 
-    console.log('✅ Dados carregados do state:', usuario);
-  }
+      }
 
   // Carregar dados do servidor (fallback se não tiver no state)
   loadUsuario(id: number): void {
     this.isLoading = true;
     this.usuariosService.getUserById(id).subscribe({
       next: (usuario) => {
-        console.log('✅ Dados carregados do servidor:', usuario);
-        this.loadUsuarioFromData(usuario);
+                this.loadUsuarioFromData(usuario);
         this.isLoading = false;
       },
       error: (error) => {
         console.error('❌ Erro ao carregar usuário:', error);
         console.error('Status:', error.status);
-        console.error('Mensagem:', error.error);
-
         let errorMessage = 'Erro ao carregar usuário. ';
 
         if (error.status === 500) {
@@ -146,7 +141,7 @@ export class FormUsuarioComponent implements OnInit {
 
         // Redireciona de volta para listagem
         setTimeout(() => {
-          this.router.navigate(['/usuarios']);
+          this.router.navigate(['/admin/usuarios']);
         }, 2000);
       }
     });
@@ -186,33 +181,24 @@ export class FormUsuarioComponent implements OnInit {
         };
       }
 
-      console.log('=== PAYLOAD ENVIADO ===');
-      console.log('Modo:', this.isEditMode ? 'EDIÇÃO' : 'CRIAÇÃO');
-      console.log('Endpoint:', this.isEditMode ? `PUT /api/usuarios/${this.usuarioId}` : 'POST /api/usuarios');
-      console.log('Payload:', JSON.stringify(usuarioData, null, 2));
-
+                        
       const operation = this.isEditMode && this.usuarioId
         ? this.usuariosService.updateUser(this.usuarioId, usuarioData)
         : this.usuariosService.createUser(usuarioData);
 
       operation.subscribe({
         next: (response) => {
-          console.log('=== RESPOSTA DO SERVIDOR ===');
-          console.log('Status: Sucesso');
-          console.log('Response:', response);
-
+                              
           this.showMessage(
             this.isEditMode ? 'Usuário atualizado com sucesso!' : 'Usuário cadastrado com sucesso!',
             'success'
           );
           this.isSaving = false;
-          this.router.navigate(['/usuarios']);
+          this.router.navigate(['/admin/usuarios']);
         },
         error: (error) => {
           console.error('=== ERRO AO SALVAR USUÁRIO ===');
           console.error('Status:', error.status);
-          console.error('Error:', error);
-          console.error('Error Message:', error.error);
 
           let errorMessage = 'Erro ao salvar usuário. ';
 
@@ -244,7 +230,7 @@ export class FormUsuarioComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/usuarios']);
+    this.router.navigate(['/admin/usuarios']);
   }
 
   onReset(): void {
@@ -303,6 +289,8 @@ export class FormUsuarioComponent implements OnInit {
       return 'primary';
     } else if (roleUpper.includes('SECRETARIO')) {
       return 'accent';
+    } else if (roleUpper.includes('COORDENADOR_ATIVIDADE') || roleUpper.includes('COORDENADOR ATIVIDADE')) {
+      return ''; // Retorna vazio para usar classe CSS customizada
     }
     return '';
   }
@@ -315,8 +303,15 @@ export class FormUsuarioComponent implements OnInit {
       return 'manage_accounts';
     } else if (roleUpper.includes('SECRETARIO')) {
       return 'assignment_ind';
+    } else if (roleUpper.includes('COORDENADOR_ATIVIDADE') || roleUpper.includes('COORDENADOR ATIVIDADE')) {
+      return 'event_note';
     }
     return 'person';
+  }
+
+  getRoleLabel(roleValue: string): string {
+    const role = this.roles.find(r => r.value === roleValue);
+    return role ? role.label : roleValue;
   }
 
   // Getters

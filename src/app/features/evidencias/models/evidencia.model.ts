@@ -7,6 +7,8 @@ export interface EvidenciaDTO {
   foto: string;
   legenda: string;
   criadoPor?: string;
+  ordem?: number;
+  urlFoto?: string;
 }
 
 /**

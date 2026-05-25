@@ -99,6 +99,28 @@
             </span>
             <span *ngIf="isLoading">Entrando...</span>
           </button>
+
+          <!-- Links de Ação -->
+          <div class="recovery-link">
+            <button
+              mat-button
+              type="button"
+              color="primary"
+              routerLink="/cursos-publicos"
+              class="recovery-button">
+              <mat-icon>home</mat-icon>
+              Home
+            </button>
+            <button
+              mat-button
+              type="button"
+              color="primary"
+              (click)="abrirRecuperarSenha()"
+              class="recovery-button">
+              <mat-icon>lock_reset</mat-icon>
+              Esqueci minha senha
+            </button>
+          </div>
         </form>
       </mat-card-content>
     </mat-card>

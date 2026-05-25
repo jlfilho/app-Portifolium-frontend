@@ -1,4 +1,6 @@
 <div class="page-container">
+  <app-public-header></app-public-header>
+
   <!-- Hero Section -->
   <div class="hero-section">
     <div class="hero-content">
@@ -12,29 +14,68 @@
 
   <!-- Search Section -->
   <div class="search-section">
-    <mat-form-field appearance="outline" class="search-field">
-      <mat-label>Buscar cursos</mat-label>
-      <input
-        matInput
-        [(ngModel)]="searchTerm"
-        (ngModelChange)="onSearchChange($event)"
-        autocomplete="off">
-      <mat-icon matPrefix>search</mat-icon>
-      <button
-        mat-icon-button
-        matSuffix
-        *ngIf="searchTerm"
-        (click)="clearSearch()"
-        matTooltip="Limpar busca">
-        <mat-icon>close</mat-icon>
-      </button>
-    </mat-form-field>
+    <div class="filters-card">
+      <div class="filters-grid">
+        <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Buscar cursos</mat-label>
+        <input
+          matInput
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange($event)"
+          autocomplete="off">
+        <mat-icon matPrefix>search</mat-icon>
+        <button
+          mat-icon-button
+          matSuffix
+          *ngIf="searchTerm"
+          (click)="clearSearchText()"
+          matTooltip="Limpar busca">
+          <mat-icon>close</mat-icon>
+        </button>
+        </mat-form-field>
 
-    <!-- Results info -->
-    <div class="results-info" *ngIf="!isLoading && totalElements > 0">
-      <mat-icon>info</mat-icon>
-      <span>Encontrados <strong>{{ totalElements }}</strong> curso(s)</span>
-      <span *ngIf="searchTerm" class="search-highlight">com "{{ searchTerm }}"</span>
+        <mat-form-field appearance="outline" class="unidade-field">
+          <mat-label>Unidade Acadêmica</mat-label>
+          <mat-icon matPrefix>apartment</mat-icon>
+          <mat-select
+            [disabled]="isLoadingUnidades"
+            [value]="filtroUnidadeId"
+            (selectionChange)="onUnidadeChange($event.value)">
+            <mat-option [value]="null">Todas as unidades</mat-option>
+            <mat-option *ngFor="let unidade of unidadesAcademicas" [value]="unidade.id">
+              {{ unidade.nome }}
+            </mat-option>
+          </mat-select>
+          <mat-progress-spinner
+            *ngIf="isLoadingUnidades"
+            matSuffix
+            diameter="20"
+            mode="indeterminate">
+          </mat-progress-spinner>
+        </mat-form-field>
+      </div>
+      <div class="filters-footer">
+        <div class="results-info" *ngIf="!isLoading && totalElements > 0">
+          <mat-icon>info</mat-icon>
+          <span>Encontrados <strong>{{ totalElements }}</strong> curso(s)</span>
+          <span *ngIf="searchTerm" class="search-highlight">com "{{ searchTerm }}"</span>
+          <span *ngIf="filtroUnidadeId" class="search-highlight">na unidade selecionada</span>
+        </div>
+
+        <div class="filters-illustration">
+          <mat-icon>tune</mat-icon>
+        </div>
+
+        <button
+          mat-stroked-button
+          class="clear-button"
+          (click)="clearAllFilters()"
+          *ngIf="hasActiveFilters()"
+          matTooltip="Limpar filtros">
+          <mat-icon>filter_alt_off</mat-icon>
+          Limpar filtros
+        </button>
+      </div>
     </div>
   </div>
 
@@ -51,27 +92,23 @@
       class="curso-card"
       matRipple
       (click)="viewCurso(curso)">
-      <!-- Card Header com Imagem -->
-      <div class="card-header-image" [class.has-image]="curso.fotoCapa || curso.imagemCapa">
-        <!-- Imagem de capa se existir -->
+      <div class="card-header-image has-image">
         <img
-          *ngIf="curso.fotoCapa || curso.imagemCapa"
-          [src]="getImageUrl(curso.fotoCapa || curso.imagemCapa)"
+          [src]="getCursoCardImage(curso)"
           [alt]="'Capa do curso ' + curso.nome"
           class="curso-image"
           (error)="onImageError($event)">
+      </div>
 
-        <!-- Overlay com título -->
-        <div class="header-overlay">
+      <!-- Card Content -->
+      <mat-card-content class="card-content">
+        <div class="curso-heading">
           <h3 class="curso-nome">{{ curso.nome }}</h3>
           <mat-chip-set *ngIf="getTipoNome(curso)" class="tipo-chip-set">
             <mat-chip class="chip-highlight">{{ getTipoNome(curso) }}</mat-chip>
           </mat-chip-set>
         </div>
-      </div>
 
-      <!-- Card Content -->
-      <mat-card-content class="card-content">
         <p class="curso-descricao" *ngIf="curso.descricao">
           {{ curso.descricao }}
         </p>
@@ -104,7 +141,7 @@
       mat-raised-button
       color="primary"
       *ngIf="searchTerm"
-      (click)="clearSearch()">
+      (click)="clearSearchText()">
       <mat-icon>clear</mat-icon>
       Limpar Busca
     </button>
@@ -122,4 +159,3 @@
     class="paginator">
   </mat-paginator>
 </div>
-

@@ -1,0 +1,48 @@
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 360px;
+  padding-top: 12px;
+}
+
+.dialog-description {
+  margin: 0;
+  font-size: 14px;
+  color: #475569;
+}
+
+.date-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.range-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #ef4444;
+}
+
+.dialog-actions {
+  padding: 0 24px 16px;
+}
+
+.dialog-actions button[color="primary"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (max-width: 480px) {
+  .dialog-content {
+    min-width: 0;
+  }
+}
+

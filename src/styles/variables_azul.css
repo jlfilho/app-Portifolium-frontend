@@ -1,0 +1,471 @@
+/* ============================================
+   PALETA DE CORES – TEMA AZUL (Tech Elegante)
+   Compatível com Angular Material v16–v19 (M3)
+   ============================================ */
+
+   :root {
+    /* ============================================
+       MATERIAL SYSTEM VARIABLES (M3)
+    ============================================ */
+
+    /* === PRIMARY (AZUL PRINCIPAL) === */
+    --md-sys-color-primary: #2563EB;                  /* Azul principal */
+    --md-sys-color-on-primary: #FFFFFF;
+    --md-sys-color-primary-container: #DBEAFE;        /* Azul bem claro (container) */
+    --md-sys-color-on-primary-container: #1D4ED8;     /* Azul mais escuro para texto */
+
+    /* === SECONDARY (AZUL/CIANO SUAVE) === */
+    --md-sys-color-secondary: #0EA5E9;                /* Ciano elegante */
+    --md-sys-color-on-secondary: #022C3A;
+    --md-sys-color-secondary-container: #E0F2FE;
+    --md-sys-color-on-secondary-container: #0369A1;
+
+    /* === TERTIARY (VIOLETA-TECH) === */
+    --md-sys-color-tertiary: #6366F1;                 /* Violeta/indigo de apoio */
+    --md-sys-color-on-tertiary: #EEF2FF;
+    --md-sys-color-tertiary-container: #E0E7FF;
+    --md-sys-color-on-tertiary-container: #312E81;
+
+    /* === ERROR === */
+    --md-sys-color-error: #D32F2F;
+    --md-sys-color-on-error: #FFFFFF;
+    --md-sys-color-error-container: #FDECEA;
+    --md-sys-color-on-error-container: #8A1C1C;
+
+    /* === SURFACE / BACKGROUND === */
+    --md-sys-color-surface: #FFFFFF;
+    --md-sys-color-on-surface: #0F172A;
+    --md-sys-color-surface-variant: #F8FAFC;
+    --md-sys-color-on-surface-variant: #475569;
+
+    --md-sys-color-background: #F8FAFC;              /* Fundo geral azulado suave */
+    --md-sys-color-on-background: #0F172A;
+
+    /* === OUTLINE === */
+    --md-sys-color-outline: #CBD5E1;
+    --md-sys-color-outline-variant: #E2E8F0;
+
+    /* === SHADOWS === */
+    --md-sys-color-shadow: rgba(15, 23, 42, 0.10);
+    --md-sys-color-scrim: rgba(15, 23, 42, 0.6);
+
+    /* === INVERSE === */
+    --md-sys-color-inverse-surface: #0F172A;
+    --md-sys-color-inverse-on-surface: #FFFFFF;
+    --md-sys-color-inverse-primary: #93C5FD;
+
+    /* ============================================
+       VARIÁVEIS CUSTOMIZADAS DO PROJETO
+    ============================================ */
+
+    /* Paleta principal */
+    --primary-color: #2563EB;        /* Azul principal */
+    --secondary-color: #0EA5E9;      /* Ciano suave */
+    --accent-color: #6366F1;         /* Violeta/indigo de acento */
+
+    --accent-color-light: #DBEAFE;   /* Azul bem claro */
+
+    /* Backgrounds */
+    --bg-dark: #F8FAFC;              /* Fundo da página */
+    --bg-darker: #EDF2F7;            /* barras / seções */
+    --bg-card: #FFFFFF;
+    --bg-content: #F8FAFC;
+    --bg-actions: #EDF2F7;
+    --bg-hover: rgba(37, 99, 235, 0.08); /* hover azul suave */
+
+    /* Texto */
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-dark: #020617;
+    --text-medium: #64748B;
+    --text-light: #94A3B8;
+
+    /* Bordas */
+    --border-color: #CBD5E1;
+
+    /* Gradientes */
+    --gradient-primary: linear-gradient(90deg, #2563EB 0%, #0EA5E9 100%);
+    --gradient-secondary: linear-gradient(90deg, #0EA5E9 0%, #6366F1 100%);
+    --gradient-accent: linear-gradient(90deg, #6366F1 0%, #2563EB 100%);
+    --gradient-hover: var(--gradient-accent);
+
+    --card-header-gradient: var(--gradient-primary);
+    --primary-button-gradient: var(--gradient-primary);
+    --secondary-button-gradient: var(--gradient-secondary);
+
+    --chip-gradient: linear-gradient(135deg, #2563EB 0%, #0EA5E9 100%);
+    --chip-background: rgba(37, 99, 235, 0.08);
+    --chip-text-color: #0F172A;
+
+    /* Estados */
+    --success-color: #22C55E;
+    --error-color: #EF4444;
+    --warning-color: #F59E0B;
+    --info-color: #2563EB;
+
+    /* Sombras */
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+    --shadow-md: 0 4px 6px rgba(15, 23, 42, 0.08);
+    --shadow-lg: 0 10px 15px rgba(15, 23, 42, 0.12);
+    --shadow-xl: 0 20px 25px rgba(15, 23, 42, 0.16);
+
+    --shadow-primary: 0 4px 12px rgba(37, 99, 235, 0.35);
+    --shadow-accent: 0 4px 16px rgba(99, 102, 241, 0.35);
+
+    /* Bordas */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --border-radius-xl: 16px;
+    --border-radius-full: 9999px;
+
+    /* Transições */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.2s ease;
+    --transition-slow: 0.3s ease;
+
+    /* Espaçamentos */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-2xl: 48px;
+
+    /* Tipografia */
+    --font-family-base: 'Roboto', Arial, sans-serif;
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    --font-size-h1: 2.5rem;
+    --font-size-h2: 2rem;
+    --font-size-h3: 1.5rem;
+    --font-size-h4: 1.25rem;
+    --font-size-body: 1rem;
+    --font-size-small: 0.875rem;
+    --font-size-caption: 0.75rem;
+
+    --line-height-h1: 1.2;
+    --line-height-h2: 1.25;
+    --line-height-h3: 1.3;
+    --line-height-body: 1.6;
+    --line-height-small: 1.4;
+
+    /* Larguras padrão */
+    --page-max-width: 1200px;
+    --page-max-width-wide: 1400px;
+    --card-max-width: 960px;
+    --card-max-width-narrow: 640px;
+
+    /* Breakpoints */
+    --breakpoint-xs: 480px;
+    --breakpoint-sm: 600px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 1024px;
+    --breakpoint-xl: 1200px;
+    --breakpoint-2xl: 1400px;
+  }
+
+/* ============================================
+   CLASSES UTILITÁRIAS
+   ============================================ */
+
+/* Backgrounds */
+.bg-primary { background: var(--primary-color) !important; }
+.bg-secondary { background: var(--secondary-color) !important; }
+.bg-accent { background: var(--accent-color) !important; }
+.bg-dark { background: var(--bg-dark) !important; }
+.bg-card { background: var(--bg-card) !important; }
+.bg-gradient-primary { background: var(--gradient-primary) !important; }
+.bg-gradient-secondary { background: var(--gradient-secondary) !important; }
+.bg-gradient-accent { background: var(--gradient-accent) !important; }
+
+/* Text Colors */
+.text-primary { color: var(--text-primary) !important; }
+.text-secondary { color: var(--text-secondary) !important; }
+.text-dark { color: var(--text-dark) !important; }
+.text-accent { color: var(--accent-color) !important; }
+
+/* Sombras */
+.shadow-sm { box-shadow: var(--shadow-sm) !important; }
+.shadow-md { box-shadow: var(--shadow-md) !important; }
+.shadow-lg { box-shadow: var(--shadow-lg) !important; }
+.shadow-primary { box-shadow: var(--shadow-primary) !important; }
+.shadow-accent { box-shadow: var(--shadow-accent) !important; }
+
+/* Border Radius */
+.rounded-sm { border-radius: var(--border-radius-sm) !important; }
+.rounded-md { border-radius: var(--border-radius-md) !important; }
+.rounded-lg { border-radius: var(--border-radius-lg) !important; }
+.rounded-xl { border-radius: var(--border-radius-xl) !important; }
+.rounded-full { border-radius: var(--border-radius-full) !important; }
+
+/* Tipografia utilitária */
+.heading-h1 {
+  font-size: var(--font-size-h1);
+  line-height: var(--line-height-h1);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+}
+
+.heading-h2 {
+  font-size: var(--font-size-h2);
+  line-height: var(--line-height-h2);
+  font-weight: var(--font-weight-semibold);
+  margin: 0;
+}
+
+.text-body {
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  font-weight: var(--font-weight-regular);
+}
+
+.text-small {
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+/* Containers padrão */
+.page-container {
+  width: 100%;
+  max-width: var(--page-max-width-wide);
+  padding: var(--spacing-lg);
+  margin: 0 auto;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+
+.page-container.narrow {
+  max-width: var(--page-max-width);
+}
+
+.page-container.full-height {
+  min-height: calc(100vh - 64px);
+}
+
+/* Cabeçalhos de seção/page */
+.app-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.app-section-header__title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-h2);
+  line-height: var(--line-height-h2);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.app-section-header__subtitle {
+  font-size: var(--font-size-small);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.app-section-header__actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+/* Ações de formulário padrão */
+.app-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-actions);
+}
+
+.app-form-actions.stacked {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* Chips utilitários */
+.chip-default {
+  background: var(--chip-background) !important;
+  color: var(--chip-text-color) !important;
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--border-radius-full);
+}
+
+.chip-highlight {
+  background: var(--chip-gradient) !important;
+  color: #ffffff !important;
+  font-weight: var(--font-weight-semibold);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-radius: var(--border-radius-full);
+}
+
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 4px 12px;
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+}
+
+.badge-status.success {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success-color);
+}
+
+.badge-status.warn {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--warning-color);
+}
+
+.badge-status.error {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--error-color);
+}
+
+
+/* Botões utilitários */
+.btn-primary {
+  background: var(--primary-button-gradient) !important;
+  color: #FFFFFF !important;
+  box-shadow: var(--shadow-primary);
+  border-radius: var(--border-radius-md);
+  padding: 0 var(--spacing-md) !important;
+  text-transform: none !important;
+  font-weight: var(--font-weight-medium) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  min-height: 44px;
+}
+
+.btn-primary mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: currentColor !important;
+}
+
+.add-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.add-button mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: currentColor !important;
+}
+
+.btn-primary:hover:not([disabled]) {
+  background: var(--gradient-accent) !important;
+  box-shadow: var(--shadow-accent) !important;
+}
+
+.btn-secondary {
+  background: var(--secondary-button-gradient) !important;
+  color: #FFFFFF !important;
+  box-shadow: var(--shadow-accent);
+  border-radius: var(--border-radius-md);
+  padding: 0 var(--spacing-md) !important;
+  text-transform: none !important;
+  font-weight: var(--font-weight-medium) !important;
+}
+
+.btn-secondary:hover:not([disabled]) {
+  background: var(--gradient-primary) !important;
+}
+
+.btn-cancel {
+  border-color: var(--border-color) !important;
+  color: var(--text-medium) !important;
+  text-transform: none !important;
+  font-weight: var(--font-weight-medium) !important;
+  border-radius: var(--border-radius-md);
+  padding: 0 var(--spacing-md) !important;
+  min-height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: var(--spacing-sm) !important;
+}
+
+.btn-cancel:hover:not([disabled]) {
+  background-color: var(--bg-hover) !important;
+  color: var(--text-dark) !important;
+  border-color: var(--text-medium) !important;
+}
+
+/* Padronizar altura de botões de ação (Cancelar, Limpar, etc.) */
+mat-card-actions button[mat-stroked-button],
+mat-card-actions button[mat-button],
+.cancel-button,
+button[mat-stroked-button].cancel-button,
+button[mat-button]:has(mat-icon:contains('close')) {
+  min-height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: var(--spacing-sm) !important;
+}
+
+/* Estados globais */
+.app-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  color: var(--text-medium);
+  padding: var(--spacing-md);
+}
+
+.app-loading--inline {
+  padding: var(--spacing-sm) 0;
+}
+
+.app-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xl) var(--spacing-lg);
+  text-align: center;
+  color: var(--text-medium);
+}
+
+.app-empty-state__icon {
+  font-size: 48px;
+  color: var(--text-light);
+}
+
+.app-empty-state__title {
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.app-empty-state__subtitle {
+  font-size: var(--font-size-small);
+  color: var(--text-medium);
+  margin: 0;
+}
+

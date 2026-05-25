@@ -17,6 +17,7 @@ import { AtividadeDTO, EvidenciaDTO } from '../../models/public.models';
 // Services
 import { PublicApiService } from '../../services/public-api.service';
 import { PublicNavigationService } from '../../services/public-navigation.service';
+import { BreaklinesPipe } from '../../../shared/pipes/breaklines.pipe';
 
 @Component({
   selector: 'acadmanage-visualizar-atividade-publica',
@@ -34,7 +35,8 @@ import { PublicNavigationService } from '../../services/public-navigation.servic
     MatSnackBarModule,
     MatBadgeModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    BreaklinesPipe
   ],
   templateUrl: './visualizar-atividade.component.html',
   styleUrl: './visualizar-atividade.component.css'
@@ -50,10 +52,9 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
   isLoadingEvidencias = false;
 
   // Carrossel de evidências
-  evidenciasPaginas: EvidenciaDTO[][] = [];
-  paginaAtualEvidencias = 0;
-  evidenciasPorPagina = 3;
-  totalPaginasEvidencias = 0;
+  currentSlideIndex = 0;
+  carrosselPageSize = 5;
+  carrosselPageIndex = 0;
   lightboxOpen = false;
   lightboxIndex = 0;
   private scrollLocked = false;
@@ -88,14 +89,12 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.errorMessage = '';
 
-    console.log('📚 Carregando atividade pública:', this.atividadeId);
-
+    
     this.publicApiService.getAtividadeById(this.atividadeId).subscribe({
       next: (atividade: AtividadeDTO) => {
         this.atividade = atividade;
         this.isLoading = false;
-        console.log('✅ Atividade carregada:', atividade);
-      },
+              },
       error: (error: any) => {
         console.error('❌ Erro ao carregar atividade:', error);
         this.errorMessage = 'Erro ao carregar atividade';
@@ -107,67 +106,80 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
 
   loadEvidencias(): void {
     this.isLoadingEvidencias = true;
-    console.log('📸 Carregando evidências da atividade:', this.atividadeId);
-
+    
     this.publicApiService.getEvidenciasPorAtividade(this.atividadeId).subscribe({
-      next: (evidencias: EvidenciaDTO[]) => {
-        this.evidencias = evidencias;
-        this.calcularPaginasEvidencias();
+      next: (evidencias: EvidenciaDTO[] | null) => {
+        const normalized = Array.isArray(evidencias)
+          ? evidencias.map(e => this.normalizeEvidencia(e))
+          : [];
+        this.evidencias = this.sortEvidencias(normalized);
+        this.currentSlideIndex = 0;
+        this.carrosselPageIndex = 0;
+        this.lightboxIndex = 0;
         this.isLoadingEvidencias = false;
-        console.log('✅ Evidências carregadas:', evidencias.length);
-      },
+              },
       error: (error: any) => {
         console.error('❌ Erro ao carregar evidências:', error);
         this.evidencias = [];
-        this.evidenciasPaginas = [];
-        this.totalPaginasEvidencias = 0;
-        this.paginaAtualEvidencias = 0;
+        this.currentSlideIndex = 0;
+        this.carrosselPageIndex = 0;
+        this.lightboxIndex = 0;
         this.isLoadingEvidencias = false;
       }
     });
   }
 
   // Métodos do carrossel de evidências
-  calcularPaginasEvidencias(): void {
-    this.evidenciasPaginas = [];
-    this.totalPaginasEvidencias = Math.ceil(this.evidencias.length / this.evidenciasPorPagina);
+  get evidenciasPaginadas(): EvidenciaDTO[] {
+    const start = this.carrosselPageIndex * this.carrosselPageSize;
+    const end = start + this.carrosselPageSize;
+    return this.evidencias.slice(start, end);
+  }
 
-    for (let i = 0; i < this.totalPaginasEvidencias; i++) {
-      const inicio = i * this.evidenciasPorPagina;
-      const fim = inicio + this.evidenciasPorPagina;
-      this.evidenciasPaginas.push(this.evidencias.slice(inicio, fim));
+  get currentEvidencia(): EvidenciaDTO | null {
+    return this.evidenciasPaginadas[this.currentSlideIndex] || null;
+  }
+
+  get totalCarrosselPages(): number {
+    return Math.ceil(this.evidencias.length / this.carrosselPageSize);
+  }
+
+  get hasMultiplePages(): boolean {
+    return this.evidencias.length > this.carrosselPageSize;
+  }
+
+  previousSlide(): void {
+    if (this.evidenciasPaginadas.length === 0) return;
+    this.currentSlideIndex = (this.currentSlideIndex - 1 + this.evidenciasPaginadas.length) % this.evidenciasPaginadas.length;
+  }
+
+  nextSlide(): void {
+    if (this.evidenciasPaginadas.length === 0) return;
+    this.currentSlideIndex = (this.currentSlideIndex + 1) % this.evidenciasPaginadas.length;
+  }
+
+  goToSlide(index: number): void {
+    this.currentSlideIndex = index;
+  }
+
+  previousCarrosselPage(): void {
+    if (this.carrosselPageIndex > 0) {
+      this.carrosselPageIndex--;
+      this.currentSlideIndex = 0;
     }
-
-    console.log('📊 Páginas de evidências calculadas:', {
-      totalEvidencias: this.evidencias.length,
-      evidenciasPorPagina: this.evidenciasPorPagina,
-      totalPaginas: this.totalPaginasEvidencias,
-      paginas: this.evidenciasPaginas.map((p, i) => ({ pagina: i + 1, evidencias: p.length }))
-    });
   }
 
-  getEvidenciasPaginaAtual(): EvidenciaDTO[] {
-    return this.evidenciasPaginas[this.paginaAtualEvidencias] || [];
-  }
-
-  proximaPaginaEvidencias(): void {
-    if (this.paginaAtualEvidencias < this.totalPaginasEvidencias - 1) {
-      this.paginaAtualEvidencias++;
-      console.log('➡️ Próxima página de evidências:', this.paginaAtualEvidencias + 1);
+  nextCarrosselPage(): void {
+    if (this.carrosselPageIndex < this.totalCarrosselPages - 1) {
+      this.carrosselPageIndex++;
+      this.currentSlideIndex = 0;
     }
   }
 
-  paginaAnteriorEvidencias(): void {
-    if (this.paginaAtualEvidencias > 0) {
-      this.paginaAtualEvidencias--;
-      console.log('⬅️ Página anterior de evidências:', this.paginaAtualEvidencias + 1);
-    }
-  }
-
-  irParaPaginaEvidencias(pagina: number): void {
-    if (pagina >= 0 && pagina < this.totalPaginasEvidencias) {
-      this.paginaAtualEvidencias = pagina;
-      console.log('🎯 Indo para página de evidências:', pagina + 1);
+  goToCarrosselPage(pageIndex: number): void {
+    if (pageIndex >= 0 && pageIndex < this.totalCarrosselPages) {
+      this.carrosselPageIndex = pageIndex;
+      this.currentSlideIndex = 0;
     }
   }
 
@@ -179,34 +191,29 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     this.lightboxIndex = index;
     this.lightboxOpen = true;
     this.disableScroll();
-    console.log('🔍 Lightbox aberta para evidência:', evidencia.id);
-  }
+      }
 
   closeLightbox(): void {
     this.lightboxOpen = false;
     this.enableScroll();
-    console.log('❎ Lightbox fechada');
-  }
+      }
 
   nextLightbox(): void {
     if (!this.evidencias.length) return;
     this.lightboxIndex = (this.lightboxIndex + 1) % this.evidencias.length;
-    console.log('➡️ Próxima evidência no lightbox:', this.lightboxIndex + 1);
-  }
+      }
 
   prevLightbox(): void {
     if (!this.evidencias.length) return;
     this.lightboxIndex = (this.lightboxIndex - 1 + this.evidencias.length) % this.evidencias.length;
-    console.log('⬅️ Evidência anterior no lightbox:', this.lightboxIndex + 1);
-  }
+      }
 
   goToLightbox(index: number): void {
     if (index < 0 || index >= this.evidencias.length) {
       return;
     }
     this.lightboxIndex = index;
-    console.log('🎯 Lightbox navegada para índice:', index + 1);
-  }
+      }
 
   get lightboxEvidencia(): EvidenciaDTO | null {
     return this.evidencias[this.lightboxIndex] || null;
@@ -214,7 +221,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
 
   getLightboxImageUrl(): string {
     const evidencia = this.lightboxEvidencia;
-    return evidencia ? this.getEvidenciaImageUrl(evidencia.foto) : '';
+    return evidencia ? this.getEvidenciaImageUrlFromEvidencia(evidencia) : '';
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -264,6 +271,24 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     return dataObj.toLocaleDateString('pt-BR');
   }
 
+  // Formatar data da atividade (suporta período)
+  formatarDataAtividade(atividade: any): string {
+    if (!atividade?.dataRealizacao) return 'Data não informada';
+    
+    const dataInicio = new Date(atividade.dataRealizacao + 'T00:00:00');
+    const dataInicioFormatada = dataInicio.toLocaleDateString('pt-BR');
+    
+    if (!atividade.dataFim) {
+      // Evento em data única
+      return dataInicioFormatada;
+    } else {
+      // Evento em período
+      const dataFim = new Date(atividade.dataFim + 'T00:00:00');
+      const dataFimFormatada = dataFim.toLocaleDateString('pt-BR');
+      return `${dataInicioFormatada} a ${dataFimFormatada}`;
+    }
+  }
+
   // Obter URL da imagem
   getImageUrl(fotoCapa: string): string {
     if (!fotoCapa) return '';
@@ -278,6 +303,10 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     return this.publicApiService.getEvidenciaImageUrl(foto);
   }
 
+  getEvidenciaImageUrlFromEvidencia(evidencia: EvidenciaDTO | null | undefined): string {
+    return this.publicApiService.getEvidenciaImageUrl(this.getEvidenciaFotoPath(evidencia));
+  }
+
   // Erro ao carregar imagem
   onImageError(event: any): void {
     event.target.style.display = 'none';
@@ -288,6 +317,39 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     this.snackBar.open(message, 'Fechar', {
       duration: 5000,
       panelClass: [`snackbar-${type}`]
+    });
+  }
+
+  private getEvidenciaFotoPath(evidencia: EvidenciaDTO | null | undefined): string {
+    if (!evidencia) {
+      return '';
+    }
+    return evidencia.foto || evidencia.urlFoto || '';
+  }
+
+  private normalizeEvidencia(evidencia: EvidenciaDTO): EvidenciaDTO {
+    const ordem =
+      typeof evidencia.ordem === 'number'
+        ? evidencia.ordem
+        : (evidencia as any)?.indice ?? undefined;
+
+    const foto = this.getEvidenciaFotoPath(evidencia);
+
+    return {
+      ...evidencia,
+      foto,
+      ordem: typeof ordem === 'number' ? ordem : undefined
+    };
+  }
+
+  private sortEvidencias(evidencias: EvidenciaDTO[]): EvidenciaDTO[] {
+    return [...evidencias].sort((a, b) => {
+      const ordemA = typeof a.ordem === 'number' ? a.ordem : Number.MAX_SAFE_INTEGER;
+      const ordemB = typeof b.ordem === 'number' ? b.ordem : Number.MAX_SAFE_INTEGER;
+      if (ordemA !== ordemB) {
+        return ordemA - ordemB;
+      }
+      return (a.id ?? Number.MAX_SAFE_INTEGER) - (b.id ?? Number.MAX_SAFE_INTEGER);
     });
   }
 }

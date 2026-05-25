@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, Observable, firstValueFrom } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs/operators';
+import { HttpErrorResponse } from '@angular/common/http';
 
 // Angular Material
 import { MatCardModule } from '@angular/material/card';
@@ -34,6 +35,10 @@ import { AtividadeDTO, AtividadeUpdateDTO, AtividadeCreateDTO, PessoaPapelDTO } 
 import { Papel, PapeisDisponiveis, PapelUtils } from '../../models/papel.enum';
 import { CursoFilter } from '../../../cursos/models/curso-filter.model';
 import { extractApiMessage } from '../../../../shared/utils/message.utils';
+import { PessoasService } from '../../../pessoas/services/pessoas.service';
+import { PessoaFilter } from '../../../pessoas/models/pessoa-filter.model';
+import { Pessoa } from '../../../pessoas/models/pessoa.model';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'acadmanage-form-atividade',
@@ -90,12 +95,19 @@ export class FormAtividadeComponent implements OnInit {
   papelSelecionado: Papel = Papel.PARTICIPANTE;
   papeisDisponiveis = PapeisDisponiveis;
   coordenadorId: number | null = null;
+  private integranteInfoCache = new Map<number, { nome?: string; cpf?: string }>();
+  private integranteInfoRequests = new Set<number>();
 
   // Filtros para busca de usuários
   filtroCoordenador = '';
   filtroIntegrante = '';
   pessoasFiltradas: any[] = [];
   coordenadoresFiltrados: any[] = [];
+
+  @ViewChild('participantesCsvInput') participantesCsvInput?: ElementRef<HTMLInputElement>;
+  isImportingParticipantes = false;
+  importParticipantesMessage: string | null = null;
+  importParticipantesError: string | null = null;
 
   // Controle de filtro para mat-select
   coordenadorFiltro = '';
@@ -128,7 +140,10 @@ export class FormAtividadeComponent implements OnInit {
     private imageCompressionService: ImageCompressionService,
     private snackBar: MatSnackBar,
     private dateAdapter: DateAdapter<Date>,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private imagemCapaDialog: MatDialog,
+    private pessoasService: PessoasService,
+    private location: Location
   ) {
     this.initForm();
     // Configurar locale pt-BR para o DatePicker
@@ -147,13 +162,11 @@ export class FormAtividadeComponent implements OnInit {
       // Modo EDIÇÃO
       this.isEditMode = true;
       this.atividadeId = Number(id);
-      console.log('✏️ Modo EDIÇÃO - Atividade ID:', this.atividadeId);
-    } else if (cursoIdParam) {
+          } else if (cursoIdParam) {
       // Modo CRIAÇÃO
       this.isEditMode = false;
       this.cursoId = Number(cursoIdParam);
-      console.log('➕ Modo CRIAÇÃO - Curso ID:', this.cursoId);
-    }
+          }
 
     // Tentar recuperar dados do state (enviado pela navegação)
     const state = history.state;
@@ -166,19 +179,13 @@ export class FormAtividadeComponent implements OnInit {
     if (!this.isEditMode) {
       if (state && state.cursoNome) {
         this.cursoNome = state.cursoNome;
-        console.log('📚 Nome do curso (do state):', this.cursoNome);
-      }
+              }
     }
 
     this.loadData();
 
     // Log para debug
-    console.log('🔍 FormAtividadeComponent inicializado:');
-    console.log('🔍 Modo:', this.isEditMode ? 'EDIÇÃO' : 'CRIAÇÃO');
-    console.log('🔍 Atividade ID:', this.atividadeId);
-    console.log('🔍 Curso ID:', this.cursoId);
-    console.log('🔍 Atividade do state:', this.atividade);
-  }
+                      }
 
   initForm(): void {
     this.atividadeForm = this.fb.group({
@@ -188,6 +195,7 @@ export class FormAtividadeComponent implements OnInit {
       statusPublicacao: [false],
       coordenador: [''],
       dataRealizacao: ['', Validators.required],
+      dataFim: [null], // Campo opcional para data fim
       cursoId: [{ value: '', disabled: true }], // Desabilitado - curso não pode ser alterado
       categoriaId: ['', Validators.required]
     });
@@ -228,15 +236,13 @@ export class FormAtividadeComponent implements OnInit {
       this.cursosService.getAllCourses(filter).subscribe({
         next: (page) => {
           this.cursos = page.content || [];
-          console.log('📚 Cursos carregados:', this.cursos.length);
-
+          
           // Se estiver em modo criação e não tiver nome do curso, buscar
           if (!this.isEditMode && !this.cursoNome && this.cursoId) {
             const curso = this.cursos.find(c => c.id === this.cursoId);
             if (curso) {
               this.cursoNome = curso.nome;
-              console.log('📚 Nome do curso encontrado:', this.cursoNome);
-            }
+                          }
           }
 
           resolve();
@@ -255,8 +261,7 @@ export class FormAtividadeComponent implements OnInit {
       this.cursosService.getAllCategoriesPaginado({ page: 0, size: 1000, sortBy: 'id', direction: 'ASC' }).subscribe({
         next: (page: any) => {
           this.categorias = Array.isArray(page) ? page : (page?.content || []);
-          console.log('📂 Categorias carregadas:', this.categorias);
-          resolve();
+                    resolve();
         },
         error: (error: any) => {
           console.error('❌ Erro ao carregar categorias:', error);
@@ -274,8 +279,7 @@ export class FormAtividadeComponent implements OnInit {
           this.fontesFinanciadoras = fontes || [];
           // Inicializar lista filtrada com todas as fontes
           this.fontesFinanciadorasFiltradas = [...this.fontesFinanciadoras];
-          console.log('💰 Fontes financiadoras carregadas:', this.fontesFinanciadoras);
-          resolve();
+                    resolve();
         },
         error: (error: any) => {
           console.error('❌ Erro ao carregar fontes financiadoras:', error);
@@ -289,8 +293,7 @@ export class FormAtividadeComponent implements OnInit {
 
   loadPessoas(): Promise<void> {
     return new Promise((resolve) => {
-      console.log('📡 Inicializando busca de pessoas...');
-
+      
       // Inicializar listas vazias
       this.pessoas = [];
       this.pessoasFiltradas = [];
@@ -300,8 +303,7 @@ export class FormAtividadeComponent implements OnInit {
       this.coordenadorSearchSubject.next('');
       this.integranteSearchSubject.next('');
 
-      console.log('👥 Sistema de busca de pessoas inicializado');
-      resolve();
+            resolve();
     });
   }
 
@@ -317,8 +319,7 @@ export class FormAtividadeComponent implements OnInit {
         next: (atividade) => {
           this.atividade = atividade;
           this.populateForm();
-          console.log('✅ Atividade carregada:', atividade);
-          resolve();
+                    resolve();
         },
         error: (error) => {
           console.error('❌ Erro ao carregar atividade:', error);
@@ -339,9 +340,13 @@ export class FormAtividadeComponent implements OnInit {
       statusPublicacao: this.atividade.statusPublicacao,
       coordenador: this.atividade.coordenador,
       dataRealizacao: this.atividade.dataRealizacao,
+      dataFim: this.atividade.dataFim || null,
       cursoId: this.atividade.curso.id,
       categoriaId: this.atividade.categoria.id
     });
+
+    this.cursoId = this.atividade.curso.id;
+    this.cursoNome = this.atividade.curso.nome;
 
     // Configurar preview da imagem atual
     if (this.atividade.fotoCapa) {
@@ -354,23 +359,34 @@ export class FormAtividadeComponent implements OnInit {
     // Carregar fontes financiadoras da atividade
     if (this.atividade.fontesFinanciadora && this.atividade.fontesFinanciadora.length > 0) {
       this.fontesFinanciadorasSelecionadas = [...this.atividade.fontesFinanciadora];
-      console.log('💰 Fontes financiadoras da atividade carregadas:', this.fontesFinanciadorasSelecionadas);
-    }
+          }
 
     // Carregar integrantes da atividade
     if (this.atividade.integrantes && this.atividade.integrantes.length > 0) {
-      this.integrantesSelecionados = [...this.atividade.integrantes];
-      console.log('👥 Integrantes da atividade carregados:', this.integrantesSelecionados);
-
+      this.integrantesSelecionados = this.atividade.integrantes
+        .map(integrante => {
+          const idNormalizado = this.extractPessoaId(integrante);
+          return {
+            id: idNormalizado ?? integrante.id,
+            nome: integrante.nome ?? '',
+            cpf: integrante.cpf ?? '',
+            papel: integrante.papel
+          };
+        })
+        .filter(integrante => integrante.id !== null && integrante.id !== undefined);
+      this.integrantesSelecionados.forEach(integrante => this.ensureIntegranteInfo(integrante));
+      
       // Identificar o coordenador
       const coordenador = this.integrantesSelecionados.find(i => i.papel === Papel.COORDENADOR);
       if (coordenador) {
-        this.coordenadorId = coordenador.id;
-        console.log('👤 Coordenador identificado:', coordenador);
-      }
+        this.coordenadorId = this.extractPessoaId(coordenador) ?? null;
+              }
     }
 
-    console.log('📝 Formulário preenchido com dados da atividade');
+    
+    if (this.isEditMode && this.atividadeId) {
+      this.refreshIntegrantesFromApi();
+    }
   }
 
   // Métodos para upload de imagem
@@ -380,8 +396,7 @@ export class FormAtividadeComponent implements OnInit {
 
     const file = event.target.files[0];
     if (file) {
-      console.log('📸 Arquivo selecionado via input:', file.name);
-      await this.handleFile(file);
+            await this.handleFile(file);
     }
   }
 
@@ -416,12 +431,7 @@ export class FormAtividadeComponent implements OnInit {
       return;
     }
 
-    console.log('📸 Arquivo selecionado:', {
-      nome: file.name,
-      tamanho: this.imageCompressionService.formatFileSize(file.size),
-      tipo: file.type
-    });
-
+    
     try {
       // Mostrar mensagem de compressão
       this.showMessage('Comprimindo imagem...', 'warning');
@@ -445,12 +455,7 @@ export class FormAtividadeComponent implements OnInit {
         'success'
       );
 
-      console.log('✅ Compressão concluída:', {
-        tamanhoOriginal: this.imageCompressionService.formatFileSize(compressionResult.originalSize),
-        tamanhoComprimido: this.imageCompressionService.formatFileSize(compressionResult.compressedSize),
-        taxaCompressao: `${compressionResult.compressionRatio.toFixed(1)}%`
-      });
-
+      
     } catch (error) {
       console.error('❌ Erro na compressão:', error);
       this.showMessage('Erro ao processar a imagem. Tente novamente.', 'error');
@@ -487,12 +492,10 @@ export class FormAtividadeComponent implements OnInit {
     this.isUploading = true;
     this.uploadProgress = 0;
 
-    console.log('📤 Iniciando upload da imagem...');
-
+    
     this.atividadesService.uploadFotoCapa(this.atividadeId, this.selectedFile).subscribe({
       next: (response) => {
-        console.log('✅ Upload realizado com sucesso:', response);
-        this.uploadProgress = 100;
+                this.uploadProgress = 100;
         this.showMessage('Foto de capa atualizada com sucesso!', 'success');
 
         // Atualizar preview com a nova URL
@@ -577,9 +580,7 @@ export class FormAtividadeComponent implements OnInit {
 
   // Métodos para gerenciar fontes financiadoras
   adicionarFonteFinanciadora(): void {
-    console.log('🔄 Tentando adicionar fonte. ID selecionado:', this.fonteFinanciadoraSelecionada);
-    console.log('📋 Fontes selecionadas ANTES:', [...this.fontesFinanciadorasSelecionadas]);
-
+        
     if (!this.fonteFinanciadoraSelecionada) {
       this.showMessage('Selecione uma fonte financiadora', 'warning');
       return;
@@ -592,23 +593,18 @@ export class FormAtividadeComponent implements OnInit {
 
     if (jaAdicionada) {
       this.showMessage('Esta fonte financiadora já foi adicionada', 'warning');
-      console.log('⚠️ Fonte já adicionada!');
-      return;
+            return;
     }
 
     // Usar a fonte completa armazenada
     const fonte = this.fonteFinanciadoraSelecionadaCompleta;
 
-    console.log('🔍 Fonte armazenada:', fonte);
-
+    
     if (fonte) {
       this.fontesFinanciadorasSelecionadas.push(fonte);
       this.fonteFinanciadoraSelecionada = null; // Limpar seleção
       this.fonteFinanciadoraSelecionadaCompleta = null; // Limpar fonte completa
-      console.log('✅ Fonte financiadora adicionada à lista:', fonte);
-      console.log('📋 Fontes selecionadas DEPOIS:', [...this.fontesFinanciadorasSelecionadas]);
-      console.log('📊 Total de fontes:', this.fontesFinanciadorasSelecionadas.length);
-
+                  
       // Atualizar lista filtrada após adicionar
       this.filtrarFontesFinanciadoras(this.fonteFinanciadoraFiltro);
 
@@ -620,18 +616,12 @@ export class FormAtividadeComponent implements OnInit {
   }
 
   removerFonteFinanciadora(fonte: any): void {
-    console.log('🗑️ Tentando remover fonte:', fonte);
-    console.log('📋 Fontes selecionadas ANTES da remoção:', [...this.fontesFinanciadorasSelecionadas]);
-
+        
     const index = this.fontesFinanciadorasSelecionadas.findIndex(f => f.id === fonte.id);
-    console.log('📍 Índice encontrado:', index);
-
+    
     if (index > -1) {
       this.fontesFinanciadorasSelecionadas.splice(index, 1);
-      console.log('❌ Fonte financiadora removida da lista:', fonte);
-      console.log('📋 Fontes restantes:', [...this.fontesFinanciadorasSelecionadas]);
-      console.log('📊 Total de fontes:', this.fontesFinanciadorasSelecionadas.length);
-
+                  
       // Atualizar lista filtrada após remover
       this.filtrarFontesFinanciadoras(this.fonteFinanciadoraFiltro);
 
@@ -671,12 +661,10 @@ export class FormAtividadeComponent implements OnInit {
       return nomeA.localeCompare(nomeB);
     });
 
-    console.log('🔍 Fontes financiadoras filtradas:', this.fontesFinanciadorasFiltradas.length);
-  }
+      }
 
   onFonteFinanciadoraSelected(nomeFonte: string): void {
-    console.log('💰 Fonte financiadora selecionada:', nomeFonte);
-
+    
     if (!nomeFonte) return;
 
     // Encontrar a fonte selecionada pelo nome
@@ -694,8 +682,7 @@ export class FormAtividadeComponent implements OnInit {
     // Limpar o campo de busca
     this.fonteFinanciadoraFiltro = '';
 
-    console.log('✅ Fonte selecionada para adicionar:', fonte);
-  }
+      }
 
   // Configurar debounce para filtros de usuários
   private setupDebounceFilters(): void {
@@ -704,8 +691,8 @@ export class FormAtividadeComponent implements OnInit {
       debounceTime(300),
       distinctUntilChanged(),
       switchMap(termo => this.searchCoordenadores(termo))
-    ).subscribe(usuarios => {
-      this.coordenadoresFiltrados = usuarios;
+    ).subscribe(coordenadores => {
+      this.coordenadoresFiltrados = coordenadores;
     });
 
     // Debounce para filtro de integrantes
@@ -719,31 +706,29 @@ export class FormAtividadeComponent implements OnInit {
   }
 
   // Métodos para buscar usuários na API
-  private searchCoordenadores(termo: string): Observable<any[]> {
-    const pageRequest = {
+  private searchCoordenadores(termo: string): Observable<Pessoa[]> {
+    const filter: PessoaFilter = {
       page: 0,
       size: 50,
-      sortBy: 'id',
-      direction: 'ASC' as 'ASC'
+      sortBy: 'nome',
+      direction: 'ASC',
+      nome: termo && termo.trim() ? termo.trim() : undefined
     };
 
-    return this.usuariosService.getAllUsersPaginado(pageRequest, termo).pipe(
-      map((page: any) => page.content || []),
-      map((usuarios: any[]) => {
-        // Filtrar coordenadores já selecionados
-        const usuariosFiltrados = usuarios.filter((pessoa: any) => {
-          const jaEhCoordenador = this.integrantesSelecionados.some(
-            integrante => integrante.id === pessoa.id && integrante.papel === Papel.COORDENADOR
-          );
-          return !jaEhCoordenador;
-        });
-
-        // Ordenar por nome
-        return usuariosFiltrados.sort((a: any, b: any) => {
-          const nomeA = (a.nome || a.name || '').toLowerCase();
-          const nomeB = (b.nome || b.name || '').toLowerCase();
-          return nomeA.localeCompare(nomeB);
-        });
+    return this.pessoasService.getPage(filter).pipe(
+      map(page => page.content || []),
+      map((pessoas: Pessoa[]) => {
+        return pessoas
+          .filter(pessoa => {
+            return !this.integrantesSelecionados.some(
+              integrante => integrante.id === pessoa.id && integrante.papel === Papel.COORDENADOR
+            );
+          })
+          .sort((a: Pessoa, b: Pessoa) => {
+            const nomeA = (a.nome || '').toLowerCase();
+            const nomeB = (b.nome || '').toLowerCase();
+            return nomeA.localeCompare(nomeB);
+          });
       })
     );
   }
@@ -776,8 +761,15 @@ export class FormAtividadeComponent implements OnInit {
 
   // Métodos para filtrar usuários no mat-autocomplete
   filtrarCoordenadores(termo: string): void {
-    this.coordenadorFiltro = termo;
-    this.coordenadorSearchSubject.next(termo);
+    const valor = termo || '';
+    const trimmed = valor.trim();
+
+    if (!trimmed && this.coordenadorId) {
+      this.removerCoordenadorSelecionado(false);
+    }
+
+    this.coordenadorFiltro = valor;
+    this.coordenadorSearchSubject.next(trimmed);
   }
 
   filtrarIntegrantes(termo: string): void {
@@ -794,8 +786,7 @@ export class FormAtividadeComponent implements OnInit {
 
   // Métodos para gerenciar integrantes
   onCoordenadorChange(nomePessoa: string): void {
-    console.log('👤 Coordenador alterado para:', nomePessoa);
-
+    
     if (!nomePessoa) return;
 
     // Encontrar a pessoa selecionada pelo nome
@@ -808,21 +799,21 @@ export class FormAtividadeComponent implements OnInit {
 
     // Atualizar o campo de texto com o nome da pessoa selecionada
     this.coordenadorFiltro = pessoa.nome || pessoa.name;
+    this.coordenadorId = pessoa.id;
 
     // Remover coordenador anterior (se existir)
     const coordenadorAnteriorIndex = this.integrantesSelecionados.findIndex(i => i.papel === Papel.COORDENADOR);
     if (coordenadorAnteriorIndex > -1) {
       const coordenadorAnterior = this.integrantesSelecionados[coordenadorAnteriorIndex];
-      console.log('🔄 Removendo coordenador anterior:', coordenadorAnterior.nome);
-      this.integrantesSelecionados.splice(coordenadorAnteriorIndex, 1);
+            this.integrantesSelecionados.splice(coordenadorAnteriorIndex, 1);
     }
 
     // Verificar se a pessoa já está nos integrantes com outro papel
     const integranteExistenteIndex = this.integrantesSelecionados.findIndex(i => i.id === pessoa.id);
     if (integranteExistenteIndex > -1) {
       // Atualizar papel para COORDENADOR
-      console.log('🔄 Pessoa já era integrante, atualizando para COORDENADOR');
-      this.integrantesSelecionados[integranteExistenteIndex].papel = Papel.COORDENADOR;
+            this.integrantesSelecionados[integranteExistenteIndex].papel = Papel.COORDENADOR;
+      this.cacheIntegranteInfo(this.integrantesSelecionados[integranteExistenteIndex]);
     } else {
       // Adicionar como novo integrante
       const novoCoordenador: PessoaPapelDTO = {
@@ -832,24 +823,22 @@ export class FormAtividadeComponent implements OnInit {
         papel: Papel.COORDENADOR
       };
       this.integrantesSelecionados.unshift(novoCoordenador); // Adiciona no início
-      console.log('✅ Coordenador adicionado aos integrantes:', novoCoordenador);
-    }
+      this.cacheIntegranteInfo(novoCoordenador);
+          }
 
     // Atualizar campo coordenador no formulário
     this.atividadeForm.patchValue({
       coordenador: pessoa.nome || pessoa.name
     });
 
-    console.log('📋 Integrantes após mudança de coordenador:', this.integrantesSelecionados);
-
+    
     // Atualizar listas filtradas após mudança
     this.filtrarCoordenadores(this.coordenadorFiltro);
     this.filtrarIntegrantes(this.integranteFiltro);
   }
 
   onIntegranteSelected(nomePessoa: string): void {
-    console.log('👤 Integrante selecionado:', nomePessoa);
-
+    
     if (!nomePessoa) return;
 
     // Encontrar a pessoa selecionada pelo nome
@@ -867,13 +856,10 @@ export class FormAtividadeComponent implements OnInit {
     // Limpar o campo de busca
     this.integranteFiltro = '';
 
-    console.log('✅ Pessoa selecionada para adicionar:', pessoa);
-  }
+      }
 
   adicionarIntegrante(): void {
-    console.log('🔄 Tentando adicionar integrante. Pessoa ID:', this.pessoaSelecionada, 'Papel:', this.papelSelecionado);
-    console.log('📋 Integrantes selecionados ANTES:', [...this.integrantesSelecionados]);
-
+        
     if (!this.pessoaSelecionada) {
       this.showMessage('Selecione uma pessoa', 'warning');
       return;
@@ -882,8 +868,7 @@ export class FormAtividadeComponent implements OnInit {
     // Não permitir adicionar COORDENADOR manualmente (deve usar o campo específico)
     if (this.papelSelecionado === Papel.COORDENADOR) {
       this.showMessage('Para definir o coordenador, use o campo "Coordenador" acima', 'warning');
-      console.log('⚠️ Tentativa de adicionar coordenador manualmente');
-      return;
+            return;
     }
 
     // Verificar se já foi adicionada
@@ -893,15 +878,13 @@ export class FormAtividadeComponent implements OnInit {
 
     if (jaAdicionada) {
       this.showMessage('Esta pessoa já foi adicionada', 'warning');
-      console.log('⚠️ Pessoa já adicionada!');
-      return;
+            return;
     }
 
     // Usar a pessoa completa armazenada
     const pessoa = this.pessoaSelecionadaCompleta;
 
-    console.log('🔍 Pessoa armazenada:', pessoa);
-
+    
     if (pessoa) {
       // Criar objeto PessoaPapelDTO
       const integrante: PessoaPapelDTO = {
@@ -912,14 +895,12 @@ export class FormAtividadeComponent implements OnInit {
       };
 
       this.integrantesSelecionados.push(integrante);
+      this.cacheIntegranteInfo(integrante);
       this.pessoaSelecionada = null; // Limpar seleção
       this.pessoaSelecionadaCompleta = null; // Limpar pessoa completa
       this.papelSelecionado = Papel.PARTICIPANTE; // Resetar para padrão
 
-      console.log('✅ Integrante adicionado à lista:', integrante);
-      console.log('📋 Integrantes selecionados DEPOIS:', [...this.integrantesSelecionados]);
-      console.log('📊 Total de integrantes:', this.integrantesSelecionados.length);
-
+                  
       // Atualizar listas filtradas após adição
       this.filtrarIntegrantes(this.integranteFiltro);
       // Sem mensagem - só mostra ao salvar
@@ -930,53 +911,317 @@ export class FormAtividadeComponent implements OnInit {
   }
 
   removerIntegrante(integrante: PessoaPapelDTO): void {
-    console.log('🗑️ Tentando remover integrante:', integrante);
-    console.log('📋 Integrantes selecionados ANTES da remoção:', [...this.integrantesSelecionados]);
-
-    // Não permitir remover o coordenador (deve trocar no campo específico)
-    if (integrante.papel === Papel.COORDENADOR) {
-      this.showMessage('O coordenador não pode ser removido. Para trocar, selecione outro no campo "Coordenador"', 'warning');
-      console.log('⚠️ Tentativa de remover coordenador bloqueada');
-      return;
-    }
-
+        
     const index = this.integrantesSelecionados.findIndex(i => i.id === integrante.id);
-    console.log('📍 Índice encontrado:', index);
-
+    
     if (index > -1) {
       this.integrantesSelecionados.splice(index, 1);
-      console.log('❌ Integrante removido da lista:', integrante);
-      console.log('📋 Integrantes restantes:', [...this.integrantesSelecionados]);
-      console.log('📊 Total de integrantes:', this.integrantesSelecionados.length);
+                  
+      if (integrante.papel === Papel.COORDENADOR) {
+        this.removerCoordenadorSelecionado(true);
+        this.filtrarCoordenadores('');
+      }
       // Sem mensagem - só mostra ao salvar
     } else {
       console.error('❌ Integrante não encontrado para remoção!');
     }
   }
 
-  alterarPapelIntegrante(integrante: PessoaPapelDTO, novoPapel: Papel): void {
-    console.log('🔄 Alterando papel de:', integrante.nome, 'para:', novoPapel);
+  triggerImportParticipantes(): void {
+    if (this.isImportingParticipantes) {
+      return;
+    }
 
+    if (!this.isEditMode || !this.atividadeId) {
+      this.showMessage('Importação disponível apenas após salvar a atividade.', 'warning');
+      return;
+    }
+
+    this.importParticipantesMessage = null;
+    this.importParticipantesError = null;
+
+    this.participantesCsvInput?.nativeElement.click();
+  }
+
+  onParticipantesCsvSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+
+    if (!this.isEditMode || !this.atividadeId) {
+      this.showMessage('Salve a atividade antes de importar participantes.', 'warning');
+      input.value = '';
+      return;
+    }
+
+    const file = input.files[0];
+    this.isImportingParticipantes = true;
+    this.importParticipantesMessage = null;
+    this.importParticipantesError = null;
+
+    this.atividadesService.importarPessoasCsv(this.atividadeId, file).subscribe({
+      next: (associacoes) => {
+        this.isImportingParticipantes = false;
+        const processed = Array.isArray(associacoes) ? associacoes.length : 0;
+        this.importParticipantesMessage =
+          processed > 0
+            ? `Importação concluída: ${processed} participante(s) processado(s).`
+            : 'Importação concluída. Nenhum participante novo foi adicionado.';
+
+        this.showMessage('Importação concluída com sucesso!', 'success');
+        this.refreshIntegrantesFromApi();
+
+        if (this.participantesCsvInput?.nativeElement) {
+          this.participantesCsvInput.nativeElement.value = '';
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        this.isImportingParticipantes = false;
+        this.handleImportParticipantesError(error);
+
+        if (this.participantesCsvInput?.nativeElement) {
+          this.participantesCsvInput.nativeElement.value = '';
+        }
+      }
+    });
+  }
+
+  private handleImportParticipantesError(error: HttpErrorResponse): void {
+    const finalize = (message: string | null) => {
+      const fallback =
+        error.status === 400
+          ? 'Não foi possível importar. Verifique se o arquivo segue o formato esperado (nome, CPF e papel).'
+          : 'Erro ao importar participantes. Tente novamente.';
+
+      const finalMessage = message || fallback;
+      this.importParticipantesError = finalMessage;
+      this.importParticipantesMessage = null;
+      this.showMessage(finalMessage, 'error');
+    };
+
+    if (error?.error instanceof Blob) {
+      const blob = error.error as Blob;
+      blob
+        .text()
+        .then(text => {
+          let parsed: any = text;
+          try {
+            parsed = JSON.parse(text);
+          } catch {
+            // mantém texto simples
+          }
+          const apiMessage = extractApiMessage(parsed);
+          if (apiMessage) {
+            finalize(apiMessage);
+            return;
+          }
+          if (typeof parsed === 'string' && parsed.trim().length > 0) {
+            finalize(parsed);
+            return;
+          }
+          finalize(null);
+        })
+        .catch(() => finalize(null));
+      return;
+    }
+
+    const apiMessage = extractApiMessage(error);
+    finalize(apiMessage);
+  }
+
+  private refreshIntegrantesFromApi(): void {
+    if (!this.isEditMode || !this.atividadeId) {
+      return;
+    }
+
+    this.atividadesService.listarPessoasPorAtividade(this.atividadeId).subscribe({
+      next: (lista) => {
+        const mapped = Array.isArray(lista)
+          ? lista
+              .map(item => this.mapIntegranteResponse(item))
+              .filter((i): i is PessoaPapelDTO => !!i)
+          : [];
+
+        this.integrantesSelecionados = mapped;
+        this.integrantesSelecionados.forEach(integrante => this.ensureIntegranteInfo(integrante));
+
+        const coordenador = this.integrantesSelecionados.find(i => i.papel === Papel.COORDENADOR);
+        if (coordenador) {
+          this.coordenadorId = coordenador.id;
+          this.atividadeForm.patchValue({ coordenador: coordenador.nome }, { emitEvent: false });
+        } else {
+          this.coordenadorId = null;
+          this.atividadeForm.patchValue({ coordenador: '' }, { emitEvent: false });
+        }
+
+        this.filtrarIntegrantes(this.integranteFiltro);
+        this.filtrarCoordenadores(this.coordenadorFiltro);
+      },
+      error: (error) => {
+        console.error('❌ Erro ao atualizar integrantes após importação:', error);
+      }
+    });
+  }
+
+  private mapIntegranteResponse(item: any): PessoaPapelDTO | null {
+    if (!item) {
+      return null;
+    }
+
+    const pessoa = item.pessoa ?? item.pessoaDTO ?? item.usuario ?? null;
+    const id = this.extractPessoaId(item) ?? this.extractPessoaId(pessoa);
+
+    if (!id) {
+      return null;
+    }
+
+    const nome = item.nome ?? pessoa?.nome ?? pessoa?.nomeCompleto ?? pessoa?.descricao ?? '';
+    const cpf = item.cpf ?? pessoa?.cpf ?? pessoa?.documento ?? '';
+    const papel = item.papel ?? item.role ?? '';
+
+    if (!papel) {
+      console.warn('⚠️ Registro de integrante sem papel ao importar CSV:', item);
+      return null;
+    }
+
+    const integrante: PessoaPapelDTO = {
+      id,
+      nome,
+      cpf,
+      papel
+    };
+
+    this.ensureIntegranteInfo(integrante);
+    return integrante;
+  }
+
+  getNomeIntegrante(integrante: PessoaPapelDTO | null | undefined): string {
+    if (!integrante) {
+      return 'Participante';
+    }
+
+    const nomeNormalizado = integrante.nome?.trim();
+    if (nomeNormalizado) {
+      return nomeNormalizado;
+    }
+
+    const integranteId = this.extractPessoaId(integrante);
+
+    if (integranteId) {
+      const cached = this.integranteInfoCache.get(integranteId);
+      if (cached?.nome?.trim()) {
+        return cached.nome.trim();
+      }
+    }
+
+    if (integranteId && Array.isArray(this.pessoas)) {
+      const pessoaEncontrada = this.pessoas.find(p => {
+        const idPessoa =
+          this.extractPessoaId(p) ??
+          (typeof p.id === 'number' ? p.id : null);
+        return idPessoa === integranteId;
+      });
+
+      if (pessoaEncontrada) {
+        const nomePessoa =
+          pessoaEncontrada.nome ??
+          pessoaEncontrada.nomeCompleto ??
+          pessoaEncontrada.descricao ??
+          pessoaEncontrada.nomeExibicao ??
+          '';
+        if (nomePessoa.trim()) {
+          return nomePessoa.trim();
+        }
+      }
+    }
+
+    if (integrante.cpf) {
+      return integrante.cpf;
+    }
+
+    if (integranteId) {
+      this.ensureIntegranteInfo(integrante);
+      return `Pessoa #${integranteId}`;
+    }
+
+    return 'Participante';
+  }
+
+  private extractPessoaId(source: any): number | null {
+    if (source == null) {
+      return null;
+    }
+
+    if (typeof source === 'number') {
+      return source;
+    }
+
+    if (typeof source === 'object') {
+      if (typeof source.pessoaId === 'number') {
+        return source.pessoaId;
+      }
+      if (typeof source.id === 'number') {
+        return source.id;
+      }
+      if (typeof source.idPessoa === 'number') {
+        return source.idPessoa;
+      }
+      if (source.id && typeof source.id === 'object') {
+        const nested = source.id;
+        if (typeof nested.pessoaId === 'number') {
+          return nested.pessoaId;
+        }
+        if (typeof nested.id === 'number') {
+          return nested.id;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  private removerCoordenadorSelecionado(exibirAviso: boolean): void {
+    const coordenadorIndex = this.integrantesSelecionados.findIndex(
+      integrante => integrante.papel === Papel.COORDENADOR && integrante.id === this.coordenadorId
+    );
+
+    if (coordenadorIndex > -1) {
+      const removido = this.integrantesSelecionados[coordenadorIndex];
+      this.integrantesSelecionados.splice(coordenadorIndex, 1);
+          }
+
+    this.coordenadorId = null;
+    this.coordenadorFiltro = '';
+    this.atividadeForm.patchValue({ coordenador: '' });
+    const coordenadorControl = this.atividadeForm.get('coordenador');
+    coordenadorControl?.markAsDirty();
+    coordenadorControl?.updateValueAndValidity();
+
+    if (exibirAviso) {
+      this.showMessage('Coordenador removido da atividade. Selecione outro coordenador.', 'warning');
+    }
+  }
+
+  alterarPapelIntegrante(integrante: PessoaPapelDTO, novoPapel: Papel): void {
+    
     // Não permitir alterar para COORDENADOR (deve usar o campo específico)
     if (novoPapel === Papel.COORDENADOR) {
       this.showMessage('Para definir como coordenador, use o campo "Coordenador" acima', 'warning');
-      console.log('⚠️ Tentativa de alterar para coordenador bloqueada');
-      return;
+            return;
     }
 
     // Não permitir alterar o papel do coordenador atual
     if (integrante.papel === Papel.COORDENADOR) {
       this.showMessage('O coordenador não pode ter seu papel alterado. Selecione outro coordenador primeiro', 'warning');
-      console.log('⚠️ Tentativa de alterar papel do coordenador bloqueada');
-      return;
+            return;
     }
 
     const index = this.integrantesSelecionados.findIndex(i => i.id === integrante.id);
 
     if (index > -1) {
       this.integrantesSelecionados[index].papel = novoPapel;
-      console.log('✅ Papel alterado:', this.integrantesSelecionados[index]);
-      // Sem mensagem - só mostra ao salvar
+            // Sem mensagem - só mostra ao salvar
     }
   }
 
@@ -1011,8 +1256,7 @@ export class FormAtividadeComponent implements OnInit {
   }
 
   private validateAtividadeData(data: any): void {
-    console.log('🔍 Validando dados da atividade:');
-
+    
     // Verificar campos obrigatórios básicos
     const requiredFields = ['nome', 'objetivo', 'publicoAlvo', 'coordenador', 'dataRealizacao'];
     const missingFields: string[] = [];
@@ -1040,8 +1284,7 @@ export class FormAtividadeComponent implements OnInit {
       console.warn('⚠️ Campos com valores ausentes:', missingFields);
       // Não bloquear o envio, apenas avisar
     } else {
-      console.log('✅ Todos os campos obrigatórios preenchidos');
-    }
+          }
 
     // Verificar tipos de dados (apenas warnings)
     if (data.nome && typeof data.nome !== 'string') {
@@ -1056,8 +1299,7 @@ export class FormAtividadeComponent implements OnInit {
       console.warn('⚠️ Data pode estar em formato inválido:', data.dataRealizacao);
     }
 
-    console.log('✅ Validação concluída');
-  }
+      }
 
   private isValidDate(dateString: string): boolean {
     const date = new Date(dateString);
@@ -1069,9 +1311,7 @@ export class FormAtividadeComponent implements OnInit {
       this.isSaving = true;
 
       const formData = this.atividadeForm.value;
-      console.log('📝 Dados do formulário:', formData);
-      console.log('🔍 Modo:', this.isEditMode ? 'EDIÇÃO' : 'CRIAÇÃO');
-
+            
       if (this.isEditMode) {
         this.updateAtividade(formData);
       } else {
@@ -1091,40 +1331,48 @@ export class FormAtividadeComponent implements OnInit {
         dataRealizacao = dataRealizacao.toISOString().split('T')[0]; // YYYY-MM-DD
       }
 
+      // Converter dataFim para formato ISO se necessário
+      let dataFim = formData.dataFim;
+      if (dataFim instanceof Date) {
+        dataFim = dataFim.toISOString().split('T')[0]; // YYYY-MM-DD
+      } else if (!dataFim || dataFim === '') {
+        dataFim = null; // Garantir que seja null se vazio
+      }
+
       // Tentar diferentes formatos de dados
       let atividadeUpdate: any;
 
       // Extrair IDs das fontes financiadoras selecionadas
       const fontesFinanciadoraIds = this.fontesFinanciadorasSelecionadas.map(f => f.id);
-      console.log('💰 Fontes Selecionadas (Array Completo):', this.fontesFinanciadorasSelecionadas);
-      console.log('💰 IDs das fontes financiadoras:', fontesFinanciadoraIds);
-      console.log('💰 Quantidade de fontes selecionadas:', this.fontesFinanciadorasSelecionadas.length);
-
+                  
       // Formatar fontes financiadoras no padrão esperado pelo backend
       const fontesFinanciadoraFormatadas = this.fontesFinanciadorasSelecionadas.map(fonte => ({
         id: fonte.id,
         nome: fonte.nome
       }));
-      console.log('💰 Fontes Formatadas:', fontesFinanciadoraFormatadas);
-
+      
       // Formatar integrantes no padrão esperado pelo backend
-      const integrantesFormatados = this.integrantesSelecionados.map(integrante => ({
-        id: integrante.id,
-        nome: integrante.nome,
-        cpf: integrante.cpf,
-        papel: integrante.papel
-      }));
-      console.log('👥 Integrantes Formatados:', integrantesFormatados);
-      console.log('👥 Quantidade de integrantes:', this.integrantesSelecionados.length);
-      console.log('👥 Integrantes Selecionados (raw):', JSON.stringify(this.integrantesSelecionados, null, 2));
-
+      const integrantesFormatados = this.integrantesSelecionados
+        .map(integrante => {
+          const integranteId = this.extractPessoaId(integrante);
+          if (!integranteId) {
+            return null;
+          }
+          return {
+            id: integranteId,
+            pessoaId: integranteId,
+            nome: integrante.nome,
+            cpf: integrante.cpf,
+            papel: integrante.papel
+          };
+        })
+        .filter((integrante): integrante is { id: number; pessoaId: number; nome: string; cpf: string; papel: string } => integrante !== null);
+                  
       if (this.atividade) {
         // Buscar categoria selecionada
         const categoriaSelecionada = this.categorias.find(c => c.id === formData.categoriaId);
 
-        console.log('📚 Curso da atividade (fixo):', this.atividade.curso);
-        console.log('📂 Categoria selecionada (ID: ' + formData.categoriaId + '):', categoriaSelecionada);
-
+                
         // Formato completo com dados existentes
         atividadeUpdate = {
           id: this.atividade.id,
@@ -1134,6 +1382,7 @@ export class FormAtividadeComponent implements OnInit {
           statusPublicacao: formData.statusPublicacao !== null ? formData.statusPublicacao : false,
           coordenador: formData.coordenador || '',
           dataRealizacao: dataRealizacao || '',
+          dataFim: dataFim || null,
           fotoCapa: this.atividade.fotoCapa || '',
           curso: {
             id: this.atividade.curso.id,
@@ -1156,47 +1405,44 @@ export class FormAtividadeComponent implements OnInit {
           statusPublicacao: formData.statusPublicacao !== null ? formData.statusPublicacao : false,
           coordenador: formData.coordenador || '',
           dataRealizacao: dataRealizacao || '',
+          dataFim: dataFim || null,
           cursoId: formData.cursoId || 0,
           categoriaId: formData.categoriaId || 0,
           fontesFinanciadoraIds: fontesFinanciadoraIds
         };
       }
 
-      console.log('💾 Salvando atividade:', atividadeUpdate);
-      console.log('💾 Tipo de dataRealizacao:', typeof atividadeUpdate.dataRealizacao);
-      console.log('💾 Valor de dataRealizacao:', atividadeUpdate.dataRealizacao);
-      console.log('💰 Fontes Financiadoras Formatadas:', fontesFinanciadoraFormatadas);
-      console.log('📋 JSON que será enviado:', JSON.stringify(atividadeUpdate, null, 2));
-
+                              
       // Validação adicional dos dados antes do envio
       this.validateAtividadeData(atividadeUpdate);
 
       this.atividadesService.updateAtividade(this.atividadeId, atividadeUpdate).subscribe({
         next: (response) => {
-          console.log('✅ Atividade atualizada com sucesso:', response);
-          this.showMessage('Atividade atualizada com sucesso!', 'success');
+                    this.showMessage('Atividade atualizada com sucesso!', 'success');
           this.isSaving = false;
 
           // Atualizar dados da atividade com a resposta
           this.atividade = response;
 
           // Atualizar formulário com dados retornados
-          console.log('🔄 Atualizando formulário com dados da API...');
-          this.populateForm();
+                    this.populateForm();
 
-          console.log('✅ Formulário atualizado com sucesso');
-          console.log('👥 Integrantes após atualização:', this.integrantesSelecionados.length);
-          console.log('💰 Fontes após atualização:', this.fontesFinanciadorasSelecionadas.length);
-
+                              
           // NÃO navegar de volta automaticamente - permitir upload de imagem
-          // this.goBack();
+          this.goBack();
         },
         error: (error) => {
           console.error('❌ Erro ao atualizar atividade:', error);
           console.error('❌ Status:', error?.status);
-          console.error('❌ Error Body:', error?.error);
-          this.showMessage('Erro ao atualizar atividade: ' + this.extractErrorMessage(error), 'error');
           this.isSaving = false;
+          if (error?.status === 403) {
+            this.showMessage(
+              'Você não tem permissão para editar esta atividade. Apenas coordenadores da atividade podem editá-la.',
+              'error'
+            );
+          } else {
+            this.showMessage('Erro ao atualizar atividade: ' + this.extractErrorMessage(error), 'error');
+          }
         }
       });
   }
@@ -1213,6 +1459,14 @@ export class FormAtividadeComponent implements OnInit {
     let dataRealizacao = formData.dataRealizacao;
     if (dataRealizacao instanceof Date) {
       dataRealizacao = dataRealizacao.toISOString().split('T')[0];
+    }
+
+    // Converter dataFim para formato ISO se necessário
+    let dataFim = formData.dataFim;
+    if (dataFim instanceof Date) {
+      dataFim = dataFim.toISOString().split('T')[0];
+    } else if (!dataFim || dataFim === '') {
+      dataFim = null;
     }
 
     // Buscar curso completo
@@ -1240,16 +1494,23 @@ export class FormAtividadeComponent implements OnInit {
     }));
 
     // Formatar integrantes
-    const integrantesFormatados = this.integrantesSelecionados.map(integrante => ({
-      id: integrante.id,
-      nome: integrante.nome,
-      cpf: integrante.cpf,
-      papel: integrante.papel
-    }));
+    const integrantesFormatados = this.integrantesSelecionados
+      .map(integrante => {
+        const integranteId = this.extractPessoaId(integrante);
+        if (!integranteId) {
+          return null;
+        }
+        return {
+          id: integranteId,
+          pessoaId: integranteId,
+          nome: integrante.nome,
+          cpf: integrante.cpf,
+          papel: integrante.papel
+        };
+      })
+      .filter((integrante): integrante is { id: number; pessoaId: number; nome: string; cpf: string; papel: string } => integrante !== null);
 
-    console.log('💰 Fontes Formatadas:', fontesFinanciadoraFormatadas);
-    console.log('👥 Integrantes Formatados:', integrantesFormatados);
-
+        
     // Criar objeto AtividadeDTO completo
     const novaAtividade: AtividadeDTO = {
       nome: formData.nome || '',
@@ -1258,6 +1519,7 @@ export class FormAtividadeComponent implements OnInit {
       statusPublicacao: formData.statusPublicacao !== null ? formData.statusPublicacao : false,
       coordenador: formData.coordenador || '',
       dataRealizacao: dataRealizacao || '',
+      dataFim: dataFim || null,
       curso: {
         id: curso.id,
         nome: curso.nome,
@@ -1273,24 +1535,19 @@ export class FormAtividadeComponent implements OnInit {
       integrantes: integrantesFormatados
     };
 
-    console.log('➕ Criando nova atividade:', novaAtividade);
-    console.log('📋 JSON que será enviado:', JSON.stringify(novaAtividade, null, 2));
-
+        
     this.atividadesService.createAtividade(novaAtividade).subscribe({
       next: (response) => {
-        console.log('✅ Atividade criada com sucesso:', response);
-
+        
         // Se houver imagem selecionada, fazer upload
         if (this.selectedFile && response.id) {
-          console.log('📤 Fazendo upload da foto de capa...');
-          this.atividadesService.uploadFotoCapa(response.id, this.selectedFile).subscribe({
+                    this.atividadesService.uploadFotoCapa(response.id, this.selectedFile).subscribe({
             next: (uploadResponse) => {
-              console.log('✅ Foto de capa enviada com sucesso:', uploadResponse);
-              this.showMessage('Atividade criada e foto de capa salva com sucesso!', 'success');
+                            this.showMessage('Atividade criada e foto de capa salva com sucesso!', 'success');
               this.isSaving = false;
 
               // Redirecionar para a lista de atividades do curso
-              this.router.navigate(['/atividades/curso', this.cursoId]);
+              this.router.navigate(['/admin/atividades/curso', this.cursoId]);
             },
             error: (uploadError) => {
               console.error('❌ Erro ao fazer upload da foto:', uploadError);
@@ -1298,22 +1555,28 @@ export class FormAtividadeComponent implements OnInit {
               this.isSaving = false;
 
               // Redirecionar mesmo com erro no upload
-              this.router.navigate(['/atividades/curso', this.cursoId]);
+              this.router.navigate(['/admin/atividades/curso', this.cursoId]);
             }
           });
         } else {
           // Sem imagem, apenas redirecionar
           this.showMessage('Atividade criada com sucesso!', 'success');
           this.isSaving = false;
-          this.router.navigate(['/atividades/curso', this.cursoId]);
+          this.router.navigate(['/admin/atividades/curso', this.cursoId]);
         }
       },
       error: (error) => {
         console.error('❌ Erro ao criar atividade:', error);
         console.error('❌ Status:', error?.status);
-        console.error('❌ Error Body:', error?.error);
-        this.showMessage('Erro ao criar atividade: ' + this.extractErrorMessage(error), 'error');
         this.isSaving = false;
+          if (error?.status === 403) {
+            this.showMessage(
+              'Você não tem permissão para criar atividades. Verifique se você tem a role necessária e está associado ao curso.',
+              'error'
+            );
+          } else {
+            this.showMessage('Erro ao criar atividade: ' + this.extractErrorMessage(error), 'error');
+          }
       }
     });
   }
@@ -1323,36 +1586,47 @@ export class FormAtividadeComponent implements OnInit {
       this.isSaving = true;
 
       const formData = this.atividadeForm.value;
-      console.log('📝 Salvando e voltando...');
-
+      
       // Converter data para formato ISO se necessário
       let dataRealizacao = formData.dataRealizacao;
       if (dataRealizacao instanceof Date) {
         dataRealizacao = dataRealizacao.toISOString().split('T')[0];
       }
 
+      // Converter dataFim para formato ISO se necessário
+      let dataFim = formData.dataFim;
+      if (dataFim instanceof Date) {
+        dataFim = dataFim.toISOString().split('T')[0];
+      } else if (!dataFim || dataFim === '') {
+        dataFim = null;
+      }
+
       // Extrair IDs das fontes financiadoras selecionadas
       const fontesFinanciadoraIds = this.fontesFinanciadorasSelecionadas.map(f => f.id);
-      console.log('💰 Fontes Selecionadas (saveAndGoBack):', this.fontesFinanciadorasSelecionadas);
-      console.log('💰 IDs das fontes (saveAndGoBack):', fontesFinanciadoraIds);
-      console.log('💰 Quantidade de fontes (saveAndGoBack):', this.fontesFinanciadorasSelecionadas.length);
-
+                  
       // Formatar fontes financiadoras no padrão esperado pelo backend
       const fontesFinanciadoraFormatadas = this.fontesFinanciadorasSelecionadas.map(fonte => ({
         id: fonte.id,
         nome: fonte.nome
       }));
-      console.log('💰 Fontes Formatadas (saveAndGoBack):', fontesFinanciadoraFormatadas);
-
+      
       // Formatar integrantes no padrão esperado pelo backend
-      const integrantesFormatados = this.integrantesSelecionados.map(integrante => ({
-        id: integrante.id,
-        nome: integrante.nome,
-        cpf: integrante.cpf,
-        papel: integrante.papel
-      }));
-      console.log('👥 Integrantes Formatados (saveAndGoBack):', integrantesFormatados);
-
+      const integrantesFormatados = this.integrantesSelecionados
+        .map(integrante => {
+          const integranteId = this.extractPessoaId(integrante);
+          if (!integranteId) {
+            return null;
+          }
+          return {
+            id: integranteId,
+            pessoaId: integranteId,
+            nome: integrante.nome,
+            cpf: integrante.cpf,
+            papel: integrante.papel
+          };
+        })
+        .filter((integrante): integrante is { id: number; pessoaId: number; nome: string; cpf: string; papel: string } => integrante !== null);
+      
       // Usar dados existentes da atividade
       let atividadeUpdate: any;
 
@@ -1368,6 +1642,7 @@ export class FormAtividadeComponent implements OnInit {
           statusPublicacao: formData.statusPublicacao !== null ? formData.statusPublicacao : false,
           coordenador: formData.coordenador || '',
           dataRealizacao: dataRealizacao || '',
+          dataFim: dataFim || null,
           fotoCapa: this.atividade.fotoCapa || '',
           curso: {
             id: this.atividade.curso.id,
@@ -1389,25 +1664,31 @@ export class FormAtividadeComponent implements OnInit {
           statusPublicacao: formData.statusPublicacao !== null ? formData.statusPublicacao : false,
           coordenador: formData.coordenador || '',
           dataRealizacao: dataRealizacao || '',
+          dataFim: dataFim || null,
           cursoId: formData.cursoId || 0,
           categoriaId: formData.categoriaId || 0,
           fontesFinanciadoraIds: fontesFinanciadoraIds
         };
       }
 
-      console.log('📋 JSON que será enviado (saveAndGoBack):', JSON.stringify(atividadeUpdate, null, 2));
-
+      
       this.atividadesService.updateAtividade(this.atividadeId, atividadeUpdate).subscribe({
         next: (response) => {
-          console.log('✅ Atividade salva, voltando para lista');
-          this.showMessage('Atividade atualizada com sucesso!', 'success');
+                    this.showMessage('Atividade atualizada com sucesso!', 'success');
           this.isSaving = false;
           this.goBack();
         },
         error: (error) => {
           console.error('❌ Erro ao salvar:', error);
-          this.showMessage('Erro ao atualizar atividade: ' + this.extractErrorMessage(error), 'error');
           this.isSaving = false;
+          if (error?.status === 403) {
+            this.showMessage(
+              'Você não tem permissão para editar esta atividade. Apenas coordenadores da atividade podem editá-la.',
+              'error'
+            );
+          } else {
+            this.showMessage('Erro ao atualizar atividade: ' + this.extractErrorMessage(error), 'error');
+          }
         }
       });
     } else {
@@ -1417,14 +1698,27 @@ export class FormAtividadeComponent implements OnInit {
   }
 
   goBack(): void {
+    if (window.history.length > 1) {
+      this.location.back();
+      return;
+    }
+
+    if (this.cursoId) {
+      this.router.navigate(['/admin/atividades/curso', this.cursoId], {
+        state: { cursoNome: this.cursoNome }
+      });
+      return;
+    }
+
     const state = history.state;
     if (state && state.cursoId) {
-      this.router.navigate(['/atividades/curso', state.cursoId], {
+      this.router.navigate(['/admin/atividades/curso', state.cursoId], {
         state: { cursoNome: state.cursoNome }
       });
-    } else {
-      this.router.navigate(['/cursos']);
+      return;
     }
+
+    this.router.navigate(['/admin/cursos']);
   }
 
   private extractErrorMessage(error: any): string {
@@ -1457,5 +1751,92 @@ export class FormAtividadeComponent implements OnInit {
   get statusPublicacao() { return this.atividadeForm.get('statusPublicacao'); }
   get coordenador() { return this.atividadeForm.get('coordenador'); }
   get dataRealizacao() { return this.atividadeForm.get('dataRealizacao'); }
+  get dataFim() { return this.atividadeForm.get('dataFim'); }
   get categoriaId() { return this.atividadeForm.get('categoriaId'); }
+
+  private cacheIntegranteInfo(integrante: PessoaPapelDTO): void {
+    const integranteId = this.extractPessoaId(integrante);
+    if (!integranteId) {
+      return;
+    }
+
+    const nome = integrante.nome?.trim();
+    const cpf = integrante.cpf?.trim();
+
+    const existente = this.integranteInfoCache.get(integranteId) || {};
+    const nomeAtualizado = nome || existente.nome;
+    const cpfAtualizado = cpf || existente.cpf;
+
+    this.integranteInfoCache.set(integranteId, {
+      nome: nomeAtualizado,
+      cpf: cpfAtualizado
+    });
+  }
+
+  private ensureIntegranteInfo(integrante: PessoaPapelDTO): void {
+    const integranteId = this.extractPessoaId(integrante);
+    if (!integranteId) {
+      return;
+    }
+
+    if (integrante.nome?.trim() || integrante.cpf?.trim()) {
+      this.cacheIntegranteInfo(integrante);
+      return;
+    }
+
+    const cached = this.integranteInfoCache.get(integranteId);
+    if (cached) {
+      if (cached.nome && !integrante.nome?.trim()) {
+        integrante.nome = cached.nome;
+      }
+      if (cached.cpf && !integrante.cpf?.trim()) {
+        integrante.cpf = cached.cpf;
+      }
+      return;
+    }
+
+    if (this.integranteInfoRequests.has(integranteId)) {
+      return;
+    }
+
+    this.integranteInfoRequests.add(integranteId);
+    this.pessoasService.getById(integranteId).subscribe({
+      next: (pessoa) => {
+        this.integranteInfoRequests.delete(integranteId);
+        if (!pessoa) {
+          return;
+        }
+
+        const nomePessoa =
+          (pessoa.nome || '')
+            .trim() ||
+          (pessoa.nomeCompleto || '')
+            .trim() ||
+          (pessoa.nomeSocial || '')
+            .trim() ||
+          (pessoa.descricao || '')
+            .trim();
+
+        const cpfPessoa = (pessoa.cpf || '').trim();
+
+        this.integranteInfoCache.set(integranteId, {
+          nome: nomePessoa || undefined,
+          cpf: cpfPessoa || undefined
+        });
+
+        const alvo = this.integrantesSelecionados.find(i => this.extractPessoaId(i) === integranteId);
+        if (alvo) {
+          if (nomePessoa && !alvo.nome?.trim()) {
+            alvo.nome = nomePessoa;
+          }
+          if (cpfPessoa && !alvo.cpf?.trim()) {
+            alvo.cpf = cpfPessoa;
+          }
+        }
+      },
+      error: () => {
+        this.integranteInfoRequests.delete(integranteId);
+      }
+    });
+  }
 }

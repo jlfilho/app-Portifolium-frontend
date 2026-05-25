@@ -1,0 +1,142 @@
+<div class="recovery-dialog">
+  <h2 mat-dialog-title>
+    <mat-icon>lock_reset</mat-icon>
+    Recuperar Senha
+  </h2>
+
+  <mat-dialog-content>
+    <!-- Passo 1: Solicitar Código -->
+    <div *ngIf="step === 1" class="step-content">
+      <p class="step-description">
+        Digite seu e-mail cadastrado. Enviaremos um código de recuperação para você redefinir sua senha.
+      </p>
+
+      <form [formGroup]="emailForm" class="recovery-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>E-mail</mat-label>
+          <mat-icon matPrefix>email</mat-icon>
+          <input
+            matInput
+            type="email"
+            formControlName="email"
+            placeholder="seu@email.com"
+            autocomplete="email">
+          <mat-error *ngIf="emailForm.get('email')?.hasError('required')">
+            E-mail é obrigatório
+          </mat-error>
+          <mat-error *ngIf="emailForm.get('email')?.hasError('email')">
+            E-mail inválido
+          </mat-error>
+        </mat-form-field>
+      </form>
+    </div>
+
+    <!-- Passo 2: Redefinir Senha -->
+    <div *ngIf="step === 2" class="step-content">
+      <div class="success-info">
+        <mat-icon class="success-icon">mark_email_read</mat-icon>
+        <p>
+          <strong>Código enviado!</strong><br>
+          Verifique sua caixa de entrada e digite o código recebido por e-mail.
+        </p>
+      </div>
+
+      <form [formGroup]="resetPasswordForm" class="recovery-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Código de Recuperação</mat-label>
+          <mat-icon matPrefix>vpn_key</mat-icon>
+          <input
+            matInput
+            type="text"
+            formControlName="recoveryCode"
+            placeholder="Digite o código recebido"
+            autocomplete="off">
+          <mat-error *ngIf="resetPasswordForm.get('recoveryCode')?.hasError('required')">
+            Código é obrigatório
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nova Senha</mat-label>
+          <mat-icon matPrefix>lock</mat-icon>
+          <input
+            matInput
+            [type]="hidePassword ? 'password' : 'text'"
+            formControlName="newPassword"
+            placeholder="Mínimo 6 caracteres"
+            autocomplete="new-password">
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="hidePassword = !hidePassword"
+            [attr.aria-label]="'Exibir senha'">
+            <mat-icon>{{ hidePassword ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+          <mat-hint>Mínimo 6 caracteres</mat-hint>
+          <mat-error *ngIf="resetPasswordForm.get('newPassword')?.hasError('required')">
+            Nova senha é obrigatória
+          </mat-error>
+          <mat-error *ngIf="resetPasswordForm.get('newPassword')?.hasError('minlength')">
+            Senha deve ter pelo menos 6 caracteres
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Confirmar Nova Senha</mat-label>
+          <mat-icon matPrefix>lock</mat-icon>
+          <input
+            matInput
+            [type]="hideConfirmPassword ? 'password' : 'text'"
+            formControlName="confirmPassword"
+            placeholder="Digite a senha novamente"
+            autocomplete="new-password">
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="hideConfirmPassword = !hideConfirmPassword"
+            [attr.aria-label]="'Exibir senha'">
+            <mat-icon>{{ hideConfirmPassword ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="resetPasswordForm.get('confirmPassword')?.hasError('required')">
+            Confirmação de senha é obrigatória
+          </mat-error>
+          <mat-error *ngIf="resetPasswordForm.hasError('passwordMismatch')">
+            As senhas não coincidem
+          </mat-error>
+        </mat-form-field>
+      </form>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button
+      mat-button
+      (click)="voltar()"
+      [disabled]="isLoading">
+      {{ step === 1 ? 'Cancelar' : 'Voltar' }}
+    </button>
+    <button
+      *ngIf="step === 1"
+      mat-raised-button
+      color="primary"
+      (click)="solicitarCodigo()"
+      [disabled]="emailForm.invalid || isLoading">
+      <mat-icon *ngIf="!isLoading">send</mat-icon>
+      <mat-spinner *ngIf="isLoading" diameter="20" class="inline-spinner"></mat-spinner>
+      {{ isLoading ? 'Enviando...' : 'Enviar Código' }}
+    </button>
+    <button
+      *ngIf="step === 2"
+      mat-raised-button
+      color="primary"
+      (click)="redefinirSenha()"
+      [disabled]="resetPasswordForm.invalid || isLoading">
+      <mat-icon *ngIf="!isLoading">check</mat-icon>
+      <mat-spinner *ngIf="isLoading" diameter="20" class="inline-spinner"></mat-spinner>
+      {{ isLoading ? 'Redefinindo...' : 'Redefinir Senha' }}
+    </button>
+  </mat-dialog-actions>
+</div>
+

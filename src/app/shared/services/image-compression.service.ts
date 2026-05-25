@@ -35,53 +35,63 @@ export class ImageCompressionService {
       maxSizeKB = 500 // 500KB por padrão
     } = options;
 
-    console.log('🖼️ Iniciando compressão da imagem:', {
-      nome: file.name,
-      tamanhoOriginal: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
-      tipo: file.type
-    });
-
+    
     return new Promise((resolve, reject) => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const img = new Image();
 
-      img.onload = () => {
+      if (!ctx) {
+        reject(new Error('Contexto 2D não disponível para compressão de imagem.'));
+        return;
+      }
+
+      img.onload = async () => {
         try {
-          // Calcular novas dimensões mantendo proporção
-          const { width, height } = this.calculateDimensions(
-            img.width,
-            img.height,
-            maxWidth,
-            maxHeight
-          );
+          const originalWidth = img.width;
+          const originalHeight = img.height;
+          let currentMaxWidth = maxWidth;
+          let currentMaxHeight = maxHeight;
+          let attempt = 0;
+          const maxAttempts = 6;
+          const sizeLimitBytes = maxSizeKB * 1024;
+          let lastResult: CompressionResult | null = null;
 
-          console.log('📐 Dimensões calculadas:', {
-            original: `${img.width}x${img.height}`,
-            nova: `${width}x${height}`
-          });
+          
+          while (attempt < maxAttempts) {
+            const { width, height } = this.calculateDimensions(
+              originalWidth,
+              originalHeight,
+              currentMaxWidth,
+              currentMaxHeight
+            );
 
-          // Configurar canvas
-          canvas.width = width;
-          canvas.height = height;
+            canvas.width = width;
+            canvas.height = height;
+            ctx.clearRect(0, 0, width, height);
+            ctx.drawImage(img, 0, 0, width, height);
 
-          // Desenhar imagem redimensionada
-          ctx?.drawImage(img, 0, 0, width, height);
+            
+            lastResult = await this.compressWithQuality(canvas, file, quality, maxSizeKB);
 
-          // Tentar diferentes qualidades até atingir o tamanho desejado
-          this.compressWithQuality(canvas, file, quality, maxSizeKB)
-            .then(result => {
-              console.log('✅ Compressão concluída:', {
-                tamanhoOriginal: `${(result.originalSize / 1024 / 1024).toFixed(2)} MB`,
-                tamanhoComprimido: `${(result.compressedSize / 1024).toFixed(2)} KB`,
-                taxaCompressao: `${result.compressionRatio.toFixed(1)}%`
-              });
-              resolve(result);
-            })
-            .catch(error => {
-              console.error('❌ Erro na compressão:', error);
-              reject(error);
-            });
+            
+            if (lastResult.compressedSize <= sizeLimitBytes || width <= 320 || height <= 320) {
+                            resolve(lastResult);
+              return;
+            }
+
+            currentMaxWidth = Math.max(Math.floor(currentMaxWidth * 0.85), 320);
+            currentMaxHeight = Math.max(Math.floor(currentMaxHeight * 0.85), 320);
+            attempt++;
+          }
+
+          if (lastResult) {
+            console.warn('⚠️ Não foi possível atingir exatamente o limite desejado, retornando melhor resultado obtido.');
+            resolve(lastResult);
+            return;
+          }
+
+          reject(new Error('Não foi possível comprimir a imagem.'));
         } catch (error) {
           console.error('❌ Erro ao processar imagem:', error);
           reject(error);
@@ -162,12 +172,7 @@ export class ImageCompressionService {
       });
       compressedSize = compressedFile.size;
 
-      console.log(`🔧 Tentativa ${currentStep + 1}:`, {
-        qualidade: quality,
-        tamanho: `${(compressedSize / 1024).toFixed(2)} KB`,
-        meta: `${maxSizeKB} KB`
-      });
-
+      
       // Se atingiu o tamanho desejado, parar
       if (compressedSize <= maxSizeKB * 1024) {
         break;

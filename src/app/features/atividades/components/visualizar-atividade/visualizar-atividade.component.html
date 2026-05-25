@@ -11,8 +11,8 @@
       <mat-icon class="error-icon">error</mat-icon>
       <p>{{ errorMessage }}</p>
       <button mat-raised-button color="primary" (click)="voltar()">
-        <mat-icon>arrow_back</mat-icon>
-        Voltar
+        <mat-icon>close</mat-icon>
+        Cancelar
       </button>
     </mat-card-content>
   </mat-card>
@@ -34,8 +34,17 @@
       </div>
       <div class="header-actions">
         <button mat-stroked-button (click)="voltar()">
-          <mat-icon>arrow_back</mat-icon>
-          Voltar
+          <mat-icon>close</mat-icon>
+          Cancelar
+        </button>
+        <button
+          mat-stroked-button
+          color="primary"
+          (click)="abrirDialogRelatorio()"
+          *ngIf="temPermissaoGerarRelatorio()"
+          matTooltip="Gerar relatório em PDF">
+          <mat-icon>description</mat-icon>
+          Relatório PDF
         </button>
         <button mat-raised-button color="primary" (click)="editarAtividade()">
           <mat-icon>edit</mat-icon>
@@ -112,7 +121,7 @@
             <mat-icon class="info-icon">event</mat-icon>
             <div class="info-content">
               <span class="info-label">Data de Realização</span>
-              <p class="info-value">{{ formatarData(atividade.dataRealizacao) }}</p>
+              <p class="info-value">{{ formatarDataAtividade(atividade) }}</p>
             </div>
           </div>
 
@@ -204,19 +213,20 @@
             mat-raised-button
             color="primary"
             (click)="toggleUploadForm()"
-            class="btn-upload">
+            class="btn-upload"
+            *ngIf="canManageEvidencias">
             <mat-icon>{{ showUploadForm ? 'close' : 'add_photo_alternate' }}</mat-icon>
-            {{ showUploadForm ? 'Cancelar' : 'Postar Evidência' }}
+            {{ showUploadForm ? (isEditingEvidence ? 'Cancelar edição' : 'Cancelar') : 'Postar Evidência' }}
           </button>
           </div>
 
         <!-- Formulário de Upload -->
-        <div class="upload-form-container" *ngIf="showUploadForm">
+        <div class="upload-form-container" *ngIf="showUploadForm && canManageEvidencias">
           <mat-card class="upload-form-card">
             <mat-card-content>
               <h4 class="upload-title">
-                <mat-icon>add_a_photo</mat-icon>
-                Nova Evidência
+                <mat-icon>{{ isEditingEvidence ? 'edit' : 'add_a_photo' }}</mat-icon>
+                {{ isEditingEvidence ? 'Editar Evidência' : 'Nova Evidência' }}
               </h4>
 
               <!-- Área de Drag and Drop -->
@@ -243,6 +253,7 @@
                   <button
                     mat-icon-button
                     class="btn-remove-preview"
+                    *ngIf="selectedFile"
                     (click)="removeSelectedFile(); $event.stopPropagation()">
                     <mat-icon>close</mat-icon>
                   </button>
@@ -302,24 +313,24 @@
               <div class="upload-actions">
                 <button
                   mat-stroked-button
-                  (click)="toggleUploadForm()"
+                  (click)="isEditingEvidence ? cancelarEdicaoEvidencia() : toggleUploadForm()"
                   [disabled]="isUploading || isCompressing">
                   <mat-icon>cancel</mat-icon>
                   Cancelar
                 </button>
-                <button
+                  <button
                   mat-raised-button
                   color="primary"
                   (click)="salvarEvidencia()"
-                  [disabled]="!selectedFile || !legenda.trim() || isUploading || isCompressing">
-                  <mat-icon *ngIf="!isUploading">send</mat-icon>
+                  [disabled]="(isUploading || isCompressing) || (!isEditingEvidence && !selectedFile) || !legenda.trim()">
+                  <mat-icon *ngIf="!isUploading">{{ isEditingEvidence ? 'save' : 'send' }}</mat-icon>
                   <mat-progress-spinner
                     *ngIf="isUploading"
                     mode="indeterminate"
                     diameter="20"
                     style="display: inline-block; margin-right: 8px;">
                   </mat-progress-spinner>
-                  {{ isUploading ? 'Postando...' : 'Postar Evidência' }}
+                  {{ isUploading ? (isEditingEvidence ? 'Salvando...' : 'Postando...') : (isEditingEvidence ? 'Atualizar' : 'Postar Evidência') }}
                 </button>
               </div>
             </mat-card-content>
@@ -332,13 +343,85 @@
           <span>Carregando evidências...</span>
         </div>
 
+        <!-- Reordenar evidências -->
+        <div
+          class="reorder-toolbar-wrapper"
+          *ngIf="canManageEvidencias && evidencias.length > 1 && !isLoadingEvidencias">
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="iniciarReordenacao()"
+            *ngIf="!isReordering">
+            <mat-icon>sort</mat-icon>
+            Reordenar evidências
+          </button>
+          <div class="reorder-toolbar" *ngIf="isReordering">
+            <div class="reorder-info">
+              <mat-icon>info</mat-icon>
+              <span>Use as setas para ajustar a posição das evidências e clique em "Salvar ordem".</span>
+            </div>
+            <div class="reorder-buttons">
+              <button
+                mat-stroked-button
+                (click)="cancelarReordenacao()"
+                [disabled]="savingOrder">
+                <mat-icon>close</mat-icon>
+                Cancelar
+              </button>
+              <button
+                mat-raised-button
+                color="primary"
+                (click)="salvarOrdemEvidencias()"
+                [disabled]="!orderChanged || savingOrder">
+                <mat-progress-spinner
+                  *ngIf="savingOrder"
+                  mode="indeterminate"
+                  diameter="20">
+                </mat-progress-spinner>
+                <mat-icon *ngIf="!savingOrder">save</mat-icon>
+                Salvar ordem
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="reorder-list" *ngIf="isReordering && !isLoadingEvidencias">
+          <div class="reorder-item" *ngFor="let evidencia of evidencias; index as i">
+            <div class="reorder-index">{{ i + 1 }}</div>
+            <img
+              class="reorder-thumb"
+              [src]="getEvidenciaImageUrlFromEvidencia(evidencia)"
+              [alt]="evidencia.legenda || ('Evidência ' + (i + 1))">
+            <div class="reorder-details">
+              <span class="reorder-title">{{ evidencia.legenda || 'Sem legenda' }}</span>
+              <span class="reorder-meta" *ngIf="evidencia.criadoPor">por {{ evidencia.criadoPor }}</span>
+            </div>
+            <div class="reorder-controls">
+              <button
+                mat-icon-button
+                (click)="moverEvidencia(evidencia, -1)"
+                [disabled]="i === 0 || savingOrder"
+                matTooltip="Mover para cima">
+                <mat-icon>arrow_upward</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                (click)="moverEvidencia(evidencia, 1)"
+                [disabled]="i === evidencias.length - 1 || savingOrder"
+                matTooltip="Mover para baixo">
+                <mat-icon>arrow_downward</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Carrossel -->
         <div class="carousel-container" *ngIf="!isLoadingEvidencias && evidencias.length > 0">
           <!-- Slide atual -->
           <div class="carousel-slide">
             <div class="carousel-image-wrapper">
               <img
-                [src]="getEvidenciaImageUrl(currentEvidencia!.foto)"
+                [src]="getEvidenciaImageUrlFromEvidencia(currentEvidencia!)"
                 [alt]="currentEvidencia!.legenda"
                 class="carousel-image">
 
@@ -379,23 +462,33 @@
                     <span class="caption-location">{{ atividade.nome }}</span>
                   </div>
                 </div>
-                <button
-                  mat-icon-button
-                  color="warn"
-                  matTooltip="Excluir evidência"
-                  (click)="confirmarExclusaoEvidencia(currentEvidencia!)"
-                  [disabled]="deletingEvidenceId === currentEvidencia!.id">
-                  <mat-icon *ngIf="deletingEvidenceId !== currentEvidencia!.id">delete</mat-icon>
-                  <mat-progress-spinner
-                    *ngIf="deletingEvidenceId === currentEvidencia!.id"
-                    mode="indeterminate"
-                    diameter="20">
-                  </mat-progress-spinner>
-                </button>
+                <div class="caption-actions" *ngIf="canManageEvidencias">
+                  <button
+                    mat-icon-button
+                    color="primary"
+                    matTooltip="Editar evidência"
+                    (click)="editarEvidencia(currentEvidencia!)"
+                    [disabled]="isUploading || isCompressing || deletingEvidenceId === currentEvidencia!.id">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    color="warn"
+                    matTooltip="Excluir evidência"
+                    (click)="confirmarExclusaoEvidencia(currentEvidencia!)"
+                    [disabled]="deletingEvidenceId === currentEvidencia!.id">
+                    <mat-icon *ngIf="deletingEvidenceId !== currentEvidencia!.id">delete</mat-icon>
+                    <mat-progress-spinner
+                      *ngIf="deletingEvidenceId === currentEvidencia!.id"
+                      mode="indeterminate"
+                      diameter="20">
+                    </mat-progress-spinner>
+                  </button>
+                </div>
               </div>
 
               <div class="caption-text">
-                <p>{{ currentEvidencia!.legenda }}</p>
+                <p [innerHTML]="currentEvidencia!.legenda | breaklines"></p>
               </div>
 
               <!-- Thumbnails da página atual -->
@@ -405,7 +498,7 @@
                   class="thumbnail"
                   [class.thumbnail-active]="i === currentSlideIndex"
                   (click)="goToSlide(i)">
-                  <img [src]="getEvidenciaImageUrl(evidencia.foto)" [alt]="evidencia.legenda">
+                  <img [src]="getEvidenciaImageUrlFromEvidencia(evidencia)" [alt]="evidencia.legenda">
                 </div>
               </div>
             </div>
@@ -454,13 +547,18 @@
         </div>
 
         <!-- Empty state -->
-        <div class="empty-section" *ngIf="!isLoadingEvidencias && evidencias.length === 0 && !showUploadForm">
+      <div class="empty-section" *ngIf="!isLoadingEvidencias && evidencias.length === 0 && !showUploadForm">
           <mat-icon>photo_library</mat-icon>
           <span>Nenhuma evidência cadastrada para esta atividade</span>
-          <button mat-raised-button color="primary" (click)="toggleUploadForm()" class="btn-add-first">
-            <mat-icon>add_photo_alternate</mat-icon>
-            Postar Primeira Evidência
-          </button>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="toggleUploadForm()"
+          class="btn-add-first"
+          *ngIf="canManageEvidencias">
+          <mat-icon>add_photo_alternate</mat-icon>
+          Postar Primeira Evidência
+        </button>
         </div>
         </div>
       </div>

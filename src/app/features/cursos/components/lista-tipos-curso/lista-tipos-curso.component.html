@@ -46,12 +46,6 @@
         <span>Carregando tipos de curso...</span>
       </div>
       <table *ngIf="!isLoading && tipos.length > 0" mat-table [dataSource]="tipos" class="mat-elevation-z1 full-width-table tipos-table">
-        <!-- ID -->
-        <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef>#</th>
-          <td mat-cell *matCellDef="let row">{{ row.id }}</td>
-        </ng-container>
-
         <!-- Nome -->
         <ng-container matColumnDef="nome">
           <th mat-header-cell *matHeaderCellDef>Nome</th>

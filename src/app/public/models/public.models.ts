@@ -1,12 +1,12 @@
 // Re-export dos modelos existentes para facilitar imports
 export type { Curso } from '../../features/cursos/models/curso.model';
-export type { AtividadeDTO } from '../../features/atividades/models/atividade.model';
+export type { AtividadeDTO, PessoaPapelDTO } from '../../features/atividades/models/atividade.model';
 export type { EvidenciaDTO } from '../../features/evidencias/models/evidencia.model';
 export type { Page } from '../../shared/models/page.model';
 
 // Import dos tipos para usar nas interfaces
 import type { Curso } from '../../features/cursos/models/curso.model';
-import type { AtividadeDTO } from '../../features/atividades/models/atividade.model';
+import type { AtividadeDTO, PessoaPapelDTO } from '../../features/atividades/models/atividade.model';
 import type { EvidenciaDTO } from '../../features/evidencias/models/evidencia.model';
 
 // Interfaces específicas para páginas públicas
@@ -21,3 +21,5 @@ export interface PublicAtividade extends AtividadeDTO {
 export interface PublicEvidencia extends EvidenciaDTO {
   // Pode adicionar campos específicos para visualização pública
 }
+
+export type PublicParticipante = PessoaPapelDTO;

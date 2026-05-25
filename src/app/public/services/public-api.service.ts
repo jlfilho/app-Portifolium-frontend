@@ -8,6 +8,8 @@ import { Curso } from '../../features/cursos/models/curso.model';
 import { AtividadeDTO } from '../../features/atividades/models/atividade.model';
 import { EvidenciaDTO } from '../../features/evidencias/models/evidencia.model';
 import { Page } from '../../shared/models/page.model';
+import { UnidadeAcademica } from '../../features/unidades-academicas/models/unidade-academica.model';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +24,12 @@ export class PublicApiService {
   /**
    * Busca todos os cursos públicos com paginação
    */
-  getCursosPublicos(page: number = 0, size: number = 10, nome?: string): Observable<Page<Curso>> {
+  getCursosPublicos(
+    page: number = 0,
+    size: number = 10,
+    nome?: string,
+    unidadeAcademicaId?: number
+  ): Observable<Page<Curso>> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString())
@@ -31,6 +38,10 @@ export class PublicApiService {
 
     if (nome && nome.trim()) {
       params = params.set('nome', nome.trim());
+    }
+
+    if (unidadeAcademicaId !== null && unidadeAcademicaId !== undefined) {
+      params = params.set('unidadeAcademicaId', unidadeAcademicaId.toString());
     }
 
     return this.http.get<Page<Curso>>(`${this.baseUrl}/cursos`, { params });
@@ -116,5 +127,28 @@ export class PublicApiService {
 
     const normalizedPath = foto.startsWith('/') ? foto : `/${foto}`;
     return `${this.baseUrl}/files${normalizedPath}`;
+  }
+
+  getUnidadesAcademicas(
+    page: number = 0,
+    size: number = 50,
+    nome?: string
+  ): Observable<Page<UnidadeAcademica>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', 'nome,ASC');
+
+    if (nome && nome.trim()) {
+      params = params.set('nome', nome.trim());
+    }
+
+    return this.http.get<Page<UnidadeAcademica>>(`${this.baseUrl}/unidades-academicas`, { params });
+  }
+
+  getUnidadesAcademicasList(nome?: string, size: number = 100): Observable<UnidadeAcademica[]> {
+    return this.getUnidadesAcademicas(0, size, nome).pipe(
+      map(page => page?.content ?? [])
+    );
   }
 }

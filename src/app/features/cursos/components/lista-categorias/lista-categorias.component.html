@@ -59,14 +59,6 @@
       <div class="table-container">
         <table mat-table [dataSource]="dataSource" matSort class="categorias-table">
 
-          <!-- Coluna ID -->
-          <ng-container matColumnDef="id">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Código </th>
-            <td mat-cell *matCellDef="let categoria">
-              <span class="id-badge">{{ categoria.id }}</span>
-            </td>
-          </ng-container>
-
           <!-- Coluna Nome -->
           <ng-container matColumnDef="nome">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Nome </th>
@@ -129,7 +121,6 @@
             <mat-icon class="categoria-card-icon">label</mat-icon>
             <div class="categoria-card-title">
               <h3 class="categoria-card-nome">{{ categoria.nome }}</h3>
-              <p class="categoria-card-id">Código: {{ categoria.id }}</p>
             </div>
           </div>
 

@@ -30,6 +30,8 @@ import { extractApiMessage } from '../../../../shared/utils/message.utils';
 import { Curso } from '../../models/curso.model';
 import { CursoFilter } from '../../models/curso-filter.model';
 import { environment } from '../../../../../environments/environment';
+import { UnidadesAcademicasService } from '../../../unidades-academicas/services/unidades-academicas.service';
+import { UnidadeAcademica } from '../../../unidades-academicas/models/unidade-academica.model';
 
 @Component({
   selector: 'acadmanage-cards-cursos',
@@ -69,6 +71,7 @@ export class CardsCursosComponent  implements OnInit {
   filtroNome = '';
   filtroStatus: boolean | null = null;
   filtroTipo: number | null = null;
+  filtroUnidade: number | null = null;
   private searchSubject = new Subject<string>();
 
   // Opções de status
@@ -83,6 +86,7 @@ export class CardsCursosComponent  implements OnInit {
   constructor(
     private cursosService: CursosService,
     private tiposCursoService: TiposCursoService,
+    private unidadesAcademicasService: UnidadesAcademicasService,
     private router: Router,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
@@ -94,9 +98,12 @@ export class CardsCursosComponent  implements OnInit {
 
   tiposCurso: TipoCurso[] = [];
   isLoadingTipos = false;
+  unidadesAcademicas: UnidadeAcademica[] = [];
+  isLoadingUnidades = false;
 
   ngOnInit(): void {
     this.loadTiposCurso();
+    this.loadUnidadesAcademicas();
   }
 
   // Configurar debounce para busca dinâmica
@@ -105,8 +112,7 @@ export class CardsCursosComponent  implements OnInit {
       debounceTime(500), // Aguarda 500ms após parar de digitar
       distinctUntilChanged() // Só emite se o valor mudou
     ).subscribe(searchTerm => {
-      console.log('🔍 Aplicando filtro de nome:', searchTerm);
-      this.pageIndex = 0; // Resetar para primeira página
+            this.pageIndex = 0; // Resetar para primeira página
       this.loadCourses();
     });
   }
@@ -147,21 +153,15 @@ export class CardsCursosComponent  implements OnInit {
       direction: 'ASC',
       ativo: this.filtroStatus,
       nome: this.filtroNome || undefined,
-      tipoId: this.filtroTipo ?? undefined
+      tipoId: this.filtroTipo ?? undefined,
+      unidadeAcademicaId: this.filtroUnidade ?? undefined
     };
 
-    console.log('📡 Carregando cursos do usuário (página ' + (this.pageIndex + 1) + ')');
-    console.log('🔍 Filtros aplicados:', {
-      nome: this.filtroNome || 'sem filtro',
-      status: this.filtroStatus !== null ? (this.filtroStatus ? 'Ativos' : 'Inativos') : 'Todos',
-      tipoId: this.filtroTipo ?? 'todos'
-    });
-
+        
     this.cursosService.getUserCoursesPaginado(filter).subscribe({
       next: (page) => {
         if (!page || page === null) {
-          console.log('📭 Nenhum curso encontrado (204 No Content)');
-          this.handleEmptyCourses();
+                    this.handleEmptyCourses();
           return;
         }
 
@@ -169,18 +169,14 @@ export class CardsCursosComponent  implements OnInit {
         this.totalElements = page.totalElements || 0;
         this.isLoading = false;
 
+        this.populateUnidadesFromCursos(this.cursos);
+
         if (this.cursos.length === 0) {
           this.handleEmptyCourses();
           return;
         }
 
-        console.log('✅ Cursos do usuário carregados:', {
-          exibindo: this.cursos.length,
-          total: this.totalElements,
-          pagina: this.pageIndex + 1,
-          totalPaginas: page.totalPages || 0
-        });
-      },
+              },
       error: (error) => {
         console.error('❌ Erro ao carregar cursos do usuário:', error);
         const apiMessage = extractApiMessage(error);
@@ -218,38 +214,40 @@ export class CardsCursosComponent  implements OnInit {
 
   // Chamado quando usuário muda o filtro de status
   onStatusChange(): void {
-    console.log('📊 Filtro de status alterado:', this.filtroStatus);
-    this.pageIndex = 0; // Resetar para primeira página
+        this.pageIndex = 0; // Resetar para primeira página
     this.loadCourses();
   }
 
   onTipoChange(): void {
-    console.log('🏷️ Filtro de tipo alterado:', this.filtroTipo);
-    this.pageIndex = 0;
+        this.pageIndex = 0;
+    this.loadCourses();
+  }
+
+  onUnidadeChange(): void {
+        this.pageIndex = 0;
     this.loadCourses();
   }
 
   // Limpar filtros
   limparFiltros(): void {
-    console.log('🧹 Limpando filtros');
-    this.filtroNome = '';
+        this.filtroNome = '';
     this.filtroStatus = null;
     this.filtroTipo = null;
+    this.filtroUnidade = null;
     this.pageIndex = 0;
     this.loadCourses();
   }
 
   // Método de evento de mudança de página
   onPageChange(event: PageEvent): void {
-    console.log('📄 Mudança de página:', event);
-    this.pageIndex = event.pageIndex;
+        this.pageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
     this.loadCourses();
   }
 
   // Navegar para adicionar novo curso
   addCourse(): void {
-    this.router.navigate(['/cursos/novo']);
+    this.router.navigate(['/admin/cursos/novo']);
   }
 
   // Navegar para editar curso
@@ -258,35 +256,32 @@ export class CardsCursosComponent  implements OnInit {
       this.showMessage('Curso inválido selecionado. Tente novamente.', 'error');
       return;
     }
-    this.router.navigate(['/cursos/editar', cursoId]);
+    this.router.navigate(['/admin/cursos/editar', cursoId]);
   }
 
   // Navegar para a tela de gerenciar permissões (formulário)
   managePermissions(curso: Curso): void {
-    console.log('👥 Gerenciar permissões para curso:', curso);
-    if (curso?.id == null) {
+        if (curso?.id == null) {
       this.showMessage('Curso inválido selecionado. Tente novamente.', 'error');
       return;
     }
     const cursoId = curso.id;
-    this.router.navigate(['/cursos', cursoId, 'permissoes'], { state: { cursoNome: curso.nome } });
+    this.router.navigate(['/admin/cursos', cursoId, 'permissoes'], { state: { cursoNome: curso.nome } });
   }
 
   // Navegar para a tela de atividades do curso
   manageAtividades(curso: Curso): void {
-    console.log('📚 Gerenciar atividades para curso:', curso);
-    if (curso?.id == null) {
+        if (curso?.id == null) {
       this.showMessage('Curso inválido selecionado. Tente novamente.', 'error');
       return;
     }
     const cursoId = curso.id;
-    this.router.navigate(['/atividades/curso', cursoId], { state: { cursoNome: curso.nome } });
+    this.router.navigate(['/admin/atividades/curso', cursoId], { state: { cursoNome: curso.nome } });
   }
 
   // Deletar curso com diálogo de confirmação
   deleteCourse(curso: Curso): void {
-    console.log('🗑️ Excluir curso chamado para:', curso);
-    if (curso?.id == null) {
+        if (curso?.id == null) {
       this.showMessage('Curso inválido selecionado. Tente novamente.', 'error');
       return;
     }
@@ -303,46 +298,36 @@ export class CardsCursosComponent  implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('💬 Resultado do diálogo de exclusão:', result);
-      if (result === true) {
-        console.log('✅ Confirmado! Executando exclusão...');
-        const cursoId = curso.id!;
+            if (result === true) {
+                const cursoId = curso.id!;
         this.performDelete(cursoId, curso.nome);
       } else {
-        console.log('❌ Exclusão cancelada pelo usuário');
-      }
+              }
     });
   }
 
   // Executar a exclusão
   private performDelete(cursoId: number, cursoNome: string): void {
-    console.log('📡 Chamando API para excluir curso ID:', cursoId);
-
+    
     this.cursosService.deleteCourse(cursoId).subscribe({
       next: (response) => {
-        console.log('✅ Curso excluído com sucesso! Response:', response);
-        this.showMessage(`Curso "${cursoNome}" excluído com sucesso!`, 'success');
-        console.log('🔄 Recarregando lista de cursos...');
-        this.loadCourses(); // Recarrega a lista
+                this.showMessage(`Curso "${cursoNome}" excluído com sucesso!`, 'success');
+                this.loadCourses(); // Recarrega a lista
       },
       error: (error) => {
         console.error('❌ Erro ao deletar curso:', error);
-        console.error('📊 Detalhes do erro:', error.error);
         console.error('🔢 Status HTTP:', error.status);
 
         const errorMessage = extractApiMessage(error) || 'Erro ao excluir curso. Tente novamente.';
 
-        console.log('📢 Mensagem de erro extraída:', errorMessage);
-        this.showMessage(errorMessage, 'error');
+                this.showMessage(errorMessage, 'error');
       }
     });
   }
 
   // Toggle status do curso (ativar/desativar) com confirmação
   toggleCourseStatus(curso: Curso): void {
-    console.log('🔄 Toggle status chamado para curso:', curso);
-    console.log('📊 Status atual:', curso.ativo);
-
+        
     if (curso?.id == null) {
       this.showMessage('Curso inválido selecionado. Tente novamente.', 'error');
       return;
@@ -352,8 +337,7 @@ export class CardsCursosComponent  implements OnInit {
     const acao = novoStatus ? 'ativar' : 'desativar';
     const acaoCapitalizada = novoStatus ? 'Ativar' : 'Desativar';
 
-    console.log('🎯 Novo status será:', novoStatus);
-
+    
     const dialogRef = this.dialog.open(SimpleConfirmDialogComponent, {
       width: '500px',
       panelClass: 'custom-dialog-panel',
@@ -366,39 +350,30 @@ export class CardsCursosComponent  implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('💬 Resultado do diálogo:', result);
-      if (result === true) {
-        console.log('✅ Confirmado! Executando atualização...');
-        const cursoId = curso.id!;
+            if (result === true) {
+                const cursoId = curso.id!;
         this.performStatusUpdate(cursoId, curso.nome, novoStatus);
       } else {
-        console.log('❌ Cancelado pelo usuário');
-      }
+              }
     });
   }
 
   // Executar a atualização de status
   private performStatusUpdate(cursoId: number, cursoNome: string, novoStatus: boolean): void {
-    console.log('📡 Chamando API para atualizar status...');
-    console.log('📋 Dados:', { cursoId, novoStatus });
-
+        
     this.cursosService.updateCourseStatus(cursoId, novoStatus).subscribe({
       next: (response) => {
-        console.log('✅ Resposta da API:', response);
-        const statusTexto = novoStatus ? 'ativado' : 'desativado';
+                const statusTexto = novoStatus ? 'ativado' : 'desativado';
         this.showMessage(`Curso "${cursoNome}" ${statusTexto} com sucesso!`, 'success');
-        console.log('🔄 Recarregando lista de cursos...');
-        this.loadCourses(); // Recarrega a lista
+                this.loadCourses(); // Recarrega a lista
       },
       error: (error) => {
         console.error('❌ Erro ao atualizar status do curso:', error);
-        console.error('📊 Detalhes do erro:', error.error);
         console.error('🔢 Status HTTP:', error.status);
 
         const errorMessage = extractApiMessage(error) || 'Erro ao atualizar status do curso. Tente novamente.';
 
-        console.log('📢 Mensagem de erro extraída:', errorMessage);
-        this.showMessage(errorMessage, 'error');
+                this.showMessage(errorMessage, 'error');
       }
     });
   }
@@ -429,6 +404,55 @@ export class CardsCursosComponent  implements OnInit {
     });
   }
 
+  private loadUnidadesAcademicas(): void {
+    this.isLoadingUnidades = true;
+    this.unidadesAcademicasService.getFirstPageAsList(100, undefined, 'nome', 'ASC').subscribe({
+      next: (lista) => {
+        this.unidadesAcademicas = Array.isArray(lista) ? lista : [];
+        this.isLoadingUnidades = false;
+      },
+      error: (error) => {
+        console.error('❌ Erro ao carregar unidades acadêmicas:', error);
+        this.isLoadingUnidades = false;
+        this.populateUnidadesFromCursos(this.cursos);
+      }
+    });
+  }
+
+  private populateUnidadesFromCursos(cursos: Curso[]): void {
+    if (!Array.isArray(cursos) || cursos.length === 0) {
+      return;
+    }
+
+    const mapa = new Map<number, UnidadeAcademica>();
+    cursos.forEach(curso => {
+      const unidade = (curso as any)?.unidadeAcademica as UnidadeAcademica | undefined;
+      const unidadeId = (curso as any)?.unidadeAcademicaId ?? unidade?.id;
+      const unidadeNome = unidade?.nome ?? (curso as any)?.unidadeAcademicaNome ?? (curso as any)?.unidadeNome;
+
+      if (unidadeId && unidadeNome) {
+        mapa.set(unidadeId, { id: unidadeId, nome: unidadeNome });
+      }
+    });
+
+    if (mapa.size === 0) {
+      return;
+    }
+
+    const existentes = new Set(this.unidadesAcademicas.map(u => u.id));
+    let alterou = false;
+    mapa.forEach(unidade => {
+      if (!existentes.has(unidade.id)) {
+        this.unidadesAcademicas.push(unidade);
+        alterou = true;
+      }
+    });
+
+    if (alterou) {
+      this.unidadesAcademicas.sort((a, b) => a.nome.localeCompare(b.nome));
+    }
+  }
+
   getTipoNomeById(id: number | null | undefined): string {
     if (id == null) return '';
     const found = this.tiposCurso.find(t => t.id === id);
@@ -439,11 +463,18 @@ export class CardsCursosComponent  implements OnInit {
     return curso?.tipo?.nome || this.getTipoNomeById(curso?.tipoId) || curso?.tipoNome || '';
   }
 
+  getUnidadeNomeById(id: number | null | undefined): string {
+    if (id == null) return '';
+    const found = this.unidadesAcademicas.find(u => u.id === id);
+    return found?.nome || '';
+  }
+
   private hasActiveFilters(): boolean {
     return Boolean(
       (this.filtroNome && this.filtroNome.trim()) ||
       this.filtroStatus !== null ||
-      this.filtroTipo !== null
+      this.filtroTipo !== null ||
+      this.filtroUnidade !== null
     );
   }
 

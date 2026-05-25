@@ -27,6 +27,7 @@ import { SimpleConfirmDialogComponent } from '../../../../shared/components/simp
 import { CursosUsuarioDialogComponent } from '../cursos-usuario-dialog/cursos-usuario-dialog.component';
 import { ChangePasswordDialogComponent } from '../../../../shared/components/change-password-dialog/change-password-dialog.component';
 import { PageRequest } from '../../../../shared/models/page.model';
+import { ApiService } from '../../../../shared/api.service';
 
 @Component({
   selector: 'acadmanage-lista-usuarios',
@@ -52,7 +53,7 @@ import { PageRequest } from '../../../../shared/models/page.model';
   styleUrl: './lista-usuarios.component.css'
 })
 export class ListaUsuariosComponent implements OnInit {
-  displayedColumns: string[] = ['id', 'nome', 'email', 'cpf', 'role', 'cursos', 'actions'];
+  displayedColumns: string[] = ['nome', 'email', 'cpf', 'role', 'cursos', 'actions'];
   dataSource!: MatTableDataSource<Usuario>;
   isLoading = true;
 
@@ -60,7 +61,7 @@ export class ListaUsuariosComponent implements OnInit {
   totalElements = 0;
   pageSize = 10;
   pageIndex = 0;
-  sortBy = 'id';
+  sortBy = 'nome'; // Ordenação por nome
   sortDirection: 'ASC' | 'DESC' = 'ASC';
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -70,7 +71,8 @@ export class ListaUsuariosComponent implements OnInit {
     private usuariosService: UsuariosService,
     private router: Router,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private apiService: ApiService
   ) {
     this.dataSource = new MatTableDataSource<Usuario>([]);
   }
@@ -82,12 +84,13 @@ export class ListaUsuariosComponent implements OnInit {
   ngAfterViewInit(): void {
     // Conectar eventos do MatSort para paginação do servidor
     if (this.sort) {
-      this.sort.sortChange.subscribe(() => {
-        this.pageIndex = 0; // Resetar para primeira página ao ordenar
-        this.sortBy = this.sort.active || 'id';
-        this.sortDirection = this.sort.direction === 'desc' ? 'DESC' : 'ASC';
-        this.loadUsers();
-      });
+      // Desabilitar ordenação interativa - backend só suporta ordenação por 'id'
+      // this.sort.sortChange.subscribe(() => {
+      //   this.pageIndex = 0;
+      //   this.sortBy = this.sort.active || 'id';
+      //   this.sortDirection = this.sort.direction === 'desc' ? 'DESC' : 'ASC';
+      //   this.loadUsers();
+      // });
     }
   }
 
@@ -101,13 +104,10 @@ export class ListaUsuariosComponent implements OnInit {
       direction: this.sortDirection
     };
 
-    console.log('📄 Carregando usuários paginados:', pageRequest);
-
+    
     this.usuariosService.getAllUsersPaginado(pageRequest).subscribe({
       next: (page) => {
-        console.log('✅ Página recebida:', page);
-        console.log(`📊 ${page.numberOfElements} de ${page.totalElements} usuários`);
-
+                
         this.dataSource.data = page.content;
         this.totalElements = page.totalElements;
         this.isLoading = false;
@@ -129,19 +129,18 @@ export class ListaUsuariosComponent implements OnInit {
   }
 
   onPageChange(event: any): void {
-    console.log('📄 Mudança de página:', event);
-    this.pageIndex = event.pageIndex;
+        this.pageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
     this.loadUsers();
   }
 
   addUser(): void {
-    this.router.navigate(['/usuarios/novo']);
+    this.router.navigate(['/admin/usuarios/novo']);
   }
 
   editUser(usuario: Usuario): void {
     // Passa os dados do usuário via state para evitar nova requisição
-    this.router.navigate(['/usuarios/editar', usuario.id], {
+    this.router.navigate(['/admin/usuarios/editar', usuario.id], {
       state: { usuario: usuario }
     });
   }
@@ -155,7 +154,16 @@ export class ListaUsuariosComponent implements OnInit {
     });
   }
 
+  canChangePassword(): boolean {
+    return this.apiService.isAdmin();
+  }
+
   changePassword(usuario: Usuario): void {
+    if (!this.canChangePassword()) {
+      this.showMessage('Somente administradores podem alterar a senha de usuários.', 'error');
+      return;
+    }
+
     const dialogRef = this.dialog.open(ChangePasswordDialogComponent, {
       width: '500px',
       maxWidth: '90vw',
@@ -169,8 +177,7 @@ export class ListaUsuariosComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result === true) {
         // Senha alterada com sucesso
-        console.log('Senha alterada para usuário:', usuario.nome);
-      }
+              }
     });
   }
 
@@ -214,8 +221,44 @@ export class ListaUsuariosComponent implements OnInit {
       return 'primary';
     } else if (roleUpper.includes('SECRETARIO')) {
       return 'accent';
+    } else if (roleUpper.includes('COORDENADOR_ATIVIDADE') || roleUpper.includes('COORDENADOR ATIVIDADE')) {
+      return ''; // Retorna vazio para usar classe CSS customizada
     }
     return '';
+  }
+
+  isCoordenadorAtividade(role: string): boolean {
+    const roleUpper = role.toUpperCase();
+    return roleUpper.includes('COORDENADOR_ATIVIDADE') || roleUpper.includes('COORDENADOR ATIVIDADE');
+  }
+
+  isAdministrador(role: string): boolean {
+    const roleUpper = role.toUpperCase();
+    return roleUpper.includes('ADMINISTRADOR');
+  }
+
+  isGerente(role: string): boolean {
+    const roleUpper = role.toUpperCase();
+    return roleUpper.includes('GERENTE');
+  }
+
+  isSecretario(role: string): boolean {
+    const roleUpper = role.toUpperCase();
+    return roleUpper.includes('SECRETARIO');
+  }
+
+  getRoleTooltipClass(role: string): string {
+    const roleUpper = role.toUpperCase();
+    if (roleUpper.includes('ADMINISTRADOR')) {
+      return 'administrador';
+    } else if (roleUpper.includes('GERENTE')) {
+      return 'gerente';
+    } else if (roleUpper.includes('SECRETARIO')) {
+      return 'secretario';
+    } else if (roleUpper.includes('COORDENADOR_ATIVIDADE') || roleUpper.includes('COORDENADOR ATIVIDADE')) {
+      return 'coordenador-atividade';
+    }
+    return 'default';
   }
 
   getRoleIcon(role: string): string {
@@ -226,6 +269,8 @@ export class ListaUsuariosComponent implements OnInit {
       return 'manage_accounts';
     } else if (roleUpper.includes('SECRETARIO')) {
       return 'assignment_ind';
+    } else if (roleUpper.includes('COORDENADOR_ATIVIDADE') || roleUpper.includes('COORDENADOR ATIVIDADE')) {
+      return 'event_note';
     }
     return 'person';
   }

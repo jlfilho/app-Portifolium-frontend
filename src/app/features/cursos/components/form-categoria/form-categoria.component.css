@@ -1,19 +1,7 @@
 /* ========================================
    🎨 VARIÁVEIS E PALETA - MINIMAL TECH LIGHT+
+   Usa variáveis globais de src/styles/variables.css
    ======================================== */
-:host {
-  --primary-color: #3B82F6;
-  --secondary-color: #8B5CF6;
-  --accent-color: #6366F1;
-  --success-color: #10B981;
-  --error-color: #EF4444;
-  --warning-color: #F59E0B;
-  --text-dark: #0F172A;
-  --text-medium: #475569;
-  --text-light: #64748B;
-  --bg-hover: rgba(59, 130, 246, 0.1);
-  --border-color: #CBD5E1;
-}
 
 /* ========================================
    📦 CONTAINER PRINCIPAL
@@ -93,7 +81,7 @@ mat-divider {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
   padding: 32px;
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   animation: fadeIn 0.3s ease-out;
 }
 
@@ -201,12 +189,14 @@ form {
 }
 
 .submit-button {
-  box-shadow: 0 2px 8px rgba(91, 91, 234, 0.3);
+  /* Estilos padronizados via styles.css global */
+  /* Não sobrescrever background, color ou box-shadow aqui */
 }
 
 .submit-button:hover:not([disabled]) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(91, 91, 234, 0.5);
+  /* Estilos padronizados via styles.css global */
+  /* Não sobrescrever background, color ou box-shadow aqui */
 }
 
 .submit-button[disabled] {

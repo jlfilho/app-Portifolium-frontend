@@ -1,27 +1,15 @@
-/* ===== VARIÁVEIS PÚBLICAS ===== */
-:host {
-  --primary: #667eea;
-  --primary-dark: #5568d3;
-  --secondary: #764ba2;
-  --accent: #f093fb;
-  --success: #10b981;
-  --text-dark: #1e293b;
-  --text-medium: #475569;
-  --text-light: #94a3b8;
-  --bg-light: #f8fafc;
-  --border: #e2e8f0;
-}
+/* Usa variáveis globais de src/styles/variables.css */
 
 /* ===== CONTAINER PÚBLICO ===== */
 .public-page-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary-button-gradient);
   padding: 24px;
 }
 
 /* ===== HERO SECTION PÚBLICO ===== */
 .public-hero-section {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 0.95) 0%, color-mix(in srgb, var(--secondary-color) 0.95) 100%);
   padding: 80px 24px 60px;
   text-align: center;
   position: relative;
@@ -36,8 +24,8 @@
   right: 0;
   bottom: 0;
   background:
-    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    radial-gradient(circle at 20% 50%, color-mix(in srgb, white 10%, transparent) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, color-mix(in srgb, white 10%, transparent) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -57,7 +45,7 @@
   font-weight: 700;
   color: white;
   margin: 0 0 16px 0;
-  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 2px 20px color-mix(in srgb, var(--text-dark) 20%, transparent);
 }
 
 .public-hero-icon {
@@ -68,7 +56,7 @@
 
 .public-hero-subtitle {
   font-size: 20px;
-  color: rgba(255, 255, 255, 0.95);
+  color: color-mix(in srgb, white 95%, transparent);
   margin: 0;
   font-weight: 400;
   line-height: 1.6;
@@ -85,13 +73,13 @@
 
 .public-search-field {
   width: 100%;
-  background: white;
+  background: var(--bg-card);
   border-radius: 50px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 40px color-mix(in srgb, var(--text-dark) 15%, transparent);
 }
 
 ::ng-deep .public-search-field .mat-mdc-form-field-flex {
-  background: white;
+  background: var(--bg-card);
   border-radius: 50px;
   padding: 4px 24px;
   height: 48px;
@@ -118,12 +106,12 @@
 
 /* ===== CARDS PÚBLICOS ===== */
 .public-card {
-  background: white;
+  background: var(--bg-card);
   border-radius: 16px;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -132,7 +120,7 @@
 
 .public-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-lg);
 }
 
 .public-card::before {
@@ -142,7 +130,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+  background: var(--primary-button-gradient);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -153,24 +141,24 @@
 
 /* ===== BOTÕES PÚBLICOS ===== */
 .public-btn-primary {
-  background-color: var(--primary) !important;
+  background: var(--primary-button-gradient) !important;
   color: white !important;
   transition: all 0.3s ease;
 }
 
 .public-btn-primary:hover {
-  background-color: var(--primary-dark) !important;
+  background: var(--gradient-accent) !important;
   transform: scale(1.1);
 }
 
 .public-btn-secondary {
-  background: rgba(255, 255, 255, 0.2) !important;
+  background: color-mix(in srgb, white 20%, transparent) !important;
   color: white !important;
   transition: all 0.3s ease;
 }
 
 .public-btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.3) !important;
+  background: color-mix(in srgb, white 30%, transparent) !important;
   transform: scale(1.1);
 }
 
@@ -195,11 +183,11 @@
 .public-empty-state {
   text-align: center;
   padding: 80px 24px;
-  background: rgba(255, 255, 255, 0.95);
+  background: color-mix(in srgb, white 95%, transparent);
   border-radius: 16px;
   max-width: 600px;
   margin: 0 auto;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .public-empty-icon {
@@ -226,16 +214,16 @@
 }
 
 .public-empty-state strong {
-  color: var(--primary);
+  color: var(--primary-color);
 }
 
 /* ===== PAGINAÇÃO PÚBLICA ===== */
 .public-paginator {
   max-width: 1400px;
   margin: 40px auto 0;
-  background: rgba(255, 255, 255, 0.95);
+  background: color-mix(in srgb, white 95%, transparent);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 ::ng-deep .public-paginator .mat-mdc-paginator-container {
@@ -322,15 +310,15 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
+  background: color-mix(in srgb, white 10%, transparent);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
+  background: color-mix(in srgb, white 30%, transparent);
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: color-mix(in srgb, white 50%, transparent);
 }
 

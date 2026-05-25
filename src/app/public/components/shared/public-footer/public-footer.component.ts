@@ -29,7 +29,7 @@ import { MatIconModule } from '@angular/material/icon';
   `,
   styles: [`
     .public-footer {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+      background: var(--primary-button-gradient);
       color: white;
       box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
       margin-top: auto;

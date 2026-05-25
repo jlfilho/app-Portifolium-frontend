@@ -7,17 +7,17 @@ export const USUARIOS_ROUTES: Routes = [
   {
     path: 'usuarios',
     component: ListaUsuariosComponent,
-    canActivate: [adminGuard] // Apenas ADMINISTRADOR
+    canActivate: [adminGuard]
   },
   {
     path: 'usuarios/novo',
     component: FormUsuarioComponent,
-    canActivate: [adminGuard] // Apenas ADMINISTRADOR
+    canActivate: [adminGuard]
   },
   {
     path: 'usuarios/editar/:id',
     component: FormUsuarioComponent,
-    canActivate: [adminGuard] // Apenas ADMINISTRADOR
+    canActivate: [adminGuard]
   }
 ];
 

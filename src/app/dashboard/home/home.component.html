@@ -6,17 +6,21 @@
     class="menu-button"
     (click)="toggleSidebar()"
     matTooltip="Menu"
-    matTooltipPosition="right">
+    matTooltipPosition="right"
+    aria-label="Toggle menu">
     <mat-icon>{{ isCollapsed ? 'menu_open' : 'menu' }}</mat-icon>
   </button>
 
   <!-- Logo e Nome -->
   <div class="header-brand">
-    <div class="header-logo"></div>
-    <span class="header-title">
+    <div class="header-logo">
+      <div class="logo-glow"></div>
+      <mat-icon class="logo-icon">school</mat-icon>
+    </div>
+    <div class="header-title">
       <strong>Portifólium</strong>
-      <span class="header-subtitle">Sistema de Gestão</span>
-    </span>
+      <span class="header-subtitle">O portfólio do seu curso!</span>
+    </div>
   </div>
 
   <!-- Spacer -->
@@ -24,23 +28,23 @@
 
   <!-- Informações do Usuário -->
   <div class="user-info">
-    <button
-      mat-icon-button
-      class="notification-button"
-      matTooltip="Notificações"
-      matBadge="3"
-      matBadgeColor="warn"
-      matBadgeSize="small">
-      <mat-icon>notifications</mat-icon>
-    </button>
+    <!-- Avatar do Usuário -->
+    <div class="user-avatar-container">
+      <div class="user-avatar-circle">
+        <span class="user-initial">{{ getUserInitial() }}</span>
+      </div>
+      <div class="user-status-indicator"></div>
+    </div>
 
     <!-- Menu do Usuário -->
     <button
       mat-button
       class="user-menu-button"
       [matMenuTriggerFor]="menu">
-      <mat-icon class="user-avatar">account_circle</mat-icon>
-      <span class="user-name">{{ userName }}</span>
+      <div class="user-info-text">
+        <span class="user-name">{{ userName }}</span>
+        <span class="user-role-badge">{{ getUserRoleShort() }}</span>
+      </div>
       <mat-icon class="dropdown-icon">expand_more</mat-icon>
     </button>
   </div>
@@ -48,7 +52,12 @@
   <!-- Menu Dropdown -->
   <mat-menu #menu="matMenu" class="user-dropdown">
     <div class="menu-header">
-      <mat-icon class="menu-avatar">account_circle</mat-icon>
+      <div class="menu-avatar-container">
+        <div class="menu-avatar-circle">
+          <span class="menu-user-initial">{{ getUserInitial() }}</span>
+        </div>
+        <div class="menu-status-indicator"></div>
+      </div>
       <div class="menu-user-info">
         <strong>{{ userName }}</strong>
         <small>{{ userEmail }}</small>
@@ -56,17 +65,9 @@
       </div>
     </div>
     <mat-divider></mat-divider>
-    <button mat-menu-item (click)="testDialog()">
-      <mat-icon>bug_report</mat-icon>
-      <span>Teste Diálogo</span>
-    </button>
     <button mat-menu-item (click)="goToProfile()">
       <mat-icon>person</mat-icon>
       <span>Meu Perfil</span>
-    </button>
-    <button mat-menu-item (click)="goToSettings()">
-      <mat-icon>settings</mat-icon>
-      <span>Configurações</span>
     </button>
     <mat-divider></mat-divider>
     <button mat-menu-item (click)="logout()" class="logout-item">
@@ -90,7 +91,7 @@
     <mat-nav-list class="nav-list">
       <a
         mat-list-item
-        routerLink="/dashboard"
+        routerLink="/admin/dashboard"
         routerLinkActive="active-link"
         [routerLinkActiveOptions]="{exact: true}"
         matRipple
@@ -102,7 +103,7 @@
 
       <a
         mat-list-item
-        routerLink="/cursos"
+        routerLink="/admin/cursos"
         routerLinkActive="active-link"
         matRipple
         class="nav-item">
@@ -113,7 +114,7 @@
 
       <a
         mat-list-item
-        routerLink="/categorias"
+        routerLink="/admin/categorias"
         routerLinkActive="active-link"
         matRipple
         class="nav-item"
@@ -125,7 +126,7 @@
 
       <a
         mat-list-item
-        routerLink="/tipos-curso"
+        routerLink="/admin/tipos-curso"
         routerLinkActive="active-link"
         matRipple
         class="nav-item"
@@ -137,7 +138,19 @@
 
       <a
         mat-list-item
-        routerLink="/usuarios"
+        routerLink="/admin/unidades-academicas"
+        routerLinkActive="active-link"
+        matRipple
+        class="nav-item"
+        *ngIf="isAdmin()">
+        <mat-icon class="nav-icon">apartment</mat-icon>
+        <span class="nav-text" *ngIf="!isCollapsed">Unidades Acadêmicas</span>
+        <div class="active-indicator" *ngIf="!isCollapsed"></div>
+      </a>
+
+      <a
+        mat-list-item
+        routerLink="/admin/usuarios"
         routerLinkActive="active-link"
         matRipple
         class="nav-item"
@@ -147,16 +160,40 @@
         <div class="active-indicator" *ngIf="!isCollapsed"></div>
       </a>
 
+      <a
+        mat-list-item
+        routerLink="/admin/pessoas"
+        routerLinkActive="active-link"
+        matRipple
+        class="nav-item"
+        *ngIf="canManageUsers()">
+        <mat-icon class="nav-icon">badge</mat-icon>
+        <span class="nav-text" *ngIf="!isCollapsed">Pessoas</span>
+        <div class="active-indicator" *ngIf="!isCollapsed"></div>
+      </a>
+
+      <a
+        mat-list-item
+        routerLink="/admin/auditoria"
+        routerLinkActive="active-link"
+        matRipple
+        class="nav-item"
+        *ngIf="isAdmin()">
+        <mat-icon class="nav-icon">security</mat-icon>
+        <span class="nav-text" *ngIf="!isCollapsed">Auditoria</span>
+        <div class="active-indicator" *ngIf="!isCollapsed"></div>
+      </a>
+
       <mat-divider class="nav-divider"></mat-divider>
 
       <a
         mat-list-item
-        routerLink="/configuracoes"
+        routerLink="/admin/sobre"
         routerLinkActive="active-link"
         matRipple
         class="nav-item">
-        <mat-icon class="nav-icon">settings</mat-icon>
-        <span class="nav-text" *ngIf="!isCollapsed">Configurações</span>
+        <mat-icon class="nav-icon">info</mat-icon>
+        <span class="nav-text" *ngIf="!isCollapsed">Sobre</span>
         <div class="active-indicator" *ngIf="!isCollapsed"></div>
       </a>
     </mat-nav-list>

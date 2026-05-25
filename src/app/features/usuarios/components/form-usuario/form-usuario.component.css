@@ -1,22 +1,7 @@
 /* ========================================
    🎨 VARIÁVEIS E PALETA - MINIMAL TECH LIGHT+
+   Usa variáveis globais de src/styles/variables.css
    ======================================== */
-:host {
-  --gradient-primary: linear-gradient(90deg, #3B82F6, #8B5CF6);
-  --gradient-accent: linear-gradient(90deg, #6366F1, #8B5CF6);
-  --bg-actions: #F8FAFC;
-  --primary-color: #3B82F6;
-  --secondary-color: #8B5CF6;
-  --accent-color: #6366F1;
-  --success-color: #10B981;
-  --error-color: #EF4444;
-  --warning-color: #F59E0B;
-  --text-dark: #0F172A;
-  --text-medium: #475569;
-  --text-light: #64748B;
-  --bg-hover: rgba(59, 130, 246, 0.1);
-  --border-color: #CBD5E1;
-}
 
 .form-container {
   padding: 24px;
@@ -34,7 +19,7 @@
 
 mat-card-header {
   background: var(--gradient-primary);
-  color: #fff;
+  color: white;
   padding: 24px;
   box-shadow: inset 0 -1px 0 rgba(255,255,255,0.12);
 }
@@ -79,7 +64,7 @@ mat-card-subtitle {
 /* 3) Conteúdo e rodapé com paddings consistentes */
 mat-card-content {
   padding: 24px;              /* ⬅ mantém o respiro do conteúdo */
-  background: #fff;
+  background: var(--bg-card);
 }
 
 /* Loading */
@@ -93,7 +78,7 @@ mat-card-content {
 }
 
 .loading-container p {
-  color: #666;
+  color: var(--text-medium);
   font-size: 14px;
 }
 
@@ -130,17 +115,29 @@ mat-form-field mat-icon[matPrefix] {
 }
 
 /* Role Option */
-.role-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.role-option mat-icon {
+.role-option-icon {
   font-size: 20px;
   width: 20px;
   height: 20px;
   color: var(--primary-color);
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+::ng-deep .mat-mdc-select-value-text {
+  display: flex;
+  align-items: center;
+}
+
+::ng-deep .mat-mdc-select-value-text::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  background-image: var(--role-icon);
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 /* Info Box */
@@ -149,8 +146,8 @@ mat-form-field mat-icon[matPrefix] {
   align-items: start;
   gap: 12px;
   padding: 16px;
-  background: rgba(167, 139, 250, 0.1);
-  border-left: 4px solid #A78BFA;
+  background: var(--chip-background);
+  border-left: 4px solid var(--secondary-color);
   border-radius: 4px;
 }
 
@@ -177,15 +174,15 @@ mat-form-field mat-icon[matPrefix] {
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background: #f8f9fa;
+  background: var(--bg-darker);
   border-radius: 8px;
   justify-content: center;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border-color);
 }
 
 .preview-label {
   font-size: 14px;
-  color: #666;
+  color: var(--text-medium);
   font-weight: 500;
 }
 
@@ -202,7 +199,7 @@ mat-form-field mat-icon[matPrefix] {
 mat-card-actions {
   padding: 16px 24px;         /* ⬅ mesmo alinhamento lateral do content */
   background: var(--bg-actions);
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--border-color);
   display: flex;
   gap: 8px;
   margin: 0;                  /* ⬅ nada de margens negativas */
@@ -282,19 +279,36 @@ button:active:not(:disabled) {
   transform: translateY(0);
 }
 
+/* Garantir que botões mat-button usem cor verde quando clicados */
+::ng-deep mat-card-actions button[mat-button]:active:not([disabled]),
+::ng-deep mat-card-actions button[mat-button]:focus:active:not([disabled]) {
+  color: var(--primary-color) !important;
+}
+
+::ng-deep mat-card-actions button[mat-button]:active:not([disabled]) .mdc-button__label,
+::ng-deep mat-card-actions button[mat-button]:focus:active:not([disabled]) .mdc-button__label,
+::ng-deep mat-card-actions button[mat-button]:active:not([disabled]) mat-icon,
+::ng-deep mat-card-actions button[mat-button]:focus:active:not([disabled]) mat-icon,
+::ng-deep mat-card-actions button[mat-button]:active:not([disabled]) .mat-icon,
+::ng-deep mat-card-actions button[mat-button]:focus:active:not([disabled]) .mat-icon,
+::ng-deep mat-card-actions button[mat-button]:active:not([disabled]) span,
+::ng-deep mat-card-actions button[mat-button]:focus:active:not([disabled]) span {
+  color: var(--primary-color) !important;
+}
+
 /* Material Overrides - Chips */
 ::ng-deep .mat-mdc-chip.mat-warn {
-  --mdc-chip-elevated-container-color: #EF4444 !important;
+  --mdc-chip-elevated-container-color: var(--error-color) !important;
   --mdc-chip-label-text-color: white !important;
 }
 
 ::ng-deep .mat-mdc-chip.mat-primary {
-  --mdc-chip-elevated-container-color: #3B82F6 !important;
+  --mdc-chip-elevated-container-color: var(--primary-color) !important;
   --mdc-chip-label-text-color: white !important;
 }
 
 ::ng-deep .mat-mdc-chip.mat-accent {
-  --mdc-chip-elevated-container-color: #A78BFA !important;
+  --mdc-chip-elevated-container-color: var(--secondary-color) !important;
   --mdc-chip-label-text-color: white !important;
 }
 

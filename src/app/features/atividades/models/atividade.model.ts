@@ -7,10 +7,15 @@ export interface AtividadeDTO {
   fotoCapa?: string;
   coordenador: string;
   dataRealizacao: string; // ISO date string (LocalDate)
+  dataFim?: string | null; // ISO date string (LocalDate) - NOVO CAMPO
   curso: CursoDTO;
   categoria: CategoriaDTO;
   fontesFinanciadora: FonteFinanciadoraDTO[];
   integrantes: PessoaPapelDTO[];
+  totalParticipantes?: number;
+  participantesCount?: number;
+  totalEvidencias?: number;
+  evidenciasCount?: number;
 }
 
 export interface CursoDTO {
@@ -74,6 +79,7 @@ export interface AtividadeCreateDTO {
   statusPublicacao: boolean;
   coordenador: string;
   dataRealizacao: string; // ISO date string
+  dataFim?: string | null; // ISO date string - NOVO CAMPO
   cursoId: number;
   categoriaId: number;
   fontesFinanciadoraIds?: number[];
@@ -87,6 +93,7 @@ export interface AtividadeUpdateDTO {
   statusPublicacao: boolean;
   coordenador: string;
   dataRealizacao: string; // ISO date string
+  dataFim?: string | null; // ISO date string - NOVO CAMPO
   cursoId: number;
   categoriaId: number;
   fontesFinanciadoraIds?: number[];

@@ -1,0 +1,100 @@
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 320px;
+  color: var(--text-dark);
+  margin-top: 12px;
+}
+
+.dialog-actions {
+  gap: 12px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+mat-dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-dark);
+  margin-bottom: 12px;
+}
+
+mat-dialog-title mat-icon {
+  color: var(--primary-color);
+}
+
+mat-form-field {
+  --mdc-outlined-text-field-outline-color: var(--border-color) !important;
+  --mdc-outlined-text-field-hover-outline-color: var(--primary-color) !important;
+  --mdc-outlined-text-field-focus-outline-color: var(--primary-color) !important;
+  margin-top: 8px;
+}
+
+mat-form-field.mat-focused .mdc-notched-outline__leading,
+mat-form-field.mat-focused .mdc-notched-outline__notch,
+mat-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: var(--primary-color) !important;
+}
+
+.helper-text {
+  font-size: 13px;
+  color: var(--text-medium);
+  margin: 4px 0 0;
+}
+
+.dialog-actions button[color="primary"] {
+  background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
+  color: white;
+}
+
+.dialog-actions button[color="primary"][mat-raised-button] {
+  --mdc-filled-button-container-color: var(--primary-color) !important;
+  --mdc-filled-button-label-text-color: var(--md-sys-color-on-secondary) !important;
+  --mat-filled-button-state-layer-color: var(--md-sys-color-on-secondary) !important;
+  background: linear-gradient(120deg, var(--primary-color), var(--secondary-color)) !important;
+  background-color: var(--primary-color) !important;
+  color: var(--md-sys-color-on-secondary) !important;
+}
+
+.dialog-actions button[color="primary"][mat-raised-button] .mdc-button__label,
+.dialog-actions button[color="primary"][mat-raised-button] mat-icon,
+:host ::ng-deep .dialog-actions button[color="primary"][mat-raised-button] .mdc-button__label,
+:host ::ng-deep .dialog-actions button[color="primary"][mat-raised-button] mat-icon,
+:host ::ng-deep .dialog-actions button[color="primary"][mat-raised-button] .mdc-button__label * {
+  color: var(--md-sys-color-on-secondary) !important;
+}
+
+.dialog-actions button[color="primary"][mat-raised-button]:hover {
+  background: linear-gradient(120deg, var(--secondary-color), var(--accent-color)) !important;
+  background-color: var(--secondary-color) !important;
+  color: var(--md-sys-color-on-secondary) !important;
+}
+
+.dialog-actions button[color="primary"][mat-stroked-button] {
+  background: transparent;
+  color: var(--primary-color) !important;
+  border-color: var(--border-color) !important;
+}
+
+.dialog-actions button[color="primary"][mat-stroked-button]:hover {
+  border-color: var(--primary-color);
+}
+
+.dialog-actions button[color="primary"][mat-raised-button] mat-icon {
+  margin-right: 6px;
+  color: var(--md-sys-color-on-secondary) !important;
+}
+
+:host ::ng-deep .mat-mdc-dialog-content {
+  overflow: visible;
+  padding-top: 16px;
+}
+
+:host ::ng-deep .mat-mdc-dialog-surface {
+  padding: 20px 24px 24px;
+}
+

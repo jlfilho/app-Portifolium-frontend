@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, interval } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, interval, of } from 'rxjs';
+import { tap, timeout, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { environment } from '../../environments/environment.development';
+import { environment } from '../../environments/environment';
 import { AuthoritiesResponse } from '../features/usuarios/models/usuario.model';
 import { isTokenExpired, getTokenExpirationTime, decodeToken, JwtPayload } from './utils/jwt.helper';
 
@@ -46,18 +46,15 @@ export class ApiService {
   }
 
   login(username: string, password: string): Observable<any> {
-    console.log('Tentando fazer login com: ', username, password);
-    return this.http.post<any>(`${this.baseUrl}/auth/login`, { username, password }).pipe(
+        return this.http.post<any>(`${this.baseUrl}/auth/login`, { username, password }).pipe(
       tap((response) => {
         if (response?.token) {
           localStorage.setItem('token', response.token);
           this.tokenSubject.next(response.token);
-          console.log('✅ Login efetuado com sucesso!');
-
+          
           // Verificar expiração do token
           const expiresIn = getTokenExpirationTime(response.token);
-          console.log(`⏱️ Token expira em: ${Math.floor(expiresIn / 60)} minutos`);
-
+          
           // Carregar authorities após login
           this.loadAuthorities();
 
@@ -68,12 +65,66 @@ export class ApiService {
     );
   }
 
+  /**
+   * Realiza logout do usuário, registrando a ação na auditoria
+   * Chama o endpoint POST /api/auth/logout antes de limpar os dados locais
+   */
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('authorities');
+    // Obter o token antes de remover
+    const token = this.getToken();
+
+    // Tentar chamar o endpoint de logout para registrar na auditoria
+    if (token) {
+      this.http.post(
+        `${this.baseUrl}/auth/logout`,
+        {},
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      ).pipe(
+        // Timeout de 3 segundos para não travar se o servidor estiver lento
+        timeout(3000),
+        catchError((error) => {
+          // Log do erro mas não interrompe o fluxo
+          console.warn('⚠️ Falha ao registrar logout na auditoria (continuando logout local):', error);
+          // Retorna um Observable vazio para continuar o fluxo
+          return of(null);
+        })
+      ).subscribe({
+        next: () => {
+                  },
+        error: (error) => {
+          // Este bloco não deve ser executado devido ao catchError, mas mantido por segurança
+          console.warn('⚠️ Erro ao registrar logout na auditoria:', error);
+        },
+        complete: () => {
+          // Sempre executar limpeza após tentar chamar o endpoint
+          this.performLocalLogout();
+        }
+      });
+    } else {
+      // Se não houver token, executar logout local diretamente
+            this.performLocalLogout();
+    }
+  }
+
+  /**
+   * Limpa todos os dados de sessão armazenados localmente
+   */
+  private performLocalLogout(): void {
+    // Limpar todos os dados de sessão
+    if (this.isLocalStorageAvailable()) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('authorities');
+    }
+    
+    // Limpar dados do serviço
     this.tokenSubject.next(null);
     this.authoritiesSubject.next([]);
-  }
+    
+      }
 
   getToken(): string | null {
     return this.tokenSubject.value;
@@ -106,8 +157,25 @@ export class ApiService {
    * Verificar se o usuário tem uma role específica
    */
   hasRole(role: string): boolean {
-    const authorities = this.authoritiesSubject.value;
-    return authorities.includes(`ROLE_${role}`) || authorities.includes(role);
+    return this.hasAnyRole([role]);
+  }
+
+  hasAnyRole(roles: string[]): boolean {
+    const normalized = roles.map(role => role.startsWith('ROLE_') ? role : `ROLE_${role}`);
+    const authorities = this.authoritiesSubject.value || [];
+    if (authorities.some(auth => normalized.includes(auth))) {
+      return true;
+    }
+
+    const userInfo = this.getUserInfoFromToken();
+    const tokenAuthorities = userInfo?.authorities || [];
+    return tokenAuthorities.some(auth => {
+      if (!auth) {
+        return false;
+      }
+      const formatted = auth.startsWith('ROLE_') ? auth : `ROLE_${auth}`;
+      return normalized.includes(auth) || normalized.includes(formatted);
+    });
   }
 
   /**
@@ -135,8 +203,7 @@ export class ApiService {
 
       if (token && isTokenExpired(token)) {
         console.warn('⚠️ Token expirado detectado na verificação periódica');
-        console.log('🚪 Efetuando logout automático...');
-
+        
         this.logout();
         this.router.navigate(['/login'], {
           queryParams: {
@@ -170,7 +237,7 @@ export class ApiService {
    * Obter informações do usuário do token JWT
    * Retorna: { username: string, email: string, authorities: string[], name?: string }
    */
-  getUserInfoFromToken(): { username: string; email: string; authorities: string[]; name?: string } | null {
+  getUserInfoFromToken(): { id?: number; pessoaId?: number; username: string; email: string; authorities: string[]; name?: string } | null {
     const token = this.getToken();
     if (!token) {
       console.warn('⚠️ Nenhum token encontrado');
@@ -183,16 +250,23 @@ export class ApiService {
       return null;
     }
 
-    console.log('🔍 Token decodificado:', decoded);
-
+    
     // Extrair informações do token
     // O "sub" geralmente contém o username/email
     const username = decoded.sub || '';
     const email = decoded['email'] || decoded.sub || '';
     const authorities = decoded.authorities || this.getAuthorities();
-    const name = decoded['name'] || decoded['nome'] || '';
+    const name = decoded['name'] || decoded['nome'] || decoded['nomeCompleto'] || decoded['fullName'] || decoded['given_name'] || '';
+    const rawId = decoded['id'] ?? decoded['userId'] ?? decoded['usuarioId'];
+    const rawPessoaId = decoded['pessoaId'] ?? decoded['idPessoa'] ?? decoded['pessoa'];
+    const parsedId = rawId !== undefined ? Number(rawId) : undefined;
+    const parsedPessoaId = rawPessoaId !== undefined ? Number(rawPessoaId) : undefined;
+    const id = typeof parsedId === 'number' && !Number.isNaN(parsedId) ? parsedId : undefined;
+    const pessoaId = typeof parsedPessoaId === 'number' && !Number.isNaN(parsedPessoaId) ? parsedPessoaId : undefined;
 
     return {
+      id,
+      pessoaId,
       username,
       email,
       authorities,
@@ -219,5 +293,45 @@ export class ApiService {
     if (!userInfo) return '';
 
     return userInfo.email || userInfo.username || '';
+  }
+
+  /**
+   * Verificar se o usuário pode criar atividades
+   * Permite: ADMINISTRADOR, GERENTE, SECRETARIO, COORDENADOR_ATIVIDADE
+   */
+  podeCriarAtividade(): boolean {
+    return this.hasAnyRole(['ADMINISTRADOR', 'GERENTE', 'SECRETARIO', 'COORDENADOR_ATIVIDADE']);
+  }
+
+  /**
+   * Verificar se o usuário pode editar/excluir atividades (sem verificação de coordenador específico)
+   * Permite: ADMINISTRADOR, GERENTE, SECRETARIO, COORDENADOR_ATIVIDADE
+   * Nota: Para COORDENADOR_ATIVIDADE, ainda é necessário verificar se é coordenador da atividade específica
+   */
+  podeGerenciarAtividades(): boolean {
+    return this.hasAnyRole(['ADMINISTRADOR', 'GERENTE', 'SECRETARIO', 'COORDENADOR_ATIVIDADE']);
+  }
+
+  /**
+   * Verificar se o usuário tem role de administrador, gerente ou secretário
+   * (sempre podem editar atividades onde estão associados ao curso)
+   */
+  isAdminGerenteOuSecretario(): boolean {
+    return this.hasAnyRole(['ADMINISTRADOR', 'GERENTE', 'SECRETARIO']);
+  }
+
+  /**
+   * Verificar se o usuário é coordenador de atividade
+   */
+  isCoordenadorAtividade(): boolean {
+    return this.hasRole('COORDENADOR_ATIVIDADE');
+  }
+
+  /**
+   * Obter pessoaId do usuário logado (se disponível no token)
+   */
+  getPessoaId(): number | undefined {
+    const userInfo = this.getUserInfoFromToken();
+    return userInfo?.pessoaId;
   }
 }

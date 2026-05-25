@@ -80,7 +80,7 @@ export class FormTipoCursoComponent implements OnInit {
         const apiMessage = this.extractApiMessage(error);
         this.showMessage(apiMessage || 'Erro ao carregar tipo de curso.', 'error');
         this.isLoading = false;
-        this.router.navigate(['/tipos-curso']);
+        this.router.navigate(['/admin/tipos-curso']);
       }
     });
   }
@@ -97,7 +97,7 @@ export class FormTipoCursoComponent implements OnInit {
           next: () => {
             this.showMessage('Tipo de curso atualizado com sucesso!', 'success');
             this.isSaving = false;
-            this.router.navigate(['/tipos-curso']);
+            this.router.navigate(['/admin/tipos-curso']);
           },
           error: (error) => {
             console.error('Erro ao atualizar tipo de curso:', error);
@@ -111,7 +111,7 @@ export class FormTipoCursoComponent implements OnInit {
           next: () => {
             this.showMessage('Tipo de curso criado com sucesso!', 'success');
             this.isSaving = false;
-            this.router.navigate(['/tipos-curso']);
+            this.router.navigate(['/admin/tipos-curso']);
           },
           error: (error) => {
             console.error('Erro ao criar tipo de curso:', error);
@@ -128,7 +128,7 @@ export class FormTipoCursoComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/tipos-curso']);
+    this.router.navigate(['/admin/tipos-curso']);
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {

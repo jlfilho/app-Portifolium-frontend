@@ -1,3 +1,5 @@
+import { PAPEL_COLORS } from '../../../shared/constants/colors.constants';
+
 /**
  * Enum representando os papéis que uma pessoa pode ter em uma atividade
  * Equivalente ao enum Papel do backend Java
@@ -33,14 +35,14 @@ export const PapelIcons: Record<Papel, string> = {
 };
 
 /**
- * Cores para cada papel
+ * Cores para cada papel (usando constantes centralizadas)
  */
 export const PapelColors: Record<Papel, string> = {
-  [Papel.COORDENADOR]: '#EF4444',      // Vermelho
-  [Papel.SUBCOORDENADOR]: '#F59E0B',   // Laranja
-  [Papel.BOLSISTA]: '#3B82F6',         // Azul
-  [Papel.VOLUNTARIO]: '#10B981',       // Verde
-  [Papel.PARTICIPANTE]: '#8B5CF6'      // Roxo
+  [Papel.COORDENADOR]: PAPEL_COLORS['COORDENADOR'],
+  [Papel.SUBCOORDENADOR]: PAPEL_COLORS['SUBCOORDENADOR'],
+  [Papel.BOLSISTA]: PAPEL_COLORS['BOLSISTA'],
+  [Papel.VOLUNTARIO]: PAPEL_COLORS['VOLUNTARIO'],
+  [Papel.PARTICIPANTE]: PAPEL_COLORS['PARTICIPANTE']
 };
 
 /**
@@ -76,7 +78,7 @@ export class PapelUtils {
    * Retorna a cor de um papel
    */
   static getColor(papel: Papel | string): string {
-    return PapelColors[papel as Papel] || '#64748B';
+    return PapelColors[papel as Papel] || PAPEL_COLORS['PARTICIPANTE'];
   }
 
   /**

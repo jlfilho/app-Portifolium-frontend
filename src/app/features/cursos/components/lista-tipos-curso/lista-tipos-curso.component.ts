@@ -47,7 +47,7 @@ import { TipoCursoFilter } from '../../../cursos/models/tipo-curso-filter.model'
   styleUrl: './lista-tipos-curso.component.css'
 })
 export class ListaTiposCursoComponent implements OnInit {
-  displayedColumns: string[] = ['id', 'nome', 'acao'];
+  displayedColumns: string[] = ['nome', 'acao'];
   tipos: TipoCurso[] = [];
   isLoading = true;
   errorMessage: string = '';
@@ -114,11 +114,11 @@ export class ListaTiposCursoComponent implements OnInit {
   }
 
   addTipo(): void {
-    this.router.navigate(['/tipos-curso/novo']);
+    this.router.navigate(['/admin/tipos-curso/novo']);
   }
 
   editTipo(tipo: TipoCurso): void {
-    this.router.navigate(['/tipos-curso/editar', tipo.id]);
+    this.router.navigate(['/admin/tipos-curso/editar', tipo.id]);
   }
 
   deleteTipo(tipo: TipoCurso): void {

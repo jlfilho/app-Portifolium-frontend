@@ -1,20 +1,23 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 // Angular Material
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-public-header',
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     MatToolbarModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatTooltipModule
   ],
   template: `
     <mat-toolbar class="public-header">
@@ -27,7 +30,7 @@ import { MatIconModule } from '@angular/material/icon';
             matTooltip="Voltar ao início">
             <mat-icon>school</mat-icon>
           </button>
-          <span class="header-title">AcadManage</span>
+          <span class="header-title">Portifólium</span>
         </div>
 
         <div class="header-right">
@@ -38,15 +41,30 @@ import { MatIconModule } from '@angular/material/icon';
             <mat-icon>book</mat-icon>
             Cursos
           </button>
+          <button
+            mat-button
+            class="nav-btn"
+            (click)="goToSobre()">
+            <mat-icon>info</mat-icon>
+            Sobre
+          </button>
+          <button
+            mat-button
+            class="nav-btn"
+            routerLink="/login"
+            matTooltip="Acessar área administrativa">
+            <mat-icon>login</mat-icon>
+            Login
+          </button>
         </div>
       </div>
     </mat-toolbar>
   `,
   styles: [`
     .public-header {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+      background: var(--primary-button-gradient);
       color: white;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--shadow-sm);
       position: relative;
       z-index: 1000;
     }
@@ -73,14 +91,14 @@ import { MatIconModule } from '@angular/material/icon';
     }
 
     .logo-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: color-mix(in srgb, white 10%, transparent);
       transform: scale(1.1);
     }
 
     .header-title {
       font-size: 24px;
       font-weight: 700;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      text-shadow: 0 2px 4px color-mix(in srgb, var(--text-dark) 20%, transparent);
     }
 
     .header-right {
@@ -91,17 +109,21 @@ import { MatIconModule } from '@angular/material/icon';
 
     .nav-btn {
       color: white;
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      border: 1px solid color-mix(in srgb, white 30%, transparent);
       transition: all 0.3s ease;
+      font-weight: 500;
     }
 
     .nav-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.5);
+      background: color-mix(in srgb, white 10%, transparent);
+      border-color: color-mix(in srgb, white 50%, transparent);
     }
 
     .nav-btn mat-icon {
       margin-right: 8px;
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
     }
 
     @media (max-width: 768px) {
@@ -129,6 +151,10 @@ export class PublicHeaderComponent {
 
   goToCursos(): void {
     this.router.navigate(['/cursos-publicos']);
+  }
+
+  goToSobre(): void {
+    this.router.navigate(['/sobre']);
   }
 }
 

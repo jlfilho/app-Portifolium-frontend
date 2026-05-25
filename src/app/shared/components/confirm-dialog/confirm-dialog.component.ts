@@ -60,7 +60,7 @@ export interface ConfirmDialogData {
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.5);
+      background: color-mix(in srgb, var(--text-dark) 50%, transparent);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -68,13 +68,13 @@ export interface ConfirmDialogData {
     }
 
     .custom-dialog {
-      background: #ffffff;
+      background: var(--bg-card);
       border-radius: 16px;
       padding: 40px;
       min-width: 400px;
       max-width: 500px;
       text-align: center;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      box-shadow: var(--shadow-xl);
       font-family: 'Roboto', 'Helvetica Neue', sans-serif;
     }
 
@@ -86,39 +86,39 @@ export interface ConfirmDialogData {
       align-items: center;
       justify-content: center;
       margin: 0 auto 24px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      box-shadow: var(--shadow-md);
     }
 
     .icon-container mat-icon {
       font-size: 40px;
       width: 40px;
       height: 40px;
-      color: #ffffff;
+      color: white;
     }
 
     .icon-warning {
-      background: linear-gradient(135deg, #F59E0B, #D97706);
+      background: linear-gradient(135deg, var(--warning-color), color-mix(in srgb, var(--warning-color) 85%, var(--text-dark)));
     }
 
     .icon-danger {
-      background: linear-gradient(135deg, #EF4444, #DC2626);
+      background: linear-gradient(135deg, var(--error-color), color-mix(in srgb, var(--error-color) 85%, var(--text-dark)));
     }
 
     .icon-info {
-      background: linear-gradient(135deg, #3B82F6, #2563EB);
+      background: linear-gradient(135deg, var(--primary-color), color-mix(in srgb, var(--primary-color) 85%, var(--text-dark)));
     }
 
     .title {
       font-size: 24px;
       font-weight: 600;
-      color: #0F172A;
+      color: var(--text-dark);
       margin: 0 0 16px 0;
       line-height: 1.2;
     }
 
     .message {
       font-size: 16px;
-      color: #475569;
+      color: var(--text-medium);
       margin: 0 0 32px 0;
       line-height: 1.5;
     }
@@ -142,14 +142,14 @@ export interface ConfirmDialogData {
 
     .btn-cancel {
       background: transparent;
-      color: #475569;
-      border: 2px solid #CBD5E1;
+      color: var(--text-medium);
+      border: 2px solid var(--border-color);
     }
 
     .btn-cancel:hover {
-      background: rgba(59, 130, 246, 0.1);
-      border-color: #3B82F6;
-      color: #3B82F6;
+      background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
     }
 
     .btn-confirm {
@@ -157,22 +157,22 @@ export interface ConfirmDialogData {
     }
 
     .btn-primary {
-      background: #3B82F6;
-      color: #ffffff;
+      background: var(--primary-color);
+      color: white;
     }
 
     .btn-primary:hover {
-      background: #2563EB;
+      background: color-mix(in srgb, var(--primary-color) 85%, var(--text-dark));
       transform: translateY(-1px);
     }
 
     .btn-danger {
-      background: #EF4444;
-      color: #ffffff;
+      background: var(--error-color);
+      color: white;
     }
 
     .btn-danger:hover {
-      background: #DC2626;
+      background: color-mix(in srgb, var(--error-color) 85%, var(--text-dark));
       transform: translateY(-1px);
     }
 

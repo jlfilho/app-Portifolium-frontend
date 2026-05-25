@@ -1,19 +1,7 @@
 /* ========================================
    🎨 VARIÁVEIS E PALETA - MINIMAL TECH LIGHT+
+   Usa variáveis globais de src/styles/variables.css
    ======================================== */
-:host {
-  --primary-color: #3B82F6;
-  --secondary-color: #8B5CF6;
-  --accent-color: #6366F1;
-  --success-color: #10B981;
-  --error-color: #EF4444;
-  --warning-color: #F59E0B;
-  --text-dark: #0F172A;
-  --text-medium: #475569;
-  --text-light: #64748B;
-  --bg-hover: rgba(59, 130, 246, 0.1);
-  --border-color: #CBD5E1;
-}
 
 /* Card principal */
 .form-card {
@@ -42,6 +30,26 @@ mat-card-header {
 
 .header-text {
   flex: 1;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-relatorio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-color: rgba(255, 255, 255, 0.8) !important;
+  color: white !important;
+}
+
+.btn-relatorio mat-progress-spinner {
+  --mdc-circular-progress-active-indicator-color: white;
+  width: 18px !important;
+  height: 18px !important;
 }
 
 .btn-nova-atividade {
@@ -77,14 +85,14 @@ mat-card-subtitle {
 /* Content */
 mat-card-content {
   padding: 24px;
-  background: #fff;
+  background: var(--bg-card);
 }
 
 /* Filters Section */
 .filters-section {
   margin-bottom: 24px;
   padding: 20px;
-  background: #f8f9fa;
+  background: var(--bg-darker);
   border-radius: 8px;
   border: 1px solid var(--border-color);
 }
@@ -128,6 +136,12 @@ mat-card-content {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+:host ::ng-deep .filters-actions .mat-mdc-raised-button.mat-primary {
+  background: var(--primary-button-gradient) !important;
+  color: white !important;
+  box-shadow: var(--shadow-primary) !important;
 }
 
 /* Stats row */
@@ -216,10 +230,13 @@ mat-card-content {
 /* Imagem do Card */
 .card-image {
   width: 100%;
-  height: auto;
+  height: 200px;
+  min-height: 200px;
   max-height: 200px;
   object-fit: cover;
+  object-position: center;
   display: block;
+  background-color: var(--bg-darker);
 }
 
 .card-image-placeholder {
@@ -248,11 +265,7 @@ mat-card-content {
 
 /* Header do Card */
 .card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
-  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .atividade-nome {
@@ -260,8 +273,23 @@ mat-card-content {
   font-weight: 600;
   color: var(--text-dark);
   margin: 0;
-  line-height: 1.3;
-  flex: 1;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  word-break: break-word;
+  min-height: 50px;
+  max-height: 50px;
+}
+
+/* Status abaixo do nome */
+.card-status {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
 }
 
 /* Status Chips */
@@ -270,11 +298,13 @@ mat-card-content {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 10px;
-  height: auto;
-  font-size: 11px;
+  padding: 4px 12px;
+  height: 24px;
+  font-size: 12px;
   border-radius: 12px;
   flex-shrink: 0;
+  white-space: nowrap;
+  overflow: visible;
 }
 
 .chip-publicada {
@@ -335,8 +365,8 @@ mat-card-content {
   display: flex;
   gap: 8px;
   padding: 12px 16px !important;
-  background-color: #f8fafc;
-  border-top: 1px solid #e2e8f0;
+  background-color: var(--bg-content);
+  border-top: 1px solid var(--border-color);
   margin: 0 !important;
 }
 
@@ -350,6 +380,51 @@ mat-card-content {
   font-size: 13px;
   font-weight: 500;
   height: 36px;
+}
+
+/* Garantir que o botão Visualizar use variáveis globais */
+::ng-deep .btn-visualizar.mat-mdc-raised-button.mat-primary {
+  background: var(--primary-button-gradient) !important;
+  background-color: transparent !important;
+  color: white !important;
+  box-shadow: var(--shadow-primary) !important;
+  border: none !important;
+}
+
+::ng-deep .btn-visualizar.mat-mdc-raised-button.mat-primary:hover:not([disabled]) {
+  background: var(--gradient-accent) !important;
+  background-color: transparent !important;
+  box-shadow: var(--shadow-accent) !important;
+}
+
+/* Garantir que o botão Editar use variáveis globais */
+::ng-deep .btn-editar.mat-mdc-stroked-button.mat-primary {
+  color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+::ng-deep .btn-editar.mat-mdc-stroked-button.mat-primary .mdc-button__label {
+  color: var(--primary-color) !important;
+}
+
+::ng-deep .btn-editar.mat-mdc-stroked-button.mat-primary:hover:not([disabled]) {
+  background-color: var(--bg-hover) !important;
+  border-color: var(--primary-color) !important;
+}
+
+::ng-deep .btn-editar.mat-mdc-stroked-button.mat-primary:hover:not([disabled]) .mdc-button__label {
+  color: var(--primary-color) !important;
+}
+
+/* Garantir que o botão Excluir use variáveis globais */
+::ng-deep .btn-excluir.mat-mdc-stroked-button.mat-warn {
+  color: var(--error-color) !important;
+  border-color: var(--error-color) !important;
+}
+
+::ng-deep .btn-excluir.mat-mdc-stroked-button.mat-warn:hover:not([disabled]) {
+  background-color: color-mix(in srgb, var(--error-color) 10%, transparent) !important;
+  border-color: var(--error-color) !important;
 }
 
 .btn-visualizar mat-icon,
@@ -377,7 +452,7 @@ mat-card-content {
 /* Actions */
 mat-card-actions {
   padding: 16px 24px;
-  background: #f8f9fa;
+  background: var(--bg-darker);
   margin: 0;
   border-radius: 0 0 12px 12px;
 }

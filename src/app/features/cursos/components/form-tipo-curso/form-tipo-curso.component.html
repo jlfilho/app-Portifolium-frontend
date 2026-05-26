@@ -38,11 +38,11 @@
       </form>
     </mat-card-content>
 
-    <div class="form-actions" *ngIf="!isLoading">
+    <div class="form-actions app-form-actions" *ngIf="!isLoading">
       <button
         mat-stroked-button
         type="button"
-        class="cancel-button"
+        class="cancel-button app-button-secondary"
         (click)="onCancel()"
         [disabled]="isSaving">
         <mat-icon>close</mat-icon>
@@ -53,7 +53,7 @@
         mat-raised-button
         color="primary"
         type="button"
-        class="btn-primary"
+        class="btn-primary app-button-primary"
         (click)="onSubmit()"
         [disabled]="isSaving || form.invalid">
         <mat-icon>{{ isSaving ? 'hourglass_empty' : (isEditMode ? 'save' : 'add') }}</mat-icon>

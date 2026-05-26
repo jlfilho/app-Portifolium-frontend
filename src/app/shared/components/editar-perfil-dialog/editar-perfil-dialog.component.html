@@ -90,15 +90,15 @@
     </form>
   </mat-dialog-content>
 
-  <mat-dialog-actions align="end">
-    <button mat-button (click)="onCancel()" [disabled]="isSaving">
+  <mat-dialog-actions align="end" class="app-dialog-actions">
+    <button mat-stroked-button class="app-button-secondary" (click)="onCancel()" [disabled]="isSaving">
       <mat-icon>close</mat-icon>
       Cancelar
     </button>
     <button 
       mat-raised-button 
       color="primary"
-      class="btn-primary"
+      class="btn-primary app-button-primary"
       (click)="onSubmit()" 
       [disabled]="isSaving || perfilForm.invalid">
       <mat-icon *ngIf="!isSaving">save</mat-icon>

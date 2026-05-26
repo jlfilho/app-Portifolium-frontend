@@ -20,7 +20,7 @@
       <button
         mat-stroked-button
         color="primary"
-        class="import-button"
+        class="import-button app-button-import"
         (click)="triggerImport()"
         [disabled]="!canImport() || isImporting">
         <mat-icon>file_upload</mat-icon>
@@ -29,7 +29,7 @@
 
       <button
         mat-raised-button
-        class="btn-primary add-button"
+        class="btn-primary add-button app-button-primary"
         (click)="addPessoa()"
         [disabled]="!canCreatePessoa()">
         <mat-icon>add</mat-icon>
@@ -138,6 +138,7 @@
             <button
               mat-icon-button
               color="primary"
+              class="app-icon-action"
               matTooltip="Criar usuário para esta pessoa"
               *ngIf="canCriarUsuarioParaPessoa(pessoa)"
               (click)="criarUsuarioParaPessoa(pessoa)">
@@ -147,6 +148,7 @@
             <button
               mat-icon-button
               color="primary"
+              class="app-icon-edit"
               matTooltip="Editar pessoa"
               (click)="editPessoa(pessoa)"
               [disabled]="!canManage()">
@@ -156,6 +158,7 @@
             <button
               mat-icon-button
               color="warn"
+              class="app-icon-danger"
               matTooltip="Excluir pessoa"
               (click)="deletePessoa(pessoa)"
               [disabled]="!canManage()">

@@ -11,7 +11,7 @@
     <div class="app-section-header__actions" *ngIf="isAdmin()">
       <button
         mat-raised-button
-        class="btn-primary add-button"
+        class="btn-primary add-button app-button-primary"
         matTooltip="Adicionar novo tipo de curso"
         matTooltipPosition="below"
         (click)="addTipo()">
@@ -56,10 +56,10 @@
         <ng-container matColumnDef="acao">
           <th mat-header-cell *matHeaderCellDef class="actions-header">Ações</th>
           <td mat-cell *matCellDef="let row" class="actions-cell">
-            <button mat-icon-button matTooltip="Editar" (click)="editTipo(row)">
+            <button mat-icon-button class="app-icon-edit" matTooltip="Editar" (click)="editTipo(row)">
               <mat-icon>edit</mat-icon>
             </button>
-            <button mat-icon-button matTooltip="Excluir" (click)="deleteTipo(row)">
+            <button mat-icon-button class="app-icon-danger" matTooltip="Excluir" (click)="deleteTipo(row)">
               <mat-icon>delete</mat-icon>
             </button>
           </td>

@@ -8,7 +8,7 @@
       <p>Gerencie as unidades acadêmicas vinculadas aos cursos.</p>
     </div>
 
-    <button mat-raised-button color="primary" class="btn-primary add-button" (click)="addUnidade()">
+    <button mat-raised-button color="primary" class="btn-primary add-button app-button-primary" (click)="addUnidade()">
       <mat-icon>add</mat-icon>
       Nova Unidade
     </button>
@@ -60,10 +60,10 @@
         <ng-container matColumnDef="acoes">
           <th mat-header-cell *matHeaderCellDef class="actions-header">Ações</th>
           <td mat-cell *matCellDef="let unidade" class="actions-cell">
-            <button mat-icon-button color="primary" matTooltip="Editar unidade" (click)="editUnidade(unidade)">
+            <button mat-icon-button color="primary" class="app-icon-edit" matTooltip="Editar unidade" (click)="editUnidade(unidade)">
               <mat-icon>edit</mat-icon>
             </button>
-            <button mat-icon-button color="warn" matTooltip="Excluir unidade" (click)="deleteUnidade(unidade)">
+            <button mat-icon-button color="warn" class="app-icon-danger" matTooltip="Excluir unidade" (click)="deleteUnidade(unidade)">
               <mat-icon>delete</mat-icon>
             </button>
           </td>

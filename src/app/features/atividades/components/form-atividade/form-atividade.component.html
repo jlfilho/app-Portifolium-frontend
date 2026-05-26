@@ -523,12 +523,12 @@
     </form>
   </mat-card-content>
 
-  <mat-card-actions align="end" *ngIf="!isLoading && !errorMessage">
-    <button mat-stroked-button type="button" (click)="goBack()" [disabled]="isSaving">
+  <mat-card-actions align="end" class="app-form-actions" *ngIf="!isLoading && !errorMessage">
+    <button mat-stroked-button class="app-button-secondary" type="button" (click)="goBack()" [disabled]="isSaving">
       <mat-icon>close</mat-icon>
       Cancelar
     </button>
-    <button mat-raised-button color="primary" class="btn-primary" type="button" (click)="onSubmit()" [disabled]="isSaving">
+    <button mat-raised-button color="primary" class="btn-primary app-button-primary" type="button" (click)="onSubmit()" [disabled]="isSaving">
       <mat-icon *ngIf="!isSaving">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
       <mat-progress-spinner *ngIf="isSaving" mode="indeterminate" diameter="20"></mat-progress-spinner>
       {{ isSaving ? 'Salvando...' : (isEditMode ? 'Atualizar' : 'Cadastrar') }}

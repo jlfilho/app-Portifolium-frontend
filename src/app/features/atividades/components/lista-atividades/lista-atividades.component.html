@@ -12,7 +12,7 @@
         <button
           mat-stroked-button
           color="primary"
-          class="btn-relatorio"
+          class="btn-relatorio app-button-report"
           (click)="abrirDialogRelatorio()"
           *ngIf="podeGerarRelatorio"
           [disabled]="isLoading || isGeneratingRelatorio">
@@ -29,9 +29,9 @@
           mat-raised-button 
           color="primary" 
           (click)="novaAtividade()" 
-          class="btn-nova-atividade"
+          class="btn-nova-atividade app-button-primary"
           *ngIf="podeCriarAtividade">
-          <mat-icon>add_circle</mat-icon>
+          <mat-icon>add</mat-icon>
           Nova Atividade
         </button>
       </div>
@@ -98,11 +98,11 @@
 
       <!-- Botões de Ação dos Filtros -->
       <div class="filters-actions">
-        <button mat-raised-button color="primary" (click)="aplicarFiltros()" [disabled]="isLoading">
+        <button mat-raised-button color="primary" class="app-button-primary" (click)="aplicarFiltros()" [disabled]="isLoading">
           <mat-icon>search</mat-icon>
           Buscar
         </button>
-        <button mat-stroked-button (click)="limparFiltros()" [disabled]="isLoading">
+        <button mat-stroked-button class="app-button-secondary" (click)="limparFiltros()" [disabled]="isLoading">
           <mat-icon>clear</mat-icon>
           Limpar Filtros
         </button>
@@ -201,7 +201,7 @@
               mat-raised-button
               color="primary"
               (click)="visualizarAtividade(atividade)"
-              class="btn-visualizar"
+              class="btn-visualizar app-button-primary"
               [disabled]="isLoading">
               <mat-icon>visibility</mat-icon>
               Visualizar
@@ -210,7 +210,7 @@
               mat-stroked-button
               color="primary"
               (click)="editarAtividade(atividade)"
-              class="btn-editar"
+              class="btn-editar app-button-secondary"
               [disabled]="isLoading"
               *ngIf="podeEditarAtividade(atividade)">
               <mat-icon>edit</mat-icon>
@@ -220,7 +220,7 @@
               mat-stroked-button
               color="warn"
               (click)="confirmarExclusao(atividade)"
-              class="btn-excluir"
+              class="btn-excluir app-button-danger"
               [disabled]="isLoading"
               *ngIf="podeExcluirAtividade(atividade)">
               <mat-icon>delete</mat-icon>
@@ -251,11 +251,10 @@
   </mat-card-content>
 
   <mat-card-actions align="end">
-    <button mat-stroked-button color="primary" (click)="back()">
-      <mat-icon>close</mat-icon>
+    <button mat-stroked-button class="app-button-secondary" (click)="back()">
+      <mat-icon>arrow_back</mat-icon>
       Cancelar
     </button>
   </mat-card-actions>
 </mat-card>
-
 

@@ -71,10 +71,10 @@
 
     <mat-divider></mat-divider>
 
-    <div class="form-actions">
+    <div class="form-actions app-form-actions">
       <button
         mat-stroked-button
-        class="cancel-button"
+        class="cancel-button app-button-secondary"
         type="button"
         (click)="onCancel()"
         [disabled]="isSaving">
@@ -85,7 +85,7 @@
       <button
         mat-raised-button
         color="primary"
-        class="btn-primary"
+        class="btn-primary app-button-primary"
         type="submit"
         [disabled]="isSaving"
         (click)="onSubmit()">

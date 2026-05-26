@@ -213,6 +213,18 @@ mat-card-actions button:hover:nth-child(4) {
   background: rgba(239, 68, 68, 0.1) !important;
 }
 
+mat-card-actions button.app-icon-manage {
+  color: var(--secondary-color) !important;
+}
+
+mat-card-actions button.app-icon-status {
+  color: var(--success-color) !important;
+}
+
+mat-card-actions button.app-icon-danger {
+  color: var(--error-color) !important;
+}
+
 mat-card-actions button mat-icon {
   font-size: 22px;
   width: 22px;

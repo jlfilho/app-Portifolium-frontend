@@ -10,7 +10,7 @@
     <div class="app-section-header__actions">
     <button
         mat-raised-button
-        class="btn-primary add-button"
+        class="btn-primary add-button app-button-primary"
       matTooltip="Adicionar novo curso"
       matTooltipPosition="below"
       (click)="addCourse()">
@@ -178,7 +178,7 @@
               </div>
               <button
                 mat-icon-button
-                class="edit-button"
+                class="edit-button app-icon-edit"
                 matTooltip="Editar curso"
                 matTooltipPosition="left"
                 (click)="curso.id && editCourse(curso.id); $event.stopPropagation()">
@@ -204,6 +204,7 @@
                 mat-icon-button
                 matTooltip="Gerenciar atividades"
                 matTooltipPosition="above"
+                class="app-icon-manage"
                 (click)="manageAtividades(curso); $event.stopPropagation()">
                 <mat-icon>hub</mat-icon>
               </button>
@@ -212,6 +213,7 @@
                 mat-icon-button
                 matTooltip="Gerenciar permissões"
                 matTooltipPosition="above"
+                class="app-icon-manage"
                 (click)="managePermissions(curso); $event.stopPropagation()">
                 <mat-icon>manage_accounts</mat-icon>
               </button>
@@ -220,6 +222,7 @@
                 mat-icon-button
                 [matTooltip]="curso.ativo ? 'Desativar curso' : 'Ativar curso'"
                 matTooltipPosition="above"
+                class="app-icon-status"
                 [class.status-active]="curso.ativo"
                 [class.status-inactive]="!curso.ativo"
                 (click)="toggleCourseStatus(curso); $event.stopPropagation()">
@@ -230,6 +233,7 @@
                 mat-icon-button
                 matTooltip="Excluir curso"
                 matTooltipPosition="above"
+                class="app-icon-danger"
                 (click)="deleteCourse(curso); $event.stopPropagation()">
                 <mat-icon>delete</mat-icon>
               </button>
@@ -255,7 +259,7 @@
       <mat-icon class="app-empty-state__icon">school</mat-icon>
       <p class="app-empty-state__title">Você não possui cursos cadastrados.</p>
       <p class="app-empty-state__subtitle">Crie seu primeiro curso para começar a gerenciar conteúdos.</p>
-      <button mat-raised-button color="primary" class="btn-primary add-button" (click)="addCourse()">
+      <button mat-raised-button color="primary" class="btn-primary add-button app-button-primary" (click)="addCourse()">
         <mat-icon>add</mat-icon>
         Adicionar Primeiro Curso
       </button>

@@ -311,6 +311,107 @@ p { font-size: var(--font-size-body); line-height: var(--line-height-body); marg
   box-shadow: none !important;
 }
 
+/* Contrato semantico para botoes da area logada */
+.app-form-actions,
+.app-dialog-actions,
+.app-filter-actions,
+.app-table-actions,
+.app-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-form-actions,
+.app-dialog-actions,
+.app-filter-actions {
+  justify-content: flex-end;
+}
+
+.app-table-actions,
+.app-card-actions {
+  gap: 4px;
+}
+
+button.app-button-primary,
+button.app-button-secondary,
+button.app-button-danger,
+button.app-button-report,
+button.app-button-import {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+button.app-button-primary mat-icon,
+button.app-button-secondary mat-icon,
+button.app-button-danger mat-icon,
+button.app-button-report mat-icon,
+button.app-button-import mat-icon {
+  flex: 0 0 auto;
+}
+
+button.app-icon-action,
+button.app-icon-view,
+button.app-icon-edit,
+button.app-icon-password,
+button.app-icon-manage,
+button.app-icon-status,
+button.app-icon-danger {
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+button.app-icon-action:hover,
+button.app-icon-view:hover,
+button.app-icon-edit:hover,
+button.app-icon-password:hover,
+button.app-icon-manage:hover,
+button.app-icon-status:hover,
+button.app-icon-danger:hover {
+  transform: scale(1.08);
+}
+
+button.app-icon-view,
+button.app-icon-edit,
+button.app-icon-action {
+  color: var(--primary-color) !important;
+}
+
+button.app-icon-password,
+button.app-icon-manage,
+button.app-button-report,
+button.app-button-import {
+  color: var(--secondary-color) !important;
+}
+
+button.app-icon-status {
+  color: var(--success-color) !important;
+}
+
+button.app-icon-danger,
+button.app-button-danger {
+  color: var(--error-color) !important;
+}
+
+button.app-icon-view:hover,
+button.app-icon-edit:hover,
+button.app-icon-action:hover {
+  background: color-mix(in srgb, var(--primary-color) 12%, transparent) !important;
+}
+
+button.app-icon-password:hover,
+button.app-icon-manage:hover {
+  background: color-mix(in srgb, var(--secondary-color) 12%, transparent) !important;
+}
+
+button.app-icon-status:hover {
+  background: color-mix(in srgb, var(--success-color) 12%, transparent) !important;
+}
+
+button.app-icon-danger:hover {
+  background: color-mix(in srgb, var(--error-color) 12%, transparent) !important;
+}
+
 /* ============================================
    MATERIAL GLOBAL PALETTE
    ============================================ */

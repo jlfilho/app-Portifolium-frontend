@@ -15,6 +15,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { PessoasService } from '../../services/pessoas.service';
 import { Pessoa } from '../../models/pessoa.model';
 import { extractApiMessage } from '../../../../shared/utils/message.utils';
+import { ApiService } from '../../../../shared/api.service';
 
 @Component({
   selector: 'acadmanage-form-pessoa',
@@ -46,7 +47,8 @@ export class FormPessoaComponent implements OnInit {
     private readonly pessoasService: PessoasService,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
-    private readonly snackBar: MatSnackBar
+    private readonly snackBar: MatSnackBar,
+    private readonly apiService: ApiService
   ) {
     this.form = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
@@ -87,6 +89,11 @@ export class FormPessoaComponent implements OnInit {
   }
 
   onSubmit(): void {
+    if (!this.canSubmit()) {
+      this.showMessage('Você não tem permissão para salvar esta pessoa.', 'error');
+      return;
+    }
+
     if (this.form.invalid || this.isSaving) {
       this.markAllAsTouched();
       this.showMessage('Por favor, corrija os campos destacados.', 'error');
@@ -128,6 +135,12 @@ export class FormPessoaComponent implements OnInit {
         }
       });
     }
+  }
+
+  canSubmit(): boolean {
+    return this.isEditMode
+      ? this.apiService.canAccess('PERSON_EDIT')
+      : this.apiService.canAccess('PERSON_CREATE');
   }
 
   onCancel(): void {

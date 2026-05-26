@@ -14,8 +14,7 @@
           color="primary"
           class="btn-relatorio app-button-report"
           (click)="abrirDialogRelatorio()"
-          *ngIf="podeGerarRelatorio"
-          [disabled]="isLoading || isGeneratingRelatorio">
+          [disabled]="isLoading || isGeneratingRelatorio || !podeGerarRelatorio">
           <mat-progress-spinner
             *ngIf="isGeneratingRelatorio"
             diameter="18"
@@ -30,7 +29,7 @@
           color="primary" 
           (click)="novaAtividade()" 
           class="btn-nova-atividade app-button-primary"
-          *ngIf="podeCriarAtividade">
+          [disabled]="!podeCriarAtividade">
           <mat-icon>add</mat-icon>
           Nova Atividade
         </button>
@@ -211,8 +210,7 @@
               color="primary"
               (click)="editarAtividade(atividade)"
               class="btn-editar app-button-secondary"
-              [disabled]="isLoading"
-              *ngIf="podeEditarAtividade(atividade)">
+              [disabled]="isLoading || !podeEditarAtividade(atividade)">
               <mat-icon>edit</mat-icon>
               Editar
             </button>
@@ -221,8 +219,7 @@
               color="warn"
               (click)="confirmarExclusao(atividade)"
               class="btn-excluir app-button-danger"
-              [disabled]="isLoading"
-              *ngIf="podeExcluirAtividade(atividade)">
+              [disabled]="isLoading || !podeExcluirAtividade(atividade)">
               <mat-icon>delete</mat-icon>
               Excluir
             </button>

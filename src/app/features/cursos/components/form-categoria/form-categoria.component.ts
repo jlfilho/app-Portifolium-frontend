@@ -15,6 +15,7 @@ import { MatDividerModule } from '@angular/material/divider';
 
 // Services
 import { CursosService } from '../../services/cursos.service';
+import { ApiService } from '../../../../shared/api.service';
 
 @Component({
   selector: 'acadmanage-form-categoria',
@@ -46,7 +47,8 @@ export class FormCategoriaComponent implements OnInit {
     private cursosService: CursosService,
     private router: Router,
     private route: ActivatedRoute,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private apiService: ApiService
   ) {
     this.categoriaForm = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]]
@@ -84,6 +86,11 @@ export class FormCategoriaComponent implements OnInit {
   }
 
   onSubmit(): void {
+    if (!this.canSubmit()) {
+      this.showMessage('Você não tem permissão para salvar este tipo de atividade.', 'error');
+      return;
+    }
+
     if (this.categoriaForm.valid && !this.isSaving) {
       this.isSaving = true;
       const categoriaData = {
@@ -99,6 +106,10 @@ export class FormCategoriaComponent implements OnInit {
       this.markFormGroupTouched(this.categoriaForm);
       this.showMessage('Por favor, preencha todos os campos obrigatórios.', 'error');
     }
+  }
+
+  canSubmit(): boolean {
+    return this.apiService.canAccess('CATEGORY_MANAGE');
   }
 
   createCategoria(categoriaData: { nome: string }): void {

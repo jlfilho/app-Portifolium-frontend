@@ -15,6 +15,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { UnidadesAcademicasService } from '../../services/unidades-academicas.service';
 import { UnidadeAcademica } from '../../models/unidade-academica.model';
 import { extractApiMessage } from '../../../../shared/utils/message.utils';
+import { ApiService } from '../../../../shared/api.service';
 
 @Component({
   selector: 'acadmanage-form-unidade-academica',
@@ -46,7 +47,8 @@ export class FormUnidadeAcademicaComponent implements OnInit {
     private readonly unidadesService: UnidadesAcademicasService,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
-    private readonly snackBar: MatSnackBar
+    private readonly snackBar: MatSnackBar,
+    private readonly apiService: ApiService
   ) {
     this.form = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(120)]],
@@ -85,6 +87,11 @@ export class FormUnidadeAcademicaComponent implements OnInit {
   }
 
   onSubmit(): void {
+    if (!this.canSubmit()) {
+      this.showMessage('Você não tem permissão para salvar esta unidade acadêmica.', 'error');
+      return;
+    }
+
     if (this.form.invalid || this.isSaving) {
       this.markFormGroupTouched(this.form);
       this.showMessage('Por favor, preencha os campos obrigatórios.', 'error');
@@ -126,6 +133,10 @@ export class FormUnidadeAcademicaComponent implements OnInit {
         }
       });
     }
+  }
+
+  canSubmit(): boolean {
+    return this.apiService.canAccess('UNIT_CREATE');
   }
 
   onCancel(): void {

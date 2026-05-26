@@ -42,12 +42,12 @@
           color="primary"
           class="app-button-report"
           (click)="abrirDialogRelatorio()"
-          *ngIf="temPermissaoGerarRelatorio()"
+          [disabled]="!temPermissaoGerarRelatorio()"
           matTooltip="Gerar relatório em PDF">
           <mat-icon>picture_as_pdf</mat-icon>
           Relatório PDF
         </button>
-        <button mat-raised-button color="primary" class="app-button-primary" (click)="editarAtividade()">
+        <button mat-raised-button color="primary" class="app-button-primary" (click)="editarAtividade()" [disabled]="!canEditAtividade()">
           <mat-icon>edit</mat-icon>
           Editar
         </button>
@@ -215,7 +215,7 @@
             color="primary"
             (click)="toggleUploadForm()"
             class="btn-upload app-button-primary"
-            *ngIf="canManageEvidencias">
+            [disabled]="!canManageEvidencias">
             <mat-icon>{{ showUploadForm ? 'close' : 'add_photo_alternate' }}</mat-icon>
             {{ showUploadForm ? (isEditingEvidence ? 'Cancelar edição' : 'Cancelar') : 'Postar Evidência' }}
           </button>
@@ -469,20 +469,20 @@
                   </div>
                 </div>
                 <div class="caption-actions" *ngIf="canManageEvidencias">
-                  <button
-                    mat-icon-button
-                    color="primary"
-                    matTooltip="Editar evidência"
-                    (click)="editarEvidencia(currentEvidencia!)"
-                    [disabled]="isUploading || isCompressing || deletingEvidenceId === currentEvidencia!.id">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  matTooltip="Editar evidência"
+                  (click)="editarEvidencia(currentEvidencia!)"
+                  [disabled]="!canManageEvidencias || isUploading || isCompressing || deletingEvidenceId === currentEvidencia!.id">
                     <mat-icon>edit</mat-icon>
                   </button>
-                  <button
-                    mat-icon-button
-                    color="warn"
-                    matTooltip="Excluir evidência"
-                    (click)="confirmarExclusaoEvidencia(currentEvidencia!)"
-                    [disabled]="deletingEvidenceId === currentEvidencia!.id">
+                <button
+                  mat-icon-button
+                  color="warn"
+                  matTooltip="Excluir evidência"
+                  (click)="confirmarExclusaoEvidencia(currentEvidencia!)"
+                  [disabled]="!canManageEvidencias || deletingEvidenceId === currentEvidencia!.id">
                     <mat-icon *ngIf="deletingEvidenceId !== currentEvidencia!.id">delete</mat-icon>
                     <mat-progress-spinner
                       *ngIf="deletingEvidenceId === currentEvidencia!.id"
@@ -561,7 +561,7 @@
           color="primary"
           (click)="toggleUploadForm()"
           class="btn-add-first app-button-primary"
-          *ngIf="canManageEvidencias">
+          [disabled]="!canManageEvidencias">
           <mat-icon>add_photo_alternate</mat-icon>
           Postar Primeira Evidência
         </button>

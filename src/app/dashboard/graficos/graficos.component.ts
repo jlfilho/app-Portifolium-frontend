@@ -21,6 +21,8 @@ import { DashboardService } from '../services/dashboard.service';
 import { DashboardDTO, MetricaDTO, ChartData } from '../models/dashboard.dto';
 import { extractApiMessage } from '../../shared/utils/message.utils';
 import { COLORS, CATEGORIA_COLORS, METRIC_COLORS, ROLE_COLORS, STATUS_COLORS } from '../../shared/constants/colors.constants';
+import { ApiService } from '../../shared/api.service';
+import { AppPermission } from '../../shared/app-permissions';
 
 interface StatCard {
   title: string;
@@ -99,7 +101,8 @@ export class GraficosComponent implements OnInit {
 
   constructor(
     private dashboardService: DashboardService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private apiService: ApiService
   ) {}
 
   ngOnInit(): void {
@@ -390,6 +393,10 @@ export class GraficosComponent implements OnInit {
   // Navegação
   navigateTo(route: string): void {
       }
+
+  canAccess(permission: AppPermission): boolean {
+    return this.apiService.canAccess(permission);
+  }
 
   // Mostrar mensagem
   private showMessage(message: string, type: 'success' | 'error' | 'warning'): void {

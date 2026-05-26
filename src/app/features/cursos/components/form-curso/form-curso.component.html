@@ -195,7 +195,7 @@
                   type="button"
                   color="primary"
                   (click)="removeSelectedFile()"
-                  [disabled]="isUploadingCover">
+                  [disabled]="isUploadingCover || !canManageCover()">
                   <mat-icon>close</mat-icon>
                   Cancelar
                 </button>
@@ -205,7 +205,7 @@
                   color="primary"
                   type="button"
                   (click)="uploadCover()"
-                  [disabled]="isUploadingCover || !cursoId">
+                  [disabled]="isUploadingCover || !cursoId || !canManageCover()">
                   <mat-icon *ngIf="!isUploadingCover">cloud_upload</mat-icon>
                   <mat-progress-spinner
                     *ngIf="isUploadingCover"
@@ -228,7 +228,7 @@
               type="button"
               color="warn"
               (click)="confirmDeleteCover()"
-              [disabled]="isUploadingCover">
+              [disabled]="isUploadingCover || !canManageCover()">
               <mat-icon>delete</mat-icon>
               Remover capa atual
             </button>
@@ -275,7 +275,7 @@
         class="btn-primary app-button-primary"
         type="button"
         (click)="onSubmit()"
-        [disabled]="isSaving || !isFormValid()"
+        [disabled]="isSaving || !isFormValid() || !canSubmit()"
         matTooltip="Salvar curso">
         <mat-icon>{{ isSaving ? 'hourglass_empty' : (isEditMode ? 'save' : 'add') }}</mat-icon>
         {{ isSaving ? 'Salvando...' : (isEditMode ? 'Atualizar' : 'Cadastrar') }}

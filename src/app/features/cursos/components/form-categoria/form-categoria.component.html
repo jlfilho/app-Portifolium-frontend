@@ -74,7 +74,7 @@
             color="primary"
             type="submit"
             class="btn-primary app-button-primary"
-            [disabled]="categoriaForm.invalid || isSaving">
+            [disabled]="categoriaForm.invalid || isSaving || !canSubmit()">
             <mat-spinner
               *ngIf="isSaving"
               diameter="20"

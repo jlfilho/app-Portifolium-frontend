@@ -227,11 +227,11 @@
     </mat-card-header>
     <mat-card-content>
       <div class="quick-actions">
-        <button mat-raised-button color="primary" class="action-btn" routerLink="/admin/cursos">
+        <button mat-raised-button color="primary" class="action-btn" [routerLink]="canAccess('COURSE_EDIT') || canAccess('COURSE_CREATE') || canAccess('COURSE_DELETE') ? '/admin/cursos' : null" [disabled]="!(canAccess('COURSE_EDIT') || canAccess('COURSE_CREATE') || canAccess('COURSE_DELETE'))">
           <mat-icon>school</mat-icon>
           Gerenciar Cursos
         </button>
-        <button mat-raised-button color="primary" class="action-btn" routerLink="/admin/usuarios">
+        <button mat-raised-button color="primary" class="action-btn" [routerLink]="canAccess('USER_CREATE') || canAccess('USER_EDIT') || canAccess('USER_DELETE') ? '/admin/usuarios' : null" [disabled]="!(canAccess('USER_CREATE') || canAccess('USER_EDIT') || canAccess('USER_DELETE'))">
           <mat-icon>people</mat-icon>
           Gerenciar Usuários
         </button>

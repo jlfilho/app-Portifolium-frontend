@@ -83,9 +83,7 @@ export class ListaPessoasComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.displayedColumns = this.canManage()
-      ? ['nome', 'usuario', 'cpf', 'acoes']
-      : ['nome', 'usuario', 'cpf'];
+    this.displayedColumns = ['nome', 'usuario', 'cpf', 'acoes'];
     this.loadPessoas();
     this.setupSearch();
   }
@@ -113,11 +111,11 @@ export class ListaPessoasComponent implements OnInit, OnDestroy {
   }
 
   canCreatePessoa(): boolean {
-    return this.apiService.hasAnyRole(['ADMINISTRADOR', 'GERENTE', 'SECRETARIO']);
+    return this.apiService.canAccess('PERSON_CREATE');
   }
 
   canImport(): boolean {
-    return this.apiService.isAdmin() || this.apiService.hasRole('GERENTE') || this.apiService.hasRole('SECRETARIO');
+    return this.apiService.canAccess('PERSON_IMPORT');
   }
 
   loadPessoas(): void {

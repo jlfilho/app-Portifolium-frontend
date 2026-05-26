@@ -78,7 +78,7 @@ export class ListaCategoriasComponent implements OnInit {
 
   // Verificar se usuário é admin
   isAdmin(): boolean {
-    return this.apiService.isAdmin();
+    return this.apiService.canAccess('CATEGORY_MANAGE');
   }
 
   ngOnInit(): void {
@@ -141,14 +141,26 @@ export class ListaCategoriasComponent implements OnInit {
   }
 
   addCategoria(): void {
+        if (!this.isAdmin()) {
+      this.showMessage('Você não tem permissão para cadastrar tipos de atividade.', 'error');
+      return;
+    }
         this.router.navigate(['/admin/categorias/novo']);
   }
 
   editCategoria(categoria: Categoria): void {
+        if (!this.isAdmin()) {
+      this.showMessage('Você não tem permissão para editar tipos de atividade.', 'error');
+      return;
+    }
         this.router.navigate(['/admin/categorias/editar', categoria.id]);
   }
 
   deleteCategoria(categoria: Categoria): void {
+    if (!this.isAdmin()) {
+      this.showMessage('Você não tem permissão para excluir tipos de atividade.', 'error');
+      return;
+    }
     
     const dialogRef = this.dialog.open(SimpleConfirmDialogComponent, {
       width: '400px',

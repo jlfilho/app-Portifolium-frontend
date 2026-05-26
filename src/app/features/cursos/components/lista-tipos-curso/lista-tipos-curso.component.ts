@@ -70,7 +70,7 @@ export class ListaTiposCursoComponent implements OnInit {
   ) {}
 
   isAdmin(): boolean {
-    return this.apiService.isAdmin();
+    return this.apiService.canAccess('TIPO_CURSO_MANAGE');
   }
 
   ngOnInit(): void {
@@ -114,14 +114,26 @@ export class ListaTiposCursoComponent implements OnInit {
   }
 
   addTipo(): void {
+    if (!this.isAdmin()) {
+      this.showMessage('Você não tem permissão para cadastrar tipos de curso.', 'error');
+      return;
+    }
     this.router.navigate(['/admin/tipos-curso/novo']);
   }
 
   editTipo(tipo: TipoCurso): void {
+    if (!this.isAdmin()) {
+      this.showMessage('Você não tem permissão para editar tipos de curso.', 'error');
+      return;
+    }
     this.router.navigate(['/admin/tipos-curso/editar', tipo.id]);
   }
 
   deleteTipo(tipo: TipoCurso): void {
+    if (!this.isAdmin()) {
+      this.showMessage('Você não tem permissão para excluir tipos de curso.', 'error');
+      return;
+    }
     const dialogRef = this.dialog.open(SimpleConfirmDialogComponent, {
       width: '420px',
       panelClass: 'custom-dialog-panel',

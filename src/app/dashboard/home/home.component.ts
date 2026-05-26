@@ -18,6 +18,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 // Services
 import { ApiService } from './../../shared/api.service';
+import { AppPermission } from '../../shared/app-permissions';
 import { PerfilUsuarioDialogComponent } from '../../shared/components/perfil-usuario-dialog/perfil-usuario-dialog.component';
 import { PessoasService } from '../../features/pessoas/services/pessoas.service';
 import { Pessoa } from '../../features/pessoas/models/pessoa.model';
@@ -234,6 +235,10 @@ export class HomeComponent implements OnInit {
     return this.apiService.hasRole('ADMINISTRADOR') ||
       this.apiService.hasRole('GERENTE') ||
       this.apiService.hasRole('SECRETARIO');
+  }
+
+  canAccess(permission: AppPermission): boolean {
+    return this.apiService.canAccess(permission);
   }
 
   /**

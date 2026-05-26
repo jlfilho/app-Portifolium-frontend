@@ -226,6 +226,10 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     });
   }
 
+  canEditAtividade(): boolean {
+    return !!this.atividade && this.atividadesService.podeEditarAtividade(this.atividade);
+  }
+
   voltar(): void {
         this.router.navigate(['/admin/atividades/curso', this.cursoId], {
       state: {

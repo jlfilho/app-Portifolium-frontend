@@ -11,6 +11,7 @@
       class="btn-primary add-button app-button-primary"
       matTooltip="Adicionar novo usuário"
       matTooltipPosition="below"
+      [disabled]="!canCreateUser()"
       (click)="addUser()">
       <mat-icon>add</mat-icon>
       Novo Usuário
@@ -132,7 +133,7 @@
                 color="accent"
                 class="app-icon-password"
                 matTooltip="Alterar senha"
-                *ngIf="canChangePassword()"
+                [disabled]="!canChangePassword()"
                 (click)="changePassword(usuario)">
                 <mat-icon>lock_reset</mat-icon>
               </button>
@@ -141,6 +142,7 @@
                 color="warn"
                 class="app-icon-danger"
                 matTooltip="Excluir usuário"
+                [disabled]="!canDeleteUser()"
                 (click)="deleteUser(usuario)">
                 <mat-icon>delete</mat-icon>
               </button>
@@ -246,7 +248,7 @@
                 color="accent"
                 class="app-icon-password"
                 matTooltip="Alterar senha"
-                *ngIf="canChangePassword()"
+                [disabled]="!canChangePassword()"
                 (click)="changePassword(usuario)">
                 <mat-icon>lock_reset</mat-icon>
               </button>
@@ -255,6 +257,7 @@
                 color="warn"
                 class="app-icon-danger"
                 matTooltip="Excluir"
+                [disabled]="!canDeleteUser()"
                 (click)="deleteUser(usuario)">
                 <mat-icon>delete</mat-icon>
               </button>

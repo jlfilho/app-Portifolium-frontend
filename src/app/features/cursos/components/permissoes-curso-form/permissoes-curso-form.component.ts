@@ -28,6 +28,7 @@ import { PageRequest } from '../../../../shared/models/page.model';
 import { extractApiMessage } from '../../../../shared/utils/message.utils';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { ApiService } from '../../../../shared/api.service';
 
 export interface PermissaoCurso {
   cursoId: number;
@@ -82,7 +83,8 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
     private cursosService: CursosService,
     private usuariosService: UsuariosService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private apiService: ApiService
   ) {}
 
   ngOnInit(): void {
@@ -176,6 +178,10 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
   }
 
   addUserToCourse(): void {
+    if (!this.canAddUsersToCourse()) {
+      this.showMessage('Você não tem permissão para adicionar usuários ao curso.', 'error');
+      return;
+    }
             
     if (!this.usuarioSelecionado) {
             this.showMessage('Selecione um usuário para adicionar', 'warning');
@@ -219,6 +225,10 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
   }
 
   confirmRemove(permissao: PermissaoCurso): void {
+    if (!this.canRemoveUsersFromCourse()) {
+      this.showMessage('Você não tem permissão para remover usuários do curso.', 'error');
+      return;
+    }
     const dialogRef = this.dialog.open(SimpleConfirmDialogComponent, {
       width: '400px',
       data: {
@@ -371,6 +381,14 @@ export class PermissoesCursoFormComponent implements OnInit, OnDestroy {
       return 'event_note';
     }
     return 'person';
+  }
+
+  canAddUsersToCourse(): boolean {
+    return this.apiService.canAccess('COURSE_ADD_MEMBER');
+  }
+
+  canRemoveUsersFromCourse(): boolean {
+    return this.apiService.canAccess('COURSE_REMOVE_MEMBER');
   }
 
   onUsuarioAutoOptionSelected(event: MatOptionSelectionChange, user: any): void {

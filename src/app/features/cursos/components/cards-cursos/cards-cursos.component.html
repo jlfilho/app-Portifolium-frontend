@@ -8,12 +8,12 @@
       </div>
     </div>
     <div class="app-section-header__actions">
-    <button
+      <button
         mat-raised-button
         class="btn-primary add-button app-button-primary"
       matTooltip="Adicionar novo curso"
       matTooltipPosition="below"
-      [disabled]="isSecretary()"
+      [disabled]="!canCreateCourse()"
       (click)="addCourse()">
       <mat-icon>add</mat-icon>
         Novo Curso
@@ -182,6 +182,7 @@
                 class="edit-button app-icon-edit"
                 matTooltip="Editar curso"
                 matTooltipPosition="left"
+                [disabled]="!canEditCourse()"
                 (click)="curso.id && editCourse(curso.id); $event.stopPropagation()">
                 <mat-icon>edit</mat-icon>
               </button>
@@ -206,6 +207,7 @@
                 matTooltip="Gerenciar atividades"
                 matTooltipPosition="above"
                 class="app-icon-manage"
+                [disabled]="!canManageCourseActivities()"
                 (click)="manageAtividades(curso); $event.stopPropagation()">
                 <mat-icon>hub</mat-icon>
               </button>
@@ -215,6 +217,7 @@
                 matTooltip="Gerenciar permissões"
                 matTooltipPosition="above"
                 class="app-icon-manage"
+                [disabled]="!canManageCoursePermissions()"
                 (click)="managePermissions(curso); $event.stopPropagation()">
                 <mat-icon>manage_accounts</mat-icon>
               </button>
@@ -226,6 +229,7 @@
                 class="app-icon-status"
                 [class.status-active]="curso.ativo"
                 [class.status-inactive]="!curso.ativo"
+                [disabled]="!canToggleCourseStatus()"
                 (click)="toggleCourseStatus(curso); $event.stopPropagation()">
                 <mat-icon>{{ curso.ativo ? 'visibility' : 'visibility_off' }}</mat-icon>
               </button>
@@ -235,6 +239,7 @@
                 matTooltip="Excluir curso"
                 matTooltipPosition="above"
                 class="app-icon-danger"
+                [disabled]="!canDeleteCourse()"
                 (click)="deleteCourse(curso); $event.stopPropagation()">
                 <mat-icon>delete</mat-icon>
               </button>
@@ -264,7 +269,7 @@
         mat-raised-button
         color="primary"
         class="btn-primary add-button app-button-primary"
-        [disabled]="isSecretary()"
+        [disabled]="!canCreateCourse()"
         (click)="addCourse()">
         <mat-icon>add</mat-icon>
         Adicionar Primeiro Curso

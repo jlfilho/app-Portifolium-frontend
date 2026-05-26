@@ -249,7 +249,7 @@ export class CardsCursosComponent  implements OnInit {
 
   // Navegar para adicionar novo curso
   addCourse(): void {
-    if (this.isSecretary()) {
+    if (!this.canCreateCourse()) {
       return;
     }
     this.router.navigate(['/admin/cursos/novo']);
@@ -261,6 +261,10 @@ export class CardsCursosComponent  implements OnInit {
       this.showMessage('Curso inválido selecionado. Tente novamente.', 'error');
       return;
     }
+    if (!this.canEditCourse()) {
+      this.showMessage('Você não tem permissão para editar cursos.', 'error');
+      return;
+    }
     this.router.navigate(['/admin/cursos/editar', cursoId]);
   }
 
@@ -268,6 +272,10 @@ export class CardsCursosComponent  implements OnInit {
   managePermissions(curso: Curso): void {
         if (curso?.id == null) {
       this.showMessage('Curso inválido selecionado. Tente novamente.', 'error');
+      return;
+    }
+    if (!this.canManageCoursePermissions()) {
+      this.showMessage('Você não tem permissão para gerenciar permissões do curso.', 'error');
       return;
     }
     const cursoId = curso.id;
@@ -288,6 +296,10 @@ export class CardsCursosComponent  implements OnInit {
   deleteCourse(curso: Curso): void {
         if (curso?.id == null) {
       this.showMessage('Curso inválido selecionado. Tente novamente.', 'error');
+      return;
+    }
+    if (!this.canDeleteCourse()) {
+      this.showMessage('Você não tem permissão para excluir cursos.', 'error');
       return;
     }
 
@@ -332,6 +344,10 @@ export class CardsCursosComponent  implements OnInit {
 
   // Toggle status do curso (ativar/desativar) com confirmação
   toggleCourseStatus(curso: Curso): void {
+    if (!this.canToggleCourseStatus()) {
+      this.showMessage('Você não tem permissão para alterar o status do curso.', 'error');
+      return;
+    }
         
     if (curso?.id == null) {
       this.showMessage('Curso inválido selecionado. Tente novamente.', 'error');
@@ -498,7 +514,27 @@ export class CardsCursosComponent  implements OnInit {
     return curso.id ?? curso.nome ?? index;
   }
 
-  isSecretary(): boolean {
-    return this.apiService.hasRole('SECRETARIO');
+  canCreateCourse(): boolean {
+    return this.apiService.canAccess('COURSE_CREATE');
+  }
+
+  canEditCourse(): boolean {
+    return this.apiService.canAccess('COURSE_EDIT');
+  }
+
+  canDeleteCourse(): boolean {
+    return this.apiService.canAccess('COURSE_DELETE');
+  }
+
+  canToggleCourseStatus(): boolean {
+    return this.apiService.canAccess('COURSE_TOGGLE_STATUS');
+  }
+
+  canManageCoursePermissions(): boolean {
+    return this.apiService.canAccess('COURSE_MANAGE_PERMISSIONS');
+  }
+
+  canManageCourseActivities(): boolean {
+    return this.apiService.canAccessAny(['COURSE_MANAGE_PERMISSIONS', 'COURSE_REPORT', 'ATIVIDADE_CREATE']);
   }
 }

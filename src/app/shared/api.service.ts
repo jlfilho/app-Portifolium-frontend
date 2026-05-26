@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { AuthoritiesResponse } from '../features/usuarios/models/usuario.model';
 import { isTokenExpired, getTokenExpirationTime, decodeToken, JwtPayload } from './utils/jwt.helper';
+import { AppPermission, APP_PERMISSION_ROLES } from './app-permissions';
 
 @Injectable({
   providedIn: 'root',
@@ -176,6 +177,19 @@ export class ApiService {
       const formatted = auth.startsWith('ROLE_') ? auth : `ROLE_${auth}`;
       return normalized.includes(auth) || normalized.includes(formatted);
     });
+  }
+
+  /**
+   * Verificar se o usuário tem acesso a uma permissão específica da interface.
+   * O mapeamento reflete as permissões efetivas do backend.
+   */
+  canAccess(permission: AppPermission): boolean {
+    const allowedRoles = APP_PERMISSION_ROLES[permission] ?? [];
+    return this.hasAnyRole([...allowedRoles]);
+  }
+
+  canAccessAny(permissions: AppPermission[]): boolean {
+    return permissions.some(permission => this.canAccess(permission));
   }
 
   /**

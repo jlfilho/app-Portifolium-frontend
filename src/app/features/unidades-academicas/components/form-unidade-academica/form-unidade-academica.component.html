@@ -36,7 +36,7 @@
             Cancelar
           </button>
 
-          <button mat-raised-button color="primary" class="btn-primary app-button-primary" type="submit" [disabled]="isSaving">
+          <button mat-raised-button color="primary" class="btn-primary app-button-primary" type="submit" [disabled]="isSaving || !canSubmit()">
             <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
             {{ isEditMode ? 'Atualizar' : 'Cadastrar' }}
             <mat-progress-spinner

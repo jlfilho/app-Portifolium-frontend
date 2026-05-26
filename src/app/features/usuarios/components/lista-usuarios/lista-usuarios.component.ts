@@ -135,6 +135,10 @@ export class ListaUsuariosComponent implements OnInit {
   }
 
   addUser(): void {
+    if (!this.canCreateUser()) {
+      this.showMessage('Você não tem permissão para cadastrar usuários.', 'error');
+      return;
+    }
     this.router.navigate(['/admin/usuarios/novo']);
   }
 
@@ -156,6 +160,14 @@ export class ListaUsuariosComponent implements OnInit {
 
   canChangePassword(): boolean {
     return this.apiService.isAdmin();
+  }
+
+  canCreateUser(): boolean {
+    return this.apiService.canAccess('USER_CREATE');
+  }
+
+  canDeleteUser(): boolean {
+    return this.apiService.canAccess('USER_DELETE');
   }
 
   changePassword(usuario: Usuario): void {

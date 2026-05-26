@@ -20,6 +20,7 @@ import { PageRequest } from '../../../../shared/models/page.model';
 import { UnidadeAcademica } from '../../models/unidade-academica.model';
 import { UnidadesAcademicasService } from '../../services/unidades-academicas.service';
 import { extractApiMessage } from '../../../../shared/utils/message.utils';
+import { ApiService } from '../../../../shared/api.service';
 
 @Component({
   selector: 'acadmanage-lista-unidades-academicas',
@@ -62,7 +63,8 @@ export class ListaUnidadesAcademicasComponent implements OnInit, AfterViewInit {
     private readonly unidadesService: UnidadesAcademicasService,
     private readonly router: Router,
     private readonly snackBar: MatSnackBar,
-    private readonly dialog: MatDialog
+    private readonly dialog: MatDialog,
+    private readonly apiService: ApiService
   ) {}
 
   ngOnInit(): void {
@@ -127,6 +129,10 @@ export class ListaUnidadesAcademicasComponent implements OnInit, AfterViewInit {
   }
 
   addUnidade(): void {
+    if (!this.canManage()) {
+      this.showMessage('Você não tem permissão para cadastrar unidades acadêmicas.', 'error');
+      return;
+    }
     this.router.navigate(['/admin/unidades-academicas/novo']);
   }
 
@@ -138,6 +144,10 @@ export class ListaUnidadesAcademicasComponent implements OnInit, AfterViewInit {
 
   deleteUnidade(unidade: UnidadeAcademica): void {
     this.openConfirmDialog(unidade);
+  }
+
+  canManage(): boolean {
+    return this.apiService.canAccess('UNIT_CREATE');
   }
 
   private performDelete(unidade: UnidadeAcademica): void {

@@ -28,6 +28,7 @@ import { extractApiMessage } from '../../../../shared/utils/message.utils';
 import { environment } from '../../../../../environments/environment';
 import { UnidadesAcademicasService } from '../../../unidades-academicas/services/unidades-academicas.service';
 import { UnidadeAcademica } from '../../../unidades-academicas/models/unidade-academica.model';
+import { ApiService } from '../../../../shared/api.service';
 
 @Component({
   selector: 'acadmanage-form-curso',
@@ -81,7 +82,8 @@ export class FormCursoComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private apiService: ApiService
   ) {
     this.initForm();
     this.setupUnidadeSearch();
@@ -165,6 +167,11 @@ export class FormCursoComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
+    if (!this.canSubmit()) {
+      this.showMessage('Você não tem permissão para salvar este curso.', 'error');
+      return;
+    }
+
     if (this.cursoForm.valid) {
       this.isSaving = true;
       const cursoData: Curso = {
@@ -199,6 +206,14 @@ export class FormCursoComponent implements OnInit, OnDestroy {
       this.markFormGroupTouched(this.cursoForm);
       this.showMessage('Por favor, preencha todos os campos obrigatórios.', 'warning');
     }
+  }
+
+  canSubmit(): boolean {
+    return this.isEditMode ? this.apiService.canAccess('COURSE_EDIT') : this.apiService.canAccess('COURSE_CREATE');
+  }
+
+  canManageCover(): boolean {
+    return this.apiService.canAccess('COURSE_COVER_MANAGE');
   }
 
   onFileSelected(event: Event): void {
@@ -245,7 +260,7 @@ export class FormCursoComponent implements OnInit, OnDestroy {
   }
 
   uploadCover(): void {
-    if (!this.isEditMode || !this.cursoId || !this.selectedFile) {
+    if (!this.canManageCover() || !this.isEditMode || !this.cursoId || !this.selectedFile) {
       return;
     }
 
@@ -278,7 +293,7 @@ export class FormCursoComponent implements OnInit, OnDestroy {
   }
 
   async confirmDeleteCover(): Promise<void> {
-    if (!this.isEditMode || !this.cursoId || !this.currentCoverUrl) {
+    if (!this.canManageCover() || !this.isEditMode || !this.cursoId || !this.currentCoverUrl) {
       return;
     }
 

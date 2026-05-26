@@ -89,96 +89,98 @@
 
     <!-- Lista de Navegação -->
     <mat-nav-list class="nav-list">
-      <a
-        mat-list-item
-        routerLink="/admin/dashboard"
+    <a
+      mat-list-item
+        [routerLink]="canAccess('DASHBOARD_VIEW') ? '/admin/dashboard' : null"
         routerLinkActive="active-link"
         [routerLinkActiveOptions]="{exact: true}"
         matRipple
-        class="nav-item">
+        class="nav-item"
+        [disabled]="!canAccess('DASHBOARD_VIEW')">
         <mat-icon class="nav-icon">dashboard</mat-icon>
         <span class="nav-text" *ngIf="!isCollapsed">Dashboard</span>
         <div class="active-indicator" *ngIf="!isCollapsed"></div>
       </a>
 
-      <a
-        mat-list-item
-        routerLink="/admin/cursos"
+    <a
+      mat-list-item
+        [routerLink]="canAccess('COURSE_CREATE') || canAccess('COURSE_EDIT') || canAccess('COURSE_DELETE') || canAccess('COURSE_MANAGE_PERMISSIONS') || canAccess('COURSE_REPORT') ? '/admin/cursos' : null"
         routerLinkActive="active-link"
         matRipple
-        class="nav-item">
+        class="nav-item"
+        [disabled]="!(canAccess('COURSE_CREATE') || canAccess('COURSE_EDIT') || canAccess('COURSE_DELETE') || canAccess('COURSE_MANAGE_PERMISSIONS') || canAccess('COURSE_REPORT'))">
         <mat-icon class="nav-icon">school</mat-icon>
         <span class="nav-text" *ngIf="!isCollapsed">Cursos</span>
         <div class="active-indicator" *ngIf="!isCollapsed"></div>
       </a>
 
-      <a
-        mat-list-item
-        routerLink="/admin/categorias"
+    <a
+      mat-list-item
+        [routerLink]="canAccess('CATEGORY_MANAGE') ? '/admin/categorias' : null"
         routerLinkActive="active-link"
         matRipple
         class="nav-item"
-        *ngIf="isAdmin()">
+        [disabled]="!canAccess('CATEGORY_MANAGE')">
         <mat-icon class="nav-icon">category</mat-icon>
         <span class="nav-text" *ngIf="!isCollapsed">Tipos de Atividades</span>
         <div class="active-indicator" *ngIf="!isCollapsed"></div>
       </a>
 
-      <a
-        mat-list-item
-        routerLink="/admin/tipos-curso"
+    <a
+      mat-list-item
+        [routerLink]="canAccess('TIPO_CURSO_MANAGE') ? '/admin/tipos-curso' : null"
         routerLinkActive="active-link"
         matRipple
         class="nav-item"
-        *ngIf="isAdmin()">
+        [disabled]="!canAccess('TIPO_CURSO_MANAGE')">
         <mat-icon class="nav-icon">style</mat-icon>
         <span class="nav-text" *ngIf="!isCollapsed">Tipos de Cursos</span>
         <div class="active-indicator" *ngIf="!isCollapsed"></div>
       </a>
 
-      <a
-        mat-list-item
-        routerLink="/admin/unidades-academicas"
+    <a
+      mat-list-item
+        [routerLink]="canAccess('UNIT_CREATE') || canAccess('UNIT_EDIT') || canAccess('UNIT_DELETE') ? '/admin/unidades-academicas' : null"
         routerLinkActive="active-link"
         matRipple
         class="nav-item"
-        *ngIf="isAdmin()">
+        [disabled]="!(canAccess('UNIT_CREATE') || canAccess('UNIT_EDIT') || canAccess('UNIT_DELETE'))">
         <mat-icon class="nav-icon">apartment</mat-icon>
         <span class="nav-text" *ngIf="!isCollapsed">Unidades Acadêmicas</span>
         <div class="active-indicator" *ngIf="!isCollapsed"></div>
       </a>
 
-      <a
-        mat-list-item
-        routerLink="/admin/usuarios"
+    <a
+      mat-list-item
+        [routerLink]="canAccess('USER_CREATE') || canAccess('USER_EDIT') || canAccess('USER_DELETE') || canAccess('USER_CHANGE_PASSWORD') ? '/admin/usuarios' : null"
         routerLinkActive="active-link"
         matRipple
         class="nav-item"
-        *ngIf="isAdmin()">
+        [disabled]="!(canAccess('USER_CREATE') || canAccess('USER_EDIT') || canAccess('USER_DELETE') || canAccess('USER_CHANGE_PASSWORD'))">
         <mat-icon class="nav-icon">group</mat-icon>
         <span class="nav-text" *ngIf="!isCollapsed">Usuários</span>
         <div class="active-indicator" *ngIf="!isCollapsed"></div>
       </a>
 
-      <a
-        mat-list-item
-        routerLink="/admin/pessoas"
+    <a
+      mat-list-item
+        [routerLink]="canAccess('PERSON_CREATE') || canAccess('PERSON_EDIT') || canAccess('PERSON_DELETE') || canAccess('PERSON_IMPORT') ? '/admin/pessoas' : null"
         routerLinkActive="active-link"
         matRipple
         class="nav-item"
-        *ngIf="canManageUsers()">
+        [disabled]="!(canAccess('PERSON_CREATE') || canAccess('PERSON_EDIT') || canAccess('PERSON_DELETE') || canAccess('PERSON_IMPORT'))">
         <mat-icon class="nav-icon">badge</mat-icon>
         <span class="nav-text" *ngIf="!isCollapsed">Pessoas</span>
         <div class="active-indicator" *ngIf="!isCollapsed"></div>
       </a>
 
-      <a
-        mat-list-item
-        routerLink="/admin/auditoria"
+    <a
+      mat-list-item
+        [routerLink]="canAccess('AUDIT_LOG_VIEW') ? '/admin/auditoria' : null"
         routerLinkActive="active-link"
         matRipple
         class="nav-item"
-        *ngIf="isAdmin()">
+        [disabled]="!canAccess('AUDIT_LOG_VIEW')">
         <mat-icon class="nav-icon">security</mat-icon>
         <span class="nav-text" *ngIf="!isCollapsed">Auditoria</span>
         <div class="active-indicator" *ngIf="!isCollapsed"></div>
@@ -186,8 +188,8 @@
 
       <mat-divider class="nav-divider"></mat-divider>
 
-      <a
-        mat-list-item
+    <a
+      mat-list-item
         routerLink="/admin/sobre"
         routerLinkActive="active-link"
         matRipple

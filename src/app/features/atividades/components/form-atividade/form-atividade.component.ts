@@ -39,6 +39,7 @@ import { PessoasService } from '../../../pessoas/services/pessoas.service';
 import { PessoaFilter } from '../../../pessoas/models/pessoa-filter.model';
 import { Pessoa } from '../../../pessoas/models/pessoa.model';
 import { Location } from '@angular/common';
+import { ApiService } from '../../../../shared/api.service';
 
 @Component({
   selector: 'acadmanage-form-atividade',
@@ -143,7 +144,8 @@ export class FormAtividadeComponent implements OnInit {
     private dialog: MatDialog,
     private imagemCapaDialog: MatDialog,
     private pessoasService: PessoasService,
-    private location: Location
+    private location: Location,
+    private apiService: ApiService
   ) {
     this.initForm();
     // Configurar locale pt-BR para o DatePicker
@@ -151,6 +153,13 @@ export class FormAtividadeComponent implements OnInit {
 
     // Configurar debounce para filtros
     this.setupDebounceFilters();
+  }
+
+  canSubmitActivity(): boolean {
+    if (this.isEditMode) {
+      return this.atividade ? this.atividadesService.podeEditarAtividade(this.atividade) : this.apiService.podeGerenciarAtividades();
+    }
+    return this.apiService.podeCriarAtividade();
   }
 
   ngOnInit(): void {
@@ -463,6 +472,11 @@ export class FormAtividadeComponent implements OnInit {
   }
 
   uploadImage(): void {
+    if (!this.canSubmitActivity()) {
+      this.showMessage('Você não tem permissão para gerenciar esta atividade.', 'error');
+      return;
+    }
+
     if (!this.selectedFile) {
       this.showMessage('Nenhum arquivo selecionado', 'error');
       return;
@@ -517,11 +531,21 @@ export class FormAtividadeComponent implements OnInit {
   }
 
   removeImage(): void {
+    if (!this.canSubmitActivity()) {
+      this.showMessage('Você não tem permissão para gerenciar esta atividade.', 'error');
+      return;
+    }
+
     this.selectedFile = null;
     this.previewUrl = this.atividade?.fotoCapa ? this.getImageUrl(this.atividade.fotoCapa) : null;
   }
 
   async confirmarExclusaoFotoCapa(): Promise<void> {
+    if (!this.canSubmitActivity()) {
+      this.showMessage('Você não tem permissão para gerenciar esta atividade.', 'error');
+      return;
+    }
+
     if (!this.isEditMode || !this.atividadeId || !this.atividade?.fotoCapa) {
       return;
     }
@@ -580,6 +604,10 @@ export class FormAtividadeComponent implements OnInit {
 
   // Métodos para gerenciar fontes financiadoras
   adicionarFonteFinanciadora(): void {
+    if (!this.canSubmitActivity()) {
+      this.showMessage('Você não tem permissão para gerenciar esta atividade.', 'error');
+      return;
+    }
         
     if (!this.fonteFinanciadoraSelecionada) {
       this.showMessage('Selecione uma fonte financiadora', 'warning');
@@ -859,6 +887,10 @@ export class FormAtividadeComponent implements OnInit {
       }
 
   adicionarIntegrante(): void {
+    if (!this.canSubmitActivity()) {
+      this.showMessage('Você não tem permissão para gerenciar esta atividade.', 'error');
+      return;
+    }
         
     if (!this.pessoaSelecionada) {
       this.showMessage('Selecione uma pessoa', 'warning');
@@ -928,6 +960,11 @@ export class FormAtividadeComponent implements OnInit {
   }
 
   triggerImportParticipantes(): void {
+    if (!this.canSubmitActivity()) {
+      this.showMessage('Você não tem permissão para importar participantes.', 'error');
+      return;
+    }
+
     if (this.isImportingParticipantes) {
       return;
     }
@@ -1307,6 +1344,11 @@ export class FormAtividadeComponent implements OnInit {
   }
 
   onSubmit(): void {
+    if (!this.canSubmitActivity()) {
+      this.showMessage('Você não tem permissão para salvar esta atividade.', 'error');
+      return;
+    }
+
     if (this.atividadeForm.valid) {
       this.isSaving = true;
 

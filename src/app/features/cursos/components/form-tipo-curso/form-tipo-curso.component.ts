@@ -17,6 +17,7 @@ import { MatSelectModule } from '@angular/material/select';
 // Services
 import { TiposCursoService } from '../../../cursos/services/tipos-curso.service';
 import { TipoCurso } from '../../../cursos/models/tipo-curso.model';
+import { ApiService } from '../../../../shared/api.service';
 
 @Component({
   selector: 'acadmanage-form-tipo-curso',
@@ -49,7 +50,8 @@ export class FormTipoCursoComponent implements OnInit {
     private tiposCursoService: TiposCursoService,
     private router: Router,
     private route: ActivatedRoute,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private apiService: ApiService
   ) {
     this.form = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]]
@@ -86,6 +88,11 @@ export class FormTipoCursoComponent implements OnInit {
   }
 
   onSubmit(): void {
+    if (!this.canSubmit()) {
+      this.showMessage('Você não tem permissão para salvar este tipo de curso.', 'error');
+      return;
+    }
+
     if (this.form.valid && !this.isSaving) {
       this.isSaving = true;
       const payload = {
@@ -125,6 +132,10 @@ export class FormTipoCursoComponent implements OnInit {
       this.markFormGroupTouched(this.form);
       this.showMessage('Por favor, preencha todos os campos obrigatórios.', 'error');
     }
+  }
+
+  canSubmit(): boolean {
+    return this.apiService.canAccess('TIPO_CURSO_MANAGE');
   }
 
   onCancel(): void {

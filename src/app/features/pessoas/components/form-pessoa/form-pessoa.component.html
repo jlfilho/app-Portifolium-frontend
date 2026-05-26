@@ -87,7 +87,7 @@
         color="primary"
         class="btn-primary app-button-primary"
         type="submit"
-        [disabled]="isSaving"
+        [disabled]="isSaving || !canSubmit()"
         (click)="onSubmit()">
         <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
         {{ isEditMode ? 'Atualizar' : 'Cadastrar' }}

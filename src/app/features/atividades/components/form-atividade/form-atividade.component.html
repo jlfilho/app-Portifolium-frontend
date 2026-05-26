@@ -160,7 +160,7 @@
             mat-raised-button
             color="primary"
             (click)="adicionarFonteFinanciadora()"
-            [disabled]="!fonteFinanciadoraSelecionada">
+            [disabled]="!fonteFinanciadoraSelecionada || !canSubmitActivity()">
             <mat-icon>add</mat-icon>
             Adicionar
           </button>
@@ -248,7 +248,7 @@
             mat-raised-button
             color="primary"
             (click)="adicionarIntegrante()"
-            [disabled]="!pessoaSelecionada">
+            [disabled]="!pessoaSelecionada || !canSubmitActivity()">
             <mat-icon>person_add</mat-icon>
             Adicionar
           </button>
@@ -275,7 +275,7 @@
               mat-stroked-button
               class="import-button"
               (click)="triggerImportParticipantes()"
-              [disabled]="isImportingParticipantes || !isEditMode">
+              [disabled]="isImportingParticipantes || !isEditMode || !canSubmitActivity()">
               <mat-icon>upload_file</mat-icon>
               Importar CSV
             </button>
@@ -438,7 +438,7 @@
                 mat-raised-button
                 color="primary"
                 (click)="uploadImage()"
-                [disabled]="isUploading">
+                [disabled]="isUploading || !canSubmitActivity()">
                 <mat-icon>cloud_upload</mat-icon>
                 {{ isUploading ? 'Enviando...' : (isEditMode ? 'Enviar Imagem' : 'Confirmar Imagem') }}
               </button>
@@ -447,7 +447,7 @@
                 type="button"
                 mat-stroked-button
                 (click)="removeImage()"
-                [disabled]="isUploading">
+                [disabled]="isUploading || !canSubmitActivity()">
                 <mat-icon>close</mat-icon>
                 Cancelar
               </button>
@@ -468,7 +468,7 @@
             mat-stroked-button
             color="warn"
             (click)="confirmarExclusaoFotoCapa()"
-            [disabled]="isDeletingFoto">
+            [disabled]="isDeletingFoto || !canSubmitActivity()">
             <mat-icon *ngIf="!isDeletingFoto">delete</mat-icon>
             <mat-progress-spinner
               *ngIf="isDeletingFoto"
@@ -486,7 +486,8 @@
             mat-stroked-button
             (click)="fileInput.click()"
             class="select-file-btn"
-            *ngIf="!selectedFile">
+            *ngIf="!selectedFile"
+            [disabled]="!canSubmitActivity()">
             <mat-icon>add_photo_alternate</mat-icon>
             Selecionar Imagem
           </button>
@@ -528,7 +529,7 @@
       <mat-icon>close</mat-icon>
       Cancelar
     </button>
-    <button mat-raised-button color="primary" class="btn-primary app-button-primary" type="button" (click)="onSubmit()" [disabled]="isSaving">
+    <button mat-raised-button color="primary" class="btn-primary app-button-primary" type="button" (click)="onSubmit()" [disabled]="isSaving || !canSubmitActivity()">
       <mat-icon *ngIf="!isSaving">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
       <mat-progress-spinner *ngIf="isSaving" mode="indeterminate" diameter="20"></mat-progress-spinner>
       {{ isSaving ? 'Salvando...' : (isEditMode ? 'Atualizar' : 'Cadastrar') }}

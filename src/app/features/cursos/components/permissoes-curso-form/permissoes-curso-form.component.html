@@ -48,9 +48,9 @@
           </mat-autocomplete>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Adicionar usuário ao curso</mat-label>
-          <mat-select [(ngModel)]="usuarioSelecionado" [disabled]="isAdding || isLoadingUsers || filteredUsuarios.length === 0">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Adicionar usuário ao curso</mat-label>
+          <mat-select [(ngModel)]="usuarioSelecionado" [disabled]="isAdding || isLoadingUsers || filteredUsuarios.length === 0 || !canAddUsersToCourse()">
             <mat-option *ngFor="let u of filteredUsuarios" [value]="u.id">
               {{ u.nome || u.name || u.email }} (ID: {{ u.id }})
             </mat-option>
@@ -79,7 +79,7 @@
           mat-raised-button
           class="btn-primary app-button-primary"
           (click)="addUserToCourse()"
-          [disabled]="!usuarioSelecionado || isAdding">
+          [disabled]="!usuarioSelecionado || isAdding || !canAddUsersToCourse()">
           <mat-icon *ngIf="!isAdding">person_add</mat-icon>
           <mat-progress-spinner
             *ngIf="isAdding"
@@ -125,6 +125,7 @@
               <button
                 mat-icon-button
                 color="warn"
+                [disabled]="!canRemoveUsersFromCourse()"
                 (click)="confirmRemove(p)"
                 matTooltip="Remover usuário do curso"
                 class="remove-button app-icon-danger">

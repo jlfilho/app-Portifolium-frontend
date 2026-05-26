@@ -18,6 +18,7 @@ import { MatChipsModule } from '@angular/material/chips';
 // Services e Models
 import { UsuariosService } from '../../services/usuarios.service';
 import { Usuario, UserRole } from '../../models/usuario.model';
+import { ApiService } from '../../../../shared/api.service';
 
 @Component({
   selector: 'acadmanage-form-usuario',
@@ -59,7 +60,8 @@ export class FormUsuarioComponent implements OnInit {
     private usuariosService: UsuariosService,
     private router: Router,
     private route: ActivatedRoute,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private apiService: ApiService
   ) {
     this.initForm();
   }
@@ -148,6 +150,11 @@ export class FormUsuarioComponent implements OnInit {
   }
 
   onSubmit(): void {
+    if (!this.canSubmit()) {
+      this.showMessage('Você não tem permissão para salvar este usuário.', 'error');
+      return;
+    }
+
     if (this.usuarioForm.valid) {
       this.isSaving = true;
 
@@ -227,6 +234,10 @@ export class FormUsuarioComponent implements OnInit {
       this.markFormGroupTouched(this.usuarioForm);
       this.showMessage('Por favor, preencha todos os campos obrigatórios.', 'warning');
     }
+  }
+
+  canSubmit(): boolean {
+    return this.isEditMode ? true : this.apiService.canAccess('USER_CREATE');
   }
 
   onCancel(): void {

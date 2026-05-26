@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { ApiService } from '../../../../shared/api.service';
 
 export interface DialogNovoUsuarioData {
   pessoaId: number;
@@ -37,7 +38,8 @@ export class DialogNovoUsuarioComponent {
   constructor(
     private readonly dialogRef: MatDialogRef<DialogNovoUsuarioComponent>,
     @Inject(MAT_DIALOG_DATA) public readonly data: DialogNovoUsuarioData,
-    private readonly fb: FormBuilder
+    private readonly fb: FormBuilder,
+    private readonly apiService: ApiService
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -51,6 +53,11 @@ export class DialogNovoUsuarioComponent {
   }
 
   submit(): void {
+    if (!this.canSubmit()) {
+      this.dialogRef.close();
+      return;
+    }
+
     if (this.form.invalid || this.isSubmitting) {
       this.form.markAllAsTouched();
       return;
@@ -67,6 +74,10 @@ export class DialogNovoUsuarioComponent {
     };
 
     this.dialogRef.close(payload);
+  }
+
+  canSubmit(): boolean {
+    return this.apiService.canAccess('PERSON_USER_CREATE');
   }
 }
 

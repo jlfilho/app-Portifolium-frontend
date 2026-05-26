@@ -9,7 +9,7 @@
     <button
       *ngIf="isAdmin()"
       mat-raised-button
-      class="btn-primary add-button"
+      class="btn-primary add-button app-button-primary"
       matTooltip="Adicionar novo tipo de atividade"
       matTooltipPosition="below"
       (click)="addCategoria()">
@@ -78,6 +78,7 @@
                 <button
                   mat-icon-button
                   color="primary"
+                  class="app-icon-edit"
                   matTooltip="Editar tipo de atividade"
                   (click)="editCategoria(categoria)">
                   <mat-icon>edit</mat-icon>
@@ -85,6 +86,7 @@
                 <button
                   mat-icon-button
                   color="warn"
+                  class="app-icon-danger"
                   matTooltip="Excluir tipo de atividade"
                   (click)="deleteCategoria(categoria)">
                   <mat-icon>delete</mat-icon>
@@ -128,15 +130,17 @@
           <div class="categoria-card-footer" *ngIf="isAdmin()">
             <div class="categoria-card-actions">
               <button
-                mat-mini-fab
+                mat-icon-button
                 color="primary"
+                class="app-icon-edit"
                 matTooltip="Editar"
                 (click)="editCategoria(categoria)">
                 <mat-icon>edit</mat-icon>
               </button>
               <button
-                mat-mini-fab
+                mat-icon-button
                 color="warn"
+                class="app-icon-danger"
                 matTooltip="Excluir"
                 (click)="deleteCategoria(categoria)">
                 <mat-icon>delete</mat-icon>

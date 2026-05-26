@@ -58,11 +58,11 @@
         </div>
 
         <!-- Botões de Ação -->
-        <div class="form-actions">
+        <div class="form-actions app-form-actions">
           <button
             mat-stroked-button
             type="button"
-            class="cancel-button"
+            class="cancel-button app-button-secondary"
             (click)="onCancel()"
             [disabled]="isSaving">
             <mat-icon>close</mat-icon>
@@ -73,7 +73,7 @@
             mat-raised-button
             color="primary"
             type="submit"
-            class="btn-primary"
+            class="btn-primary app-button-primary"
             [disabled]="categoriaForm.invalid || isSaving">
             <mat-spinner
               *ngIf="isSaving"

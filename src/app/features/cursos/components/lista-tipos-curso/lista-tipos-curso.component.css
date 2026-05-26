@@ -129,6 +129,14 @@ mat-card.table-card {
   background: rgba(239, 68, 68, 0.12) !important;
 }
 
+.actions-cell button.app-icon-edit {
+  color: var(--primary-color) !important;
+}
+
+.actions-cell button.app-icon-danger {
+  color: var(--error-color) !important;
+}
+
 .loading-container {
   display: flex;
   flex-direction: column;

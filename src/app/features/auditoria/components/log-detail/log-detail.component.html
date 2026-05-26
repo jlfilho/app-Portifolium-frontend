@@ -132,7 +132,10 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button mat-button (click)="close()">Fechar</button>
+    <button mat-stroked-button class="app-button-secondary" (click)="close()">
+      <mat-icon>close</mat-icon>
+      Fechar
+    </button>
   </mat-dialog-actions>
 </div>
 

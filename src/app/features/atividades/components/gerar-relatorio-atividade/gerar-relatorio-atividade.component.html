@@ -25,23 +25,27 @@
     </form>
   </mat-dialog-content>
 
-  <mat-dialog-actions align="end">
+  <mat-dialog-actions align="end" class="app-dialog-actions">
     <button
-      mat-button
+      mat-stroked-button
+      class="app-button-secondary"
       (click)="cancelar()"
       [disabled]="isLoading">
+      <mat-icon>close</mat-icon>
       Cancelar
     </button>
     <button
-      mat-button
+      mat-stroked-button
+      class="app-button-report"
       (click)="visualizarRelatorio()"
       [disabled]="isLoading"
       color="primary">
-      <mat-icon>visibility</mat-icon>
+      <mat-icon>picture_as_pdf</mat-icon>
       Visualizar
     </button>
     <button
       mat-raised-button
+      class="app-button-primary"
       (click)="gerarRelatorio()"
       [disabled]="isLoading"
       color="primary">

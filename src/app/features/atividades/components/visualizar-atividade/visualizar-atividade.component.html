@@ -10,9 +10,9 @@
     <mat-card-content>
       <mat-icon class="error-icon">error</mat-icon>
       <p>{{ errorMessage }}</p>
-      <button mat-raised-button color="primary" (click)="voltar()">
-        <mat-icon>close</mat-icon>
-        Cancelar
+      <button mat-stroked-button class="app-button-secondary" (click)="voltar()">
+        <mat-icon>arrow_back</mat-icon>
+        Voltar
       </button>
     </mat-card-content>
   </mat-card>
@@ -33,20 +33,21 @@
         </p>
       </div>
       <div class="header-actions">
-        <button mat-stroked-button (click)="voltar()">
-          <mat-icon>close</mat-icon>
-          Cancelar
+        <button mat-stroked-button class="app-button-secondary" (click)="voltar()">
+          <mat-icon>arrow_back</mat-icon>
+          Voltar
         </button>
         <button
           mat-stroked-button
           color="primary"
+          class="app-button-report"
           (click)="abrirDialogRelatorio()"
           *ngIf="temPermissaoGerarRelatorio()"
           matTooltip="Gerar relatório em PDF">
-          <mat-icon>description</mat-icon>
+          <mat-icon>picture_as_pdf</mat-icon>
           Relatório PDF
         </button>
-        <button mat-raised-button color="primary" (click)="editarAtividade()">
+        <button mat-raised-button color="primary" class="app-button-primary" (click)="editarAtividade()">
           <mat-icon>edit</mat-icon>
           Editar
         </button>
@@ -213,7 +214,7 @@
             mat-raised-button
             color="primary"
             (click)="toggleUploadForm()"
-            class="btn-upload"
+            class="btn-upload app-button-primary"
             *ngIf="canManageEvidencias">
             <mat-icon>{{ showUploadForm ? 'close' : 'add_photo_alternate' }}</mat-icon>
             {{ showUploadForm ? (isEditingEvidence ? 'Cancelar edição' : 'Cancelar') : 'Postar Evidência' }}
@@ -313,6 +314,7 @@
               <div class="upload-actions">
                 <button
                   mat-stroked-button
+                  class="app-button-secondary"
                   (click)="isEditingEvidence ? cancelarEdicaoEvidencia() : toggleUploadForm()"
                   [disabled]="isUploading || isCompressing">
                   <mat-icon>cancel</mat-icon>
@@ -321,6 +323,7 @@
                   <button
                   mat-raised-button
                   color="primary"
+                  class="app-button-primary"
                   (click)="salvarEvidencia()"
                   [disabled]="(isUploading || isCompressing) || (!isEditingEvidence && !selectedFile) || !legenda.trim()">
                   <mat-icon *ngIf="!isUploading">{{ isEditingEvidence ? 'save' : 'send' }}</mat-icon>
@@ -350,6 +353,7 @@
           <button
             mat-stroked-button
             color="primary"
+            class="app-button-secondary"
             (click)="iniciarReordenacao()"
             *ngIf="!isReordering">
             <mat-icon>sort</mat-icon>
@@ -363,6 +367,7 @@
             <div class="reorder-buttons">
               <button
                 mat-stroked-button
+                class="app-button-secondary"
                 (click)="cancelarReordenacao()"
                 [disabled]="savingOrder">
                 <mat-icon>close</mat-icon>
@@ -371,6 +376,7 @@
               <button
                 mat-raised-button
                 color="primary"
+                class="app-button-primary"
                 (click)="salvarOrdemEvidencias()"
                 [disabled]="!orderChanged || savingOrder">
                 <mat-progress-spinner
@@ -554,7 +560,7 @@
           mat-raised-button
           color="primary"
           (click)="toggleUploadForm()"
-          class="btn-add-first"
+          class="btn-add-first app-button-primary"
           *ngIf="canManageEvidencias">
           <mat-icon>add_photo_alternate</mat-icon>
           Postar Primeira Evidência

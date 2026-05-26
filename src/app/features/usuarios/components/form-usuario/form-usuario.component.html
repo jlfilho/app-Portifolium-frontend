@@ -150,7 +150,8 @@
 
     <mat-card-actions align="end" *ngIf="!isLoading">
       <button
-        mat-button
+        mat-stroked-button
+        class="app-button-secondary"
         type="button"
         (click)="onReset()"
         [disabled]="isSaving"
@@ -160,7 +161,8 @@
       </button>
 
       <button
-        mat-button
+        mat-stroked-button
+        class="app-button-secondary"
         type="button"
         (click)="onCancel()"
         [disabled]="isSaving">
@@ -171,7 +173,7 @@
       <button
         mat-raised-button
         color="primary"
-        class="btn-primary"
+        class="btn-primary app-button-primary"
         type="button"
         (click)="onSubmit()"
         [disabled]="isSaving || usuarioForm.invalid"

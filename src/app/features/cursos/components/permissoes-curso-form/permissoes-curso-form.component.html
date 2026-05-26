@@ -8,8 +8,8 @@
       </div>
     </div>
     <div class="app-section-header__actions">
-      <button mat-stroked-button class="btn-cancel" (click)="back()">
-        <mat-icon>close</mat-icon>
+      <button mat-stroked-button class="btn-cancel app-button-secondary" (click)="back()">
+        <mat-icon>arrow_back</mat-icon>
         Cancelar
       </button>
     </div>
@@ -77,7 +77,7 @@
         </mat-form-field>
         <button
           mat-raised-button
-          class="btn-primary"
+          class="btn-primary app-button-primary"
           (click)="addUserToCourse()"
           [disabled]="!usuarioSelecionado || isAdding">
           <mat-icon *ngIf="!isAdding">person_add</mat-icon>
@@ -127,7 +127,7 @@
                 color="warn"
                 (click)="confirmRemove(p)"
                 matTooltip="Remover usuário do curso"
-                class="remove-button">
+                class="remove-button app-icon-danger">
                 <mat-icon>delete</mat-icon>
               </button>
             </div>

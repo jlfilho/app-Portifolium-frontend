@@ -68,6 +68,7 @@ export class ListaPessoasComponent implements OnInit, OnDestroy {
   filtroNome = '';
 
   lastImportResponse?: PessoaImportResponse;
+  importErrors: string[] = [];
   isImporting = false;
   @ViewChild('csvInput') csvInput?: ElementRef<HTMLInputElement>;
   @ViewChild(MatPaginator) paginator?: MatPaginator;
@@ -226,6 +227,7 @@ export class ListaPessoasComponent implements OnInit, OnDestroy {
 
     const file = input.files[0];
     this.isImporting = true;
+    this.importErrors = [];
 
     this.pessoasService.importCsv(file).subscribe({
       next: (response) => {
@@ -242,6 +244,7 @@ export class ListaPessoasComponent implements OnInit, OnDestroy {
         console.error('❌ Erro ao importar pessoas:', error);
         this.isImporting = false;
         this.lastImportResponse = undefined;
+        this.importErrors = [];
         if (this.csvInput?.nativeElement) {
           this.csvInput.nativeElement.value = '';
         }
@@ -252,6 +255,7 @@ export class ListaPessoasComponent implements OnInit, OnDestroy {
 
   clearImportSummary(): void {
     this.lastImportResponse = undefined;
+    this.importErrors = [];
   }
 
   hasData(): boolean {
@@ -307,6 +311,7 @@ export class ListaPessoasComponent implements OnInit, OnDestroy {
           } catch {
             // permanece como texto simples
           }
+          this.importErrors = this.extractImportDetails(parsed);
           const apiMessage = extractApiMessage(parsed);
           finalize(apiMessage ?? (typeof parsed === 'string' ? parsed : null));
         })
@@ -314,8 +319,31 @@ export class ListaPessoasComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.importErrors = this.extractImportDetails(error);
     const apiMessage = extractApiMessage(error);
     finalize(apiMessage);
+  }
+
+  private extractImportDetails(error: HttpErrorResponse | any): string[] {
+    const body = error instanceof HttpErrorResponse ? error.error : error;
+    const details = body?.details ?? body?.detalhes ?? body?.errors ?? body?.erros ?? body?.mensagens;
+
+    if (!Array.isArray(details)) {
+      return [];
+    }
+
+    return details
+      .map((detail: unknown) => {
+        if (typeof detail === 'string') {
+          return detail.trim();
+        }
+        if (detail && typeof detail === 'object') {
+          const value = (detail as any).message ?? (detail as any).mensagem ?? (detail as any).detail ?? (detail as any).descricao;
+          return typeof value === 'string' ? value.trim() : '';
+        }
+        return '';
+      })
+      .filter((detail: string) => detail.length > 0);
   }
 
   private showMessage(message: string, type: 'success' | 'error' | 'info'): void {

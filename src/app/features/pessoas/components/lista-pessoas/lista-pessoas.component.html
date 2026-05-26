@@ -81,6 +81,27 @@
       </div>
     </div>
 
+    <div class="import-feedback import-feedback-error" *ngIf="importErrors.length > 0">
+      <div class="feedback-header">
+        <mat-icon color="warn">error_outline</mat-icon>
+        <span>ImportaÃ§Ã£o cancelada</span>
+        <button mat-icon-button type="button" (click)="clearImportSummary()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="feedback-body">
+        <p>Nenhuma pessoa foi cadastrada. Corrija os registros abaixo e importe o arquivo novamente.</p>
+        <div class="feedback-lists">
+          <h4>Erros encontrados</h4>
+          <mat-chip-set>
+            <mat-chip *ngFor="let erro of importErrors" color="warn" selected>
+              {{ erro }}
+            </mat-chip>
+          </mat-chip-set>
+        </div>
+      </div>
+    </div>
+
     <div class="table-wrapper" [class.loading]="isLoading">
       <div class="loading-container" *ngIf="isLoading">
         <mat-progress-spinner diameter="48" mode="indeterminate"></mat-progress-spinner>

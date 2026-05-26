@@ -32,6 +32,7 @@ import { CursoFilter } from '../../models/curso-filter.model';
 import { environment } from '../../../../../environments/environment';
 import { UnidadesAcademicasService } from '../../../unidades-academicas/services/unidades-academicas.service';
 import { UnidadeAcademica } from '../../../unidades-academicas/models/unidade-academica.model';
+import { ApiService } from '../../../../shared/api.service';
 
 @Component({
   selector: 'acadmanage-cards-cursos',
@@ -87,6 +88,7 @@ export class CardsCursosComponent  implements OnInit {
     private cursosService: CursosService,
     private tiposCursoService: TiposCursoService,
     private unidadesAcademicasService: UnidadesAcademicasService,
+    private apiService: ApiService,
     private router: Router,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
@@ -247,6 +249,9 @@ export class CardsCursosComponent  implements OnInit {
 
   // Navegar para adicionar novo curso
   addCourse(): void {
+    if (this.isSecretary()) {
+      return;
+    }
     this.router.navigate(['/admin/cursos/novo']);
   }
 
@@ -491,5 +496,9 @@ export class CardsCursosComponent  implements OnInit {
 
   trackCurso(index: number, curso: Curso): string | number {
     return curso.id ?? curso.nome ?? index;
+  }
+
+  isSecretary(): boolean {
+    return this.apiService.hasRole('SECRETARIO');
   }
 }

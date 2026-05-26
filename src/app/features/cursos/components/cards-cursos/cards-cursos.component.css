@@ -24,6 +24,22 @@
   font-size: 32px;
 }
 
+.courses-header .add-button:disabled,
+.app-empty-state .add-button:disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  background: var(--bg-darker) !important;
+  background-color: var(--bg-darker) !important;
+  color: var(--text-light) !important;
+  box-shadow: none !important;
+  filter: grayscale(25%);
+}
+
+.courses-header .add-button:disabled mat-icon,
+.app-empty-state .add-button:disabled mat-icon {
+  color: var(--text-light) !important;
+}
+
 .space {
   flex: 1;
 }

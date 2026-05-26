@@ -105,6 +105,15 @@
   gap: 12px;
 }
 
+.import-feedback-error {
+  background: color-mix(in srgb, var(--error-color) 10%, white);
+  border-left-color: var(--error-color);
+}
+
+.import-feedback-error .feedback-header mat-icon {
+  color: var(--error-color);
+}
+
 .feedback-header {
   display: flex;
   align-items: center;

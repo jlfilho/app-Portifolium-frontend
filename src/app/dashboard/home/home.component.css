@@ -681,6 +681,40 @@
   color: var(--primary-color) !important;
 }
 
+::ng-deep .nav-item.active-link:focus,
+::ng-deep .nav-item.active-link:focus-visible,
+::ng-deep .nav-item.active-link.mat-focused,
+::ng-deep .nav-item.active-link:active,
+::ng-deep .nav-item.active-link:focus:active,
+::ng-deep .nav-item.active-link.mat-focused:active {
+  background: var(--gradient-hover) !important;
+  color: white !important;
+}
+
+::ng-deep .nav-item.active-link:focus .mdc-list-item__primary-text,
+::ng-deep .nav-item.active-link:focus-visible .mdc-list-item__primary-text,
+::ng-deep .nav-item.active-link.mat-focused .mdc-list-item__primary-text,
+::ng-deep .nav-item.active-link:active .mdc-list-item__primary-text,
+::ng-deep .nav-item.active-link:focus:active .mdc-list-item__primary-text,
+::ng-deep .nav-item.active-link.mat-focused:active .mdc-list-item__primary-text,
+::ng-deep .nav-item.active-link:focus .nav-text,
+::ng-deep .nav-item.active-link:focus-visible .nav-text,
+::ng-deep .nav-item.active-link.mat-focused .nav-text,
+::ng-deep .nav-item.active-link:active .nav-text,
+::ng-deep .nav-item.active-link:focus:active .nav-text,
+::ng-deep .nav-item.active-link.mat-focused:active .nav-text {
+  color: white !important;
+}
+
+::ng-deep .nav-item.active-link:focus .mat-icon,
+::ng-deep .nav-item.active-link:focus-visible .mat-icon,
+::ng-deep .nav-item.active-link.mat-focused .mat-icon,
+::ng-deep .nav-item.active-link:active .mat-icon,
+::ng-deep .nav-item.active-link:focus:active .mat-icon,
+::ng-deep .nav-item.active-link.mat-focused:active .mat-icon {
+  color: white !important;
+}
+
 /* Ripple effect para nav-item - Garantir cor verde */
 ::ng-deep .nav-item .mat-ripple-element {
   background-color: color-mix(in srgb, var(--primary-color) 12%, transparent) !important;

@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const frontendPort = process.env.FRONTEND_PORT ?? '4300';
-const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${frontendPort}`;
+const frontendPort = process.env.FRONTEND_PORT ?? '4200';
+const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${frontendPort}`;
 
 export default defineConfig({
   testDir: './tests/e2e',

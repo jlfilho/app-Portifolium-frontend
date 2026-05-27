@@ -128,6 +128,28 @@ npm test
 ng test --code-coverage
 ```
 
+### Testes E2E com Playwright
+
+```bash
+# Instalar o navegador usado pelo Playwright
+npm run e2e:install
+
+# Executar o ambiente integrado via Docker Compose
+npm run e2e
+
+# Executar os testes contra uma aplicação já disponível
+npm run e2e:run
+
+# Executar um caso de teste isolado
+npm run e2e:run -- --project=chromium --reporter=list -g "permite cadastrar, editar, alterar senha e excluir usuario pelo frontend"
+
+# Abrir a interface interativa do Playwright
+npm run e2e:ui
+```
+
+Por padrão, `npm run e2e` sobe backend, frontend, banco e testes via Docker Compose usando o profile `e2e`.
+Para apontar os testes diretos para outra URL, defina `PLAYWRIGHT_BASE_URL` antes de executar `npm run e2e:run`.
+
 ## 🚀 Comandos Úteis
 
 ```bash

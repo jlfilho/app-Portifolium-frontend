@@ -152,11 +152,11 @@
 
     <a
       mat-list-item
-        [routerLink]="canAccess('USER_CREATE') || canAccess('USER_EDIT') || canAccess('USER_DELETE') || canAccess('USER_CHANGE_PASSWORD') ? '/admin/usuarios' : null"
+        [routerLink]="canAccess('USER_CREATE') ? '/admin/usuarios' : null"
         routerLinkActive="active-link"
         matRipple
         class="nav-item"
-        [disabled]="!(canAccess('USER_CREATE') || canAccess('USER_EDIT') || canAccess('USER_DELETE') || canAccess('USER_CHANGE_PASSWORD'))">
+        [disabled]="!canAccess('USER_CREATE')">
         <mat-icon class="nav-icon">group</mat-icon>
         <span class="nav-text" *ngIf="!isCollapsed">Usuários</span>
         <div class="active-indicator" *ngIf="!isCollapsed"></div>

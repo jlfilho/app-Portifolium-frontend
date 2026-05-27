@@ -1,4 +1,4 @@
-import { spawn, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -19,7 +19,7 @@ const env = {
   POSTGRES_PORT: postgresPort,
   JWT_SECRET_KEY:
     process.env.JWT_SECRET_KEY ??
-    'playwright-e2e-secret-key-with-at-least-32-characters',
+    'MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE=',
   APP_CORS_ALLOWED_ORIGINS:
     process.env.APP_CORS_ALLOWED_ORIGINS ?? `http://localhost:${frontendPort},http://127.0.0.1:${frontendPort}`,
   FRONTEND_URL: process.env.FRONTEND_URL ?? `http://localhost:${frontendPort}`,
@@ -47,40 +47,34 @@ if (resetContainers) {
   runDockerCompose(['down', '-v', '--remove-orphans']);
 }
 
-const compose = spawn('docker', [...dockerCompose, 'up', '--build', '--remove-orphans'], {
-  cwd: backendRoot,
-  env,
-  stdio: 'inherit',
-  shell: false
-});
-
-let shuttingDown = false;
-
-function shutdown(signal) {
-  if (shuttingDown) {
-    return;
+const result = spawnSync(
+  'docker',
+  [
+    ...dockerCompose,
+    '--profile',
+    'e2e',
+    'up',
+    '--build',
+    '--abort-on-container-exit',
+    '--exit-code-from',
+    'e2e',
+    '--remove-orphans'
+  ],
+  {
+    cwd: backendRoot,
+    env,
+    stdio: 'inherit',
+    shell: false
   }
+);
 
-  shuttingDown = true;
-  compose.kill(signal);
-
-  if (resetContainers) {
-    spawnSync('docker', [...dockerCompose, 'down', '-v', '--remove-orphans'], {
-      cwd: backendRoot,
-      env,
-      stdio: 'inherit',
-      shell: false
-    });
-  }
-
-  process.exit(0);
+if (resetContainers) {
+  spawnSync('docker', [...dockerCompose, 'down', '-v', '--remove-orphans'], {
+    cwd: backendRoot,
+    env,
+    stdio: 'inherit',
+    shell: false
+  });
 }
 
-process.on('SIGINT', () => shutdown('SIGINT'));
-process.on('SIGTERM', () => shutdown('SIGTERM'));
-
-compose.on('exit', (code) => {
-  if (!shuttingDown) {
-    process.exit(code ?? 1);
-  }
-});
+process.exit(result.status ?? 1);

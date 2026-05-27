@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 test('carrega a area publica usando a API real pelo proxy do frontend', async ({ page, request }) => {
-  const health = await request.get('/api/actuator/health');
-  expect(health.ok()).toBeTruthy();
+  const cursos = await request.get('/api/cursos?page=0&size=1&ativo=true');
+  expect(cursos.ok()).toBeTruthy();
 
   await page.goto('/cursos-publicos');
 

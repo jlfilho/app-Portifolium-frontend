@@ -11,7 +11,8 @@
     "test:coverage": "ng test --code-coverage --watch=false --browsers=ChromeHeadless",
     "test:ci": "ng test --watch=false --code-coverage --browsers=ChromeHeadless",
     "test:categorias": "ng test --include='**/cursos/**/*.spec.ts'",
-    "e2e": "playwright test",
+    "e2e": "node scripts/e2e-compose.mjs",
+    "e2e:run": "playwright test",
     "e2e:ui": "playwright test --ui",
     "e2e:install": "playwright install chromium",
     "serve:ssr:acadmanage-frontend": "node dist/acadmanage-frontend/server/server.mjs"

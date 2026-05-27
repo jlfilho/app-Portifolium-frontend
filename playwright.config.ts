@@ -17,12 +17,6 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure'
   },
-  webServer: {
-    command: 'node scripts/e2e-compose.mjs',
-    url: baseURL,
-    timeout: 300_000,
-    reuseExistingServer: process.env.PLAYWRIGHT_REUSE_SERVER === 'true'
-  },
   projects: [
     {
       name: 'chromium',

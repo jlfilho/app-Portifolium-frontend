@@ -43,6 +43,11 @@ const unidadeAcademicaE2E = {
   descricao: 'O Instituto de Computação e Tecnologias Digitais é uma unidade acadêmica voltada ao ensino, pesquisa, extensão e inovação nas áreas de Ciência da Computação, Sistemas de Informação, Engenharia de Software, Inteligência Artificial, Ciência de Dados e Tecnologias Educacionais. A unidade promove formação acadêmica e desenvolvimento de projetos tecnológicos em parceria com instituições públicas, privadas e comunidades, incentivando a transformação digital, a inovação e a inclusão tecnológica.'
 };
 
+const tipoCursoE2E = {
+  nome: 'Tipo de Curso E2E',
+  nomeEditado: 'Tipo de Curso E2E Editado'
+};
+
 const pessoasCsvE2E = [
   { nome: 'Camila Rodrigues', cpf: '353.277.147-05' },
   { nome: 'Marcos Ferreira', cpf: '474.206.446-16' },
@@ -185,6 +190,41 @@ async function removerUnidadeAcademicaE2E(request: APIRequestContext) {
   }
 }
 
+async function removerTipoCursoE2E(request: APIRequestContext) {
+  const loginResponse = await request.post('/api/auth/login', {
+    data: {
+      username: 'admin@uea.edu.br',
+      password: 'admin123'
+    }
+  });
+  expect(loginResponse.status()).toBe(200);
+
+  const { token } = await loginResponse.json();
+  const headers = { Authorization: `Bearer ${token}` };
+  const nomesParaLimpar = [tipoCursoE2E.nome, tipoCursoE2E.nomeEditado];
+
+  for (const nome of nomesParaLimpar) {
+    const tiposResponse = await request.get(`/api/tipos-curso?nome=${encodeURIComponent(nome)}&page=0&size=20`, {
+      headers
+    });
+
+    if (tiposResponse.status() === 204) {
+      continue;
+    }
+
+    expect(tiposResponse.ok()).toBeTruthy();
+    const tipos = await tiposResponse.json();
+    const registros = tipos.content ?? [];
+
+    for (const tipo of registros) {
+      if (tipo.nome === nome) {
+        const deleteResponse = await request.delete(`/api/tipos-curso/${tipo.id}`, { headers });
+        expect(deleteResponse.ok()).toBeTruthy();
+      }
+    }
+  }
+}
+
 async function buscarPessoaPorNome(page: Page, nome: string) {
   const filtroResponse = page.waitForResponse(response =>
     response.url().includes('/api/pessoas') &&
@@ -200,6 +240,15 @@ async function buscarUnidadeAcademicaPorNome(page: Page, nome: string) {
     response.request().method() === 'GET'
   );
   await page.getByLabel(/Buscar por nome/i).fill(nome);
+  await filtroResponse;
+}
+
+async function buscarTipoCursoPorNome(page: Page, nome: string) {
+  const filtroResponse = page.waitForResponse(response =>
+    response.url().includes('/api/tipos-curso') &&
+    response.request().method() === 'GET'
+  );
+  await page.getByLabel(/Buscar tipos de curso/i).fill(nome);
   await filtroResponse;
 }
 
@@ -670,5 +719,72 @@ test('permite cadastrar, editar e excluir unidade academica pelo frontend', asyn
     await expect(page.getByRole('cell', { name: unidadeAcademicaE2E.nomeEditado })).toHaveCount(0);
   } finally {
     await removerUnidadeAcademicaE2E(request);
+  }
+});
+
+test('permite cadastrar, editar e excluir tipo de curso pelo frontend', async ({ page, request }) => {
+  await removerTipoCursoE2E(request);
+
+  try {
+    await loginComoAdmin(page);
+    await page.goto('/admin/tipos-curso');
+
+    await expect(page.locator('acadmanage-lista-tipos-curso').getByText('Tipos de Cursos', { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: /Novo Tipo/i }).click();
+
+    await expect(page).toHaveURL(/\/admin\/tipos-curso\/novo$/);
+    await expect(page.getByText(/Cadastrar Tipo de Curso/i)).toBeVisible();
+
+    await page.getByLabel(/^Nome$/i).fill(tipoCursoE2E.nome);
+
+    const cadastroTipoResponse = page.waitForResponse(response =>
+      response.url().includes('/api/tipos-curso') &&
+      response.request().method() === 'POST'
+    );
+
+    await page.getByRole('button', { name: /^Cadastrar$/i }).click();
+    expect((await cadastroTipoResponse).status()).toBe(201);
+    await expect(page).toHaveURL(/\/admin\/tipos-curso$/);
+
+    await buscarTipoCursoPorNome(page, tipoCursoE2E.nome);
+
+    const linhaTipo = page.getByRole('row').filter({ hasText: tipoCursoE2E.nome });
+    await expect(linhaTipo).toBeVisible();
+    await linhaTipo.locator('button.app-icon-edit').click();
+
+    await expect(page).toHaveURL(/\/admin\/tipos-curso\/editar\/\d+$/);
+    await expect(page.getByText(/Editar Tipo de Curso/i)).toBeVisible();
+
+    await page.getByLabel(/^Nome$/i).fill(tipoCursoE2E.nomeEditado);
+
+    const atualizacaoTipoResponse = page.waitForResponse(response =>
+      /\/api\/tipos-curso\/\d+$/.test(response.url()) &&
+      response.request().method() === 'PUT'
+    );
+
+    await page.getByRole('button', { name: /^Atualizar$/i }).click();
+    expect((await atualizacaoTipoResponse).ok()).toBeTruthy();
+    await expect(page).toHaveURL(/\/admin\/tipos-curso$/);
+
+    await buscarTipoCursoPorNome(page, tipoCursoE2E.nomeEditado);
+
+    const linhaTipoEditado = page.getByRole('row').filter({ hasText: tipoCursoE2E.nomeEditado });
+    await expect(linhaTipoEditado).toBeVisible();
+    await expect(linhaTipoEditado.getByRole('cell', { name: tipoCursoE2E.nomeEditado })).toBeVisible();
+    await linhaTipoEditado.locator('button.app-icon-danger').click();
+
+    await expect(page.getByRole('heading', { name: /Excluir Tipo de Curso/i })).toBeVisible();
+
+    const deleteTipoResponse = page.waitForResponse(response =>
+      /\/api\/tipos-curso\/\d+$/.test(response.url()) &&
+      response.request().method() === 'DELETE'
+    );
+
+    await page.locator('.cdk-overlay-pane').getByRole('button', { name: /^Excluir$/i }).click();
+    expect((await deleteTipoResponse).ok()).toBeTruthy();
+
+    await expect(page.getByRole('cell', { name: tipoCursoE2E.nomeEditado })).toHaveCount(0);
+  } finally {
+    await removerTipoCursoE2E(request);
   }
 });

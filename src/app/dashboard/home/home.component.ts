@@ -228,13 +228,8 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  /**
-   * Verifica se usuário possui uma das roles administrativas (admin/gerente/secretário)
-   */
   canManageUsers(): boolean {
-    return this.apiService.hasRole('ADMINISTRADOR') ||
-      this.apiService.hasRole('GERENTE') ||
-      this.apiService.hasRole('SECRETARIO');
+    return this.apiService.canAccess('USER_CREATE');
   }
 
   canAccess(permission: AppPermission): boolean {

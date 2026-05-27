@@ -11,6 +11,10 @@
     "test:coverage": "ng test --code-coverage --watch=false --browsers=ChromeHeadless",
     "test:ci": "ng test --watch=false --code-coverage --browsers=ChromeHeadless",
     "test:categorias": "ng test --include='**/cursos/**/*.spec.ts'",
+    "e2e": "node scripts/e2e-compose.mjs",
+    "e2e:run": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "e2e:install": "playwright install chromium",
     "serve:ssr:acadmanage-frontend": "node dist/acadmanage-frontend/server/server.mjs"
   },
   "private": true,
@@ -37,6 +41,7 @@
     "@angular-devkit/build-angular": "^19.0.6",
     "@angular/cli": "^19.0.6",
     "@angular/compiler-cli": "^19.0.0",
+    "@playwright/test": "^1.60.0",
     "@types/express": "^4.17.17",
     "@types/jasmine": "~5.1.0",
     "@types/node": "^18.18.0",

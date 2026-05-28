@@ -48,6 +48,11 @@ const tipoCursoE2E = {
   nomeEditado: 'Tipo de Curso E2E Editado'
 };
 
+const tipoAtividadeE2E = {
+  nome: 'Tipo de Atividade E2E',
+  nomeEditado: 'Tipo de Atividade E2E Editado'
+};
+
 const pessoasCsvE2E = [
   { nome: 'Camila Rodrigues', cpf: '353.277.147-05' },
   { nome: 'Marcos Ferreira', cpf: '474.206.446-16' },
@@ -225,6 +230,39 @@ async function removerTipoCursoE2E(request: APIRequestContext) {
   }
 }
 
+async function removerTipoAtividadeE2E(request: APIRequestContext) {
+  const loginResponse = await request.post('/api/auth/login', {
+    data: {
+      username: 'admin@uea.edu.br',
+      password: 'admin123'
+    }
+  });
+  expect(loginResponse.status()).toBe(200);
+
+  const { token } = await loginResponse.json();
+  const headers = { Authorization: `Bearer ${token}` };
+  const nomesParaLimpar = [tipoAtividadeE2E.nome, tipoAtividadeE2E.nomeEditado];
+
+  const categoriasResponse = await request.get('/api/categorias?page=0&size=100&sortBy=id&direction=ASC', {
+    headers
+  });
+
+  if (categoriasResponse.status() === 204) {
+    return;
+  }
+
+  expect(categoriasResponse.ok()).toBeTruthy();
+  const categorias = await categoriasResponse.json();
+  const registros = categorias.content ?? [];
+
+  for (const categoria of registros) {
+    if (nomesParaLimpar.includes(categoria.nome)) {
+      const deleteResponse = await request.delete(`/api/categorias/${categoria.id}`, { headers });
+      expect(deleteResponse.ok()).toBeTruthy();
+    }
+  }
+}
+
 async function buscarPessoaPorNome(page: Page, nome: string) {
   const filtroResponse = page.waitForResponse(response =>
     response.url().includes('/api/pessoas') &&
@@ -250,6 +288,10 @@ async function buscarTipoCursoPorNome(page: Page, nome: string) {
   );
   await page.getByLabel(/Buscar tipos de curso/i).fill(nome);
   await filtroResponse;
+}
+
+async function buscarTipoAtividadePorNome(page: Page, nome: string) {
+  await page.getByLabel(/Buscar tipos de atividades/i).fill(nome);
 }
 
 async function excluirPessoaVisivel(page: Page, pessoa: { nome: string; cpf: string }) {
@@ -786,5 +828,72 @@ test('permite cadastrar, editar e excluir tipo de curso pelo frontend', async ({
     await expect(page.getByRole('cell', { name: tipoCursoE2E.nomeEditado })).toHaveCount(0);
   } finally {
     await removerTipoCursoE2E(request);
+  }
+});
+
+test('permite cadastrar, editar e excluir tipo de atividade pelo frontend', async ({ page, request }) => {
+  await removerTipoAtividadeE2E(request);
+
+  try {
+    await loginComoAdmin(page);
+    await page.goto('/admin/categorias');
+
+    await expect(page.getByRole('heading', { name: /Tipos de Atividades/i })).toBeVisible();
+    await page.getByRole('button', { name: /Novo Tipo/i }).click();
+
+    await expect(page).toHaveURL(/\/admin\/categorias\/novo$/);
+    await expect(page.getByText(/Novo Tipo de Atividade/i)).toBeVisible();
+
+    await page.getByLabel(/Nome do Tipo de Atividade/i).fill(tipoAtividadeE2E.nome);
+
+    const cadastroTipoAtividadeResponse = page.waitForResponse(response =>
+      response.url().includes('/api/categorias') &&
+      response.request().method() === 'POST'
+    );
+
+    await page.getByRole('button', { name: /^Cadastrar$/i }).click();
+    expect((await cadastroTipoAtividadeResponse).status()).toBe(201);
+    await expect(page).toHaveURL(/\/admin\/categorias$/);
+
+    await buscarTipoAtividadePorNome(page, tipoAtividadeE2E.nome);
+
+    const linhaTipoAtividade = page.getByRole('row').filter({ hasText: tipoAtividadeE2E.nome });
+    await expect(linhaTipoAtividade).toBeVisible();
+    await linhaTipoAtividade.locator('button.app-icon-edit').click();
+
+    await expect(page).toHaveURL(/\/admin\/categorias\/editar\/\d+$/);
+    await expect(page.getByText(/Editar Tipo de Atividade/i)).toBeVisible();
+
+    await page.getByLabel(/Nome do Tipo de Atividade/i).fill(tipoAtividadeE2E.nomeEditado);
+
+    const atualizacaoTipoAtividadeResponse = page.waitForResponse(response =>
+      /\/api\/categorias\/\d+$/.test(response.url()) &&
+      response.request().method() === 'PUT'
+    );
+
+    await page.getByRole('button', { name: /^Atualizar$/i }).click();
+    expect((await atualizacaoTipoAtividadeResponse).ok()).toBeTruthy();
+    await expect(page).toHaveURL(/\/admin\/categorias$/);
+
+    await buscarTipoAtividadePorNome(page, tipoAtividadeE2E.nomeEditado);
+
+    const linhaTipoAtividadeEditado = page.getByRole('row').filter({ hasText: tipoAtividadeE2E.nomeEditado });
+    await expect(linhaTipoAtividadeEditado).toBeVisible();
+    await expect(linhaTipoAtividadeEditado.getByRole('cell', { name: tipoAtividadeE2E.nomeEditado })).toBeVisible();
+    await linhaTipoAtividadeEditado.locator('button.app-icon-danger').click();
+
+    await expect(page.getByRole('heading', { name: /Confirmar Exclus/i })).toBeVisible();
+
+    const deleteTipoAtividadeResponse = page.waitForResponse(response =>
+      /\/api\/categorias\/\d+$/.test(response.url()) &&
+      response.request().method() === 'DELETE'
+    );
+
+    await page.locator('.cdk-overlay-pane').getByRole('button', { name: /^Excluir$/i }).click();
+    expect((await deleteTipoAtividadeResponse).ok()).toBeTruthy();
+
+    await expect(page.getByRole('cell', { name: tipoAtividadeE2E.nomeEditado })).toHaveCount(0);
+  } finally {
+    await removerTipoAtividadeE2E(request);
   }
 });

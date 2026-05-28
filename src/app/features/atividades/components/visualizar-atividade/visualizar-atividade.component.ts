@@ -13,6 +13,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AtividadeDTO, PessoaPapelDTO } from '../../models/atividade.model';
 import { AtividadesService } from '../../services/atividades.service';
@@ -43,6 +44,7 @@ import { GerarRelatorioAtividadeComponent } from '../gerar-relatorio-atividade/g
     MatBadgeModule,
     MatFormFieldModule,
     MatInputModule,
+    MatPaginatorModule,
     MatDialogModule,
     BreaklinesPipe
   ],
@@ -65,6 +67,10 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
   currentSlideIndex = 0;
   carrosselPageSize = 5;
   carrosselPageIndex = 0;
+
+  // Paginação dos participantes
+  integrantesPageSize = 6;
+  integrantesPageIndex = 0;
 
   // Upload de evidência
   showUploadForm = false;
@@ -153,6 +159,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
         this.atividade = atividadeNormalizada;
         this.cursoId = atividadeNormalizada.curso.id;
         this.cursoNome = atividadeNormalizada.curso.nome;
+        this.integrantesPageIndex = 0;
         this.isLoading = false;
               },
       error: (error) => {
@@ -206,6 +213,32 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     return PapelUtils.getColor(papel as Papel);
   }
 
+  get coordenadoresExibidos(): PessoaPapelDTO[] {
+    return this.getParticipantesOrdenados().filter(participante => participante.papel === Papel.COORDENADOR);
+  }
+
+  get participantesSemCoordenador(): PessoaPapelDTO[] {
+    return this.getParticipantesOrdenados().filter(participante => participante.papel !== Papel.COORDENADOR);
+  }
+
+  get participantesPaginados(): PessoaPapelDTO[] {
+    const start = this.integrantesPageIndex * this.integrantesPageSize;
+    const end = start + this.integrantesPageSize;
+    return this.participantesSemCoordenador.slice(start, end);
+  }
+
+  get totalParticipantesPaginas(): number {
+    return Math.max(1, Math.ceil(this.participantesSemCoordenador.length / this.integrantesPageSize));
+  }
+
+  get hasMoreParticipantesPages(): boolean {
+    return this.participantesSemCoordenador.length > this.integrantesPageSize;
+  }
+
+  onParticipantesPageChange(event: PageEvent): void {
+    this.integrantesPageIndex = event.pageIndex;
+  }
+
   editarAtividade(): void {
     if (!this.atividade) return;
 
@@ -246,6 +279,15 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
       verticalPosition: 'top',
       panelClass: [panelClass]
     });
+  }
+
+  private getParticipantesOrdenados(): PessoaPapelDTO[] {
+    const integrantes = this.atividade?.integrantes ?? [];
+    if (!Array.isArray(integrantes)) {
+      return [];
+    }
+
+    return [...integrantes].filter(Boolean);
   }
 
   private updatePermissions(): void {
@@ -344,6 +386,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
             participantesCount: participantesNormalizados.length
           };
         }
+        this.integrantesPageIndex = 0;
       },
       error: (error) => {
         console.error('❌ Erro ao carregar participantes da atividade:', error);
@@ -356,6 +399,7 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
             participantesCount: 0
           };
         }
+        this.integrantesPageIndex = 0;
       }
     });
   }

@@ -13,7 +13,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { AtividadeDTO, EvidenciaDTO } from '../../models/public.models';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { AtividadeDTO, EvidenciaDTO, PessoaPapelDTO } from '../../models/public.models';
 // Services
 import { PublicApiService } from '../../services/public-api.service';
 import { PublicNavigationService } from '../../services/public-navigation.service';
@@ -36,6 +37,7 @@ import { BreaklinesPipe } from '../../../shared/pipes/breaklines.pipe';
     MatBadgeModule,
     MatFormFieldModule,
     MatInputModule,
+    MatPaginatorModule,
     BreaklinesPipe
   ],
   templateUrl: './visualizar-atividade.component.html',
@@ -55,6 +57,8 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
   currentSlideIndex = 0;
   carrosselPageSize = 5;
   carrosselPageIndex = 0;
+  integrantesPageSize = 6;
+  integrantesPageIndex = 0;
   lightboxOpen = false;
   lightboxIndex = 0;
   private scrollLocked = false;
@@ -93,11 +97,13 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
     this.publicApiService.getAtividadeById(this.atividadeId).subscribe({
       next: (atividade: AtividadeDTO) => {
         this.atividade = atividade;
+        this.integrantesPageIndex = 0;
         this.isLoading = false;
               },
       error: (error: any) => {
         console.error('❌ Erro ao carregar atividade:', error);
         this.errorMessage = 'Erro ao carregar atividade';
+        this.integrantesPageIndex = 0;
         this.isLoading = false;
         this.showMessage('Erro ao carregar atividade', 'error');
       }
@@ -217,6 +223,32 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
 
   get lightboxEvidencia(): EvidenciaDTO | null {
     return this.evidencias[this.lightboxIndex] || null;
+  }
+
+  get coordenadoresExibidos(): PessoaPapelDTO[] {
+    return this.getParticipantesOrdenados().filter(participante => participante.papel === 'COORDENADOR');
+  }
+
+  get participantesSemCoordenador(): PessoaPapelDTO[] {
+    return this.getParticipantesOrdenados().filter(participante => participante.papel !== 'COORDENADOR');
+  }
+
+  get participantesPaginados(): PessoaPapelDTO[] {
+    const start = this.integrantesPageIndex * this.integrantesPageSize;
+    const end = start + this.integrantesPageSize;
+    return this.participantesSemCoordenador.slice(start, end);
+  }
+
+  get totalParticipantesPaginas(): number {
+    return Math.max(1, Math.ceil(this.participantesSemCoordenador.length / this.integrantesPageSize));
+  }
+
+  get hasMoreParticipantesPages(): boolean {
+    return this.participantesSemCoordenador.length > this.integrantesPageSize;
+  }
+
+  onParticipantesPageChange(event: PageEvent): void {
+    this.integrantesPageIndex = event.pageIndex;
   }
 
   getLightboxImageUrl(): string {
@@ -351,5 +383,13 @@ export class VisualizarAtividadeComponent implements OnInit, OnDestroy {
       }
       return (a.id ?? Number.MAX_SAFE_INTEGER) - (b.id ?? Number.MAX_SAFE_INTEGER);
     });
+  }
+
+  private getParticipantesOrdenados(): PessoaPapelDTO[] {
+    if (!this.atividade || !Array.isArray(this.atividade.integrantes)) {
+      return [];
+    }
+
+    return [...this.atividade.integrantes].filter(Boolean);
   }
 }

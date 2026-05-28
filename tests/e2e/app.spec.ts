@@ -53,6 +53,16 @@ const tipoAtividadeE2E = {
   nomeEditado: 'Tipo de Atividade E2E Editado'
 };
 
+const cursoE2E = {
+  nome: 'Curso E2E Frontend',
+  nomeEditado: 'Curso E2E Frontend Editado',
+  descricao: 'Curso criado pelo teste e2e do frontend.',
+  descricaoEditada: 'Curso editado pelo teste e2e do frontend.',
+  tipoNome: 'Tipo de Curso para Curso E2E',
+  unidadeNome: 'Unidade Academica para Curso E2E',
+  unidadeDescricao: 'Unidade academica usada como dependencia do teste e2e de curso.'
+};
+
 const pessoasCsvE2E = [
   { nome: 'Camila Rodrigues', cpf: '353.277.147-05' },
   { nome: 'Marcos Ferreira', cpf: '474.206.446-16' },
@@ -263,6 +273,105 @@ async function removerTipoAtividadeE2E(request: APIRequestContext) {
   }
 }
 
+async function criarDependenciasCursoE2E(request: APIRequestContext) {
+  const loginResponse = await request.post('/api/auth/login', {
+    data: {
+      username: 'admin@uea.edu.br',
+      password: 'admin123'
+    }
+  });
+  expect(loginResponse.status()).toBe(200);
+
+  const { token } = await loginResponse.json();
+  const headers = { Authorization: `Bearer ${token}` };
+
+  const tipoResponse = await request.post('/api/tipos-curso', {
+    headers,
+    data: { nome: cursoE2E.tipoNome }
+  });
+  expect(tipoResponse.status()).toBe(201);
+  const tipo = await tipoResponse.json();
+
+  const unidadeResponse = await request.post('/api/unidades-academicas', {
+    headers,
+    data: {
+      nome: cursoE2E.unidadeNome,
+      descricao: cursoE2E.unidadeDescricao
+    }
+  });
+  expect(unidadeResponse.status()).toBe(201);
+  const unidade = await unidadeResponse.json();
+
+  return { tipo, unidade };
+}
+
+async function removerCursoE2E(request: APIRequestContext) {
+  const loginResponse = await request.post('/api/auth/login', {
+    data: {
+      username: 'admin@uea.edu.br',
+      password: 'admin123'
+    }
+  });
+  expect(loginResponse.status()).toBe(200);
+
+  const { token } = await loginResponse.json();
+  const headers = { Authorization: `Bearer ${token}` };
+  const nomesCursoParaLimpar = [cursoE2E.nome, cursoE2E.nomeEditado];
+
+  for (const nome of nomesCursoParaLimpar) {
+    const cursosResponse = await request.get(`/api/cursos?nome=${encodeURIComponent(nome)}&page=0&size=20`, {
+      headers
+    });
+
+    if (cursosResponse.status() === 204) {
+      continue;
+    }
+
+    expect(cursosResponse.ok()).toBeTruthy();
+    const cursos = await cursosResponse.json();
+    const registros = cursos.content ?? [];
+
+    for (const curso of registros) {
+      if (curso.nome === nome) {
+        const deleteResponse = await request.delete(`/api/cursos/${curso.id}`, { headers });
+        expect(deleteResponse.ok()).toBeTruthy();
+      }
+    }
+  }
+
+  const tiposResponse = await request.get(`/api/tipos-curso?nome=${encodeURIComponent(cursoE2E.tipoNome)}&page=0&size=20`, {
+    headers
+  });
+
+  if (tiposResponse.ok() && tiposResponse.status() !== 204) {
+    const tipos = await tiposResponse.json();
+    const registros = tipos.content ?? [];
+
+    for (const tipo of registros) {
+      if (tipo.nome === cursoE2E.tipoNome) {
+        const deleteResponse = await request.delete(`/api/tipos-curso/${tipo.id}`, { headers });
+        expect(deleteResponse.ok()).toBeTruthy();
+      }
+    }
+  }
+
+  const unidadesResponse = await request.get(`/api/unidades-academicas?nome=${encodeURIComponent(cursoE2E.unidadeNome)}&page=0&size=20`, {
+    headers
+  });
+
+  if (unidadesResponse.ok() && unidadesResponse.status() !== 204) {
+    const unidades = await unidadesResponse.json();
+    const registros = unidades.content ?? [];
+
+    for (const unidade of registros) {
+      if (unidade.nome === cursoE2E.unidadeNome) {
+        const deleteResponse = await request.delete(`/api/unidades-academicas/${unidade.id}`, { headers });
+        expect(deleteResponse.ok()).toBeTruthy();
+      }
+    }
+  }
+}
+
 async function buscarPessoaPorNome(page: Page, nome: string) {
   const filtroResponse = page.waitForResponse(response =>
     response.url().includes('/api/pessoas') &&
@@ -292,6 +401,15 @@ async function buscarTipoCursoPorNome(page: Page, nome: string) {
 
 async function buscarTipoAtividadePorNome(page: Page, nome: string) {
   await page.getByLabel(/Buscar tipos de atividades/i).fill(nome);
+}
+
+async function buscarCursoPorNome(page: Page, nome: string) {
+  const filtroResponse = page.waitForResponse(response =>
+    response.url().includes('/api/cursos/usuarios') &&
+    response.request().method() === 'GET'
+  );
+  await page.getByLabel(/Buscar por nome/i).fill(nome);
+  await filtroResponse;
 }
 
 async function excluirPessoaVisivel(page: Page, pessoa: { nome: string; cpf: string }) {
@@ -895,5 +1013,89 @@ test('permite cadastrar, editar e excluir tipo de atividade pelo frontend', asyn
     await expect(page.getByRole('cell', { name: tipoAtividadeE2E.nomeEditado })).toHaveCount(0);
   } finally {
     await removerTipoAtividadeE2E(request);
+  }
+});
+
+test('permite cadastrar, editar e excluir curso pelo frontend', async ({ page, request }) => {
+  test.setTimeout(120_000);
+
+  await removerCursoE2E(request);
+  await criarDependenciasCursoE2E(request);
+
+  try {
+    await loginComoAdmin(page);
+    await page.goto('/admin/cursos');
+
+    await expect(page.getByText(/Meus Cursos/i)).toBeVisible();
+    await page.getByRole('button', { name: /Novo Curso/i }).click();
+
+    await expect(page).toHaveURL(/\/admin\/cursos\/novo$/);
+    await expect(page.getByText(/Cadastrar Novo Curso/i)).toBeVisible();
+
+    await page.getByLabel(/Nome do Curso/i).fill(cursoE2E.nome);
+    await page.getByLabel(/Tipo de Curso/i).click();
+    await page.getByRole('option', { name: cursoE2E.tipoNome }).click();
+
+    const buscaUnidadeResponse = page.waitForResponse(response =>
+      response.url().includes('/api/unidades-academicas') &&
+      response.request().method() === 'GET'
+    );
+    await page.getByLabel(/Unidade Acad/i).fill(cursoE2E.unidadeNome);
+    await buscaUnidadeResponse;
+    await page.getByRole('option', { name: cursoE2E.unidadeNome }).click();
+
+    await page.getByLabel(/Descri/i).fill(cursoE2E.descricao);
+
+    const cadastroCursoResponse = page.waitForResponse(response =>
+      response.url().includes('/api/cursos') &&
+      response.request().method() === 'POST'
+    );
+
+    await page.getByRole('button', { name: /^Cadastrar$/i }).click();
+    expect((await cadastroCursoResponse).status()).toBe(201);
+    await expect(page).toHaveURL(/\/admin\/cursos$/);
+
+    await buscarCursoPorNome(page, cursoE2E.nome);
+
+    const cardCurso = page.locator('mat-card.card').filter({ hasText: cursoE2E.nome });
+    await expect(cardCurso).toBeVisible();
+    await expect(cardCurso.getByText(cursoE2E.tipoNome)).toBeVisible();
+    await cardCurso.locator('button.app-icon-edit').click();
+
+    await expect(page).toHaveURL(/\/admin\/cursos\/editar\/\d+$/);
+    await expect(page.getByText(/Editar Curso/i)).toBeVisible();
+
+    await page.getByLabel(/Nome do Curso/i).fill(cursoE2E.nomeEditado);
+    await page.getByLabel(/Descri/i).fill(cursoE2E.descricaoEditada);
+
+    const atualizacaoCursoResponse = page.waitForResponse(response =>
+      /\/api\/cursos\/\d+$/.test(response.url()) &&
+      response.request().method() === 'PUT'
+    );
+
+    await page.getByRole('button', { name: /^Atualizar$/i }).click();
+    expect((await atualizacaoCursoResponse).ok()).toBeTruthy();
+    await expect(page).toHaveURL(/\/admin\/cursos$/);
+
+    await buscarCursoPorNome(page, cursoE2E.nomeEditado);
+
+    const cardCursoEditado = page.locator('mat-card.card').filter({ hasText: cursoE2E.nomeEditado });
+    await expect(cardCursoEditado).toBeVisible();
+    await expect(cardCursoEditado.getByText(cursoE2E.tipoNome)).toBeVisible();
+    await cardCursoEditado.locator('button.app-icon-danger').click();
+
+    await expect(page.getByRole('heading', { name: /Excluir Curso/i })).toBeVisible();
+
+    const deleteCursoResponse = page.waitForResponse(response =>
+      /\/api\/cursos\/\d+$/.test(response.url()) &&
+      response.request().method() === 'DELETE'
+    );
+
+    await page.locator('.cdk-overlay-pane').getByRole('button', { name: /^Sim, Excluir$/i }).click();
+    expect((await deleteCursoResponse).status()).toBe(204);
+
+    await expect(page.locator('mat-card.card').filter({ hasText: cursoE2E.nomeEditado })).toHaveCount(0);
+  } finally {
+    await removerCursoE2E(request);
   }
 });

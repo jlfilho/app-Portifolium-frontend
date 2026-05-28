@@ -106,6 +106,31 @@ export class ListaPessoasComponent implements OnInit, OnDestroy {
     return this.apiService.isAdmin();
   }
 
+  getCpfDisplay(cpf: string | null | undefined): string {
+    if (this.isAdmin()) {
+      return cpf ?? '';
+    }
+
+    return this.maskCpf(cpf);
+  }
+
+  private maskCpf(cpf: string | null | undefined): string {
+    if (!cpf) {
+      return '';
+    }
+
+    const digits = cpf.replace(/\D/g, '');
+
+    if (digits.length === 11) {
+      const firstDigits = digits.slice(0, 3);
+      const lastDigits = digits.slice(-5);
+
+      return `${firstDigits}.***.${lastDigits.slice(0, 3)}-${lastDigits.slice(3)}`;
+    }
+
+    return `${cpf.slice(0, 3)}*****${cpf.slice(-5)}`;
+  }
+
   canManage(): boolean {
     return this.apiService.isAdmin();
   }

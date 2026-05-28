@@ -177,8 +177,31 @@
           Integrantes / Participantes ({{ atividade.integrantes.length }})
         </h3>
 
-        <div class="integrantes-list">
-          <div *ngFor="let integrante of atividade.integrantes" class="integrante-item">
+        <div class="coordenador-block" *ngIf="coordenadoresExibidos.length > 0">
+          <div class="coordenador-label">
+            <mat-icon>star</mat-icon>
+            Coordenador
+          </div>
+
+          <div class="integrantes-list coordenador-list">
+            <div *ngFor="let integrante of coordenadoresExibidos" class="integrante-item integrante-destaque">
+              <div class="integrante-avatar">
+                <mat-icon>person</mat-icon>
+              </div>
+              <div class="integrante-info">
+                <span class="integrante-nome">{{ integrante.nome }}</span>
+                <span class="integrante-cpf">{{ integrante.cpf }}</span>
+              </div>
+              <mat-chip class="papel-chip" [style.background-color]="getPapelColor(integrante.papel)">
+                <mat-icon matChipAvatar>{{ getPapelIcon(integrante.papel) }}</mat-icon>
+                {{ getPapelLabel(integrante.papel) }}
+              </mat-chip>
+            </div>
+          </div>
+        </div>
+
+        <div class="integrantes-list" *ngIf="participantesSemCoordenador.length > 0">
+          <div *ngFor="let integrante of participantesPaginados" class="integrante-item">
             <div class="integrante-avatar">
               <mat-icon>person</mat-icon>
             </div>
@@ -192,6 +215,17 @@
             </mat-chip>
           </div>
         </div>
+
+        <mat-paginator
+          *ngIf="hasMoreParticipantesPages"
+          [length]="participantesSemCoordenador.length"
+          [pageSize]="integrantesPageSize"
+          [pageIndex]="integrantesPageIndex"
+          [hidePageSize]="true"
+          [showFirstLastButtons]="true"
+          (page)="onParticipantesPageChange($event)"
+          class="participants-paginator">
+        </mat-paginator>
       </div>
 
       <div class="empty-section" *ngIf="!atividade.integrantes || atividade.integrantes.length === 0">

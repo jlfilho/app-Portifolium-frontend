@@ -335,6 +335,31 @@
   gap: 12px;
 }
 
+.coordenador-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.coordenador-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.coordenador-label mat-icon {
+  color: var(--primary-color);
+}
+
+.coordenador-list .integrante-destaque {
+  border-left: 4px solid var(--primary-color);
+  background: color-mix(in srgb, var(--primary-color) 8%, var(--bg-card));
+}
+
 .integrante-item {
   display: flex;
   align-items: center;
@@ -405,6 +430,17 @@
   border-radius: 999px;
   font-weight: 600;
   font-size: 13px;
+}
+
+.participants-paginator {
+  margin-top: 16px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 8px;
+}
+
+:host ::ng-deep .participants-paginator .mat-mdc-paginator-container {
+  justify-content: center;
+  min-height: 52px;
 }
 
 /* Fontes Financiadoras */

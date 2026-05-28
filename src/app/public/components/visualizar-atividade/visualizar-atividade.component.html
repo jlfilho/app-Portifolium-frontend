@@ -176,16 +176,48 @@
         <span class="badge-counter">{{ (atividade.integrantes || []).length }}</span>
       </div>
 
-      <div class="integrantes-list" *ngIf="atividade.integrantes && atividade.integrantes.length; else integrantesEmpty">
-        <div *ngFor="let integrante of atividade.integrantes" class="integrante-item">
-          <div class="integrante-avatar">
-            <mat-icon>person</mat-icon>
+      <div *ngIf="atividade.integrantes && atividade.integrantes.length; else integrantesEmpty">
+        <div class="coordenador-block" *ngIf="coordenadoresExibidos.length > 0">
+          <div class="coordenador-label">
+            <mat-icon>star</mat-icon>
+            Coordenador
           </div>
-          <div class="integrante-info">
-            <span class="integrante-nome">{{ integrante.nome }}</span>
-            <span class="integrante-papel">{{ integrante.papel || 'Participante' }}</span>
+
+          <div class="integrantes-list coordenador-list">
+            <div *ngFor="let integrante of coordenadoresExibidos" class="integrante-item integrante-destaque">
+              <div class="integrante-avatar">
+                <mat-icon>person</mat-icon>
+              </div>
+              <div class="integrante-info">
+                <span class="integrante-nome">{{ integrante.nome }}</span>
+                <span class="integrante-papel">{{ integrante.papel || 'Participante' }}</span>
+              </div>
+            </div>
           </div>
         </div>
+
+        <div class="integrantes-list" *ngIf="participantesSemCoordenador.length > 0">
+          <div *ngFor="let integrante of participantesPaginados" class="integrante-item">
+            <div class="integrante-avatar">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="integrante-info">
+              <span class="integrante-nome">{{ integrante.nome }}</span>
+              <span class="integrante-papel">{{ integrante.papel || 'Participante' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <mat-paginator
+          *ngIf="hasMoreParticipantesPages"
+          [length]="participantesSemCoordenador.length"
+          [pageSize]="integrantesPageSize"
+          [pageIndex]="integrantesPageIndex"
+          [hidePageSize]="true"
+          [showFirstLastButtons]="true"
+          (page)="onParticipantesPageChange($event)"
+          class="participants-paginator">
+        </mat-paginator>
       </div>
 
       <ng-template #integrantesEmpty>

@@ -466,42 +466,44 @@ mat-divider {
    🎨 MATERIAL OVERRIDES
    ======================================== */
 /* Administrador: mat-warn -> --primary-color */
-::ng-deep .mat-mdc-chip.mat-warn {
+::ng-deep .role-chip.mat-mdc-chip.mat-warn {
   --mdc-chip-label-text-color: white !important;
   --mdc-chip-elevated-container-color: var(--primary-color) !important;
+  --mdc-chip-container-color: var(--primary-color) !important;
+  background-color: var(--primary-color) !important;
 }
 
 /* Gerente: mat-primary -> --secondary-color */
-::ng-deep .mat-mdc-chip.mat-primary {
+::ng-deep .role-chip.mat-mdc-chip.mat-primary {
   --mdc-chip-label-text-color: white !important;
   --mdc-chip-elevated-container-color: var(--secondary-color) !important;
+  --mdc-chip-container-color: var(--secondary-color) !important;
+  background-color: var(--secondary-color) !important;
 }
 
 /* Secretário: mat-accent -> --accent-color */
-::ng-deep .mat-mdc-chip.mat-accent {
+::ng-deep .role-chip.mat-mdc-chip.mat-accent {
   --mdc-chip-label-text-color: white !important;
   --mdc-chip-elevated-container-color: var(--accent-color) !important;
+  --mdc-chip-container-color: var(--accent-color) !important;
+  background-color: var(--accent-color) !important;
 }
 
 /* Coordenador de Atividade: coordenador-atividade -> --accent-color-light */
-::ng-deep .mat-mdc-chip.coordenador-atividade {
+::ng-deep .role-chip.mat-mdc-chip.coordenador-atividade {
   --mdc-chip-label-text-color: white !important;
   --mdc-chip-elevated-container-color: var(--accent-color-light) !important;
   --mdc-chip-container-color: var(--accent-color-light) !important;
   background-color: var(--accent-color-light) !important;
 }
 
-::ng-deep .mat-mdc-chip.coordenador-atividade .mat-mdc-chip-action-label,
-::ng-deep .mat-mdc-chip.coordenador-atividade span,
-::ng-deep .mat-mdc-chip.coordenador-atividade .mat-icon {
+::ng-deep .role-chip.mat-mdc-chip.coordenador-atividade .mat-mdc-chip-action-label,
+::ng-deep .role-chip.mat-mdc-chip.coordenador-atividade span,
+::ng-deep .role-chip.mat-mdc-chip.coordenador-atividade .mat-icon {
   color: white !important;
 }
 
-::ng-deep .mat-mdc-chip.coordenador-atividade.mdc-evolution-chip {
-  background-color: var(--success-color) !important;
-}
-
-::ng-deep .mat-mdc-chip .mat-icon {
+::ng-deep .role-chip.mat-mdc-chip .mat-icon {
   color: white !important;
 }
 
